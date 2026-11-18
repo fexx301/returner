@@ -1,0 +1,248 @@
+{
+  "promise": "My draft survives the release",
+  "url": "http://127.0.0.1:58595",
+  "results": [
+    {
+      "name": "old baseline",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the title \"Returner-109aa5d9\" and body \"Saved work a3785da8-06a\".\nSaved the draft and reloaded the page.\nConfirmed that both the title and body were still visible after the reload.",
+      "credits": 21.282135,
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"Returner-109aa5d9\" and body is \"Saved work a3785da8-06a\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Draft title\"; type \"Draft body\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"Returner-109aa5d9\" into \"Draft title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing draft body"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Reload the page"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Saved work a3785da8-06a\" remains visi"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: Both exact strings \"Returner-109aa5d9\" and \"Saved work a3785da8-06a\" remain visi"
+        }
+      ]
+    },
+    {
+      "name": "new user",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the title “New-Returner-109aa5d9” and body “Fresh Saved work a3785da8-06a”.\nSaved the draft and reloaded the page.\nConfirmed that both the exact title and body remained visible after the reload.",
+      "credits": 19.581435,
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"New-Returner-109aa5d9\" and body is \"Fresh Saved work a3785da8-06a\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (3 steps): type \"Draft title\"; type \"Draft body\"; click \"Save draft\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"New-Returner-109aa5d9\" into \"Draft title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing draft body content in the draft form"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "wait: PRIMARY: Reload the page"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact body \"Fresh Saved work a3785da8-06a\" remains "
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: Both exact strings remain visible: title \"New-Returner-109aa5d9\" and body \"Fresh"
+        }
+      ]
+    },
+    {
+      "name": "returning user",
+      "status": "fail",
+      "code": 1,
+      "loaded": true,
+      "reason": "Checked editor fields after loading; both are blank and no existing requested draft is available.",
+      "reasonCode": "assertion_error.step_not_achievable",
+      "summary": "The test started with no saved draft matching the required title and body. The available evidence shows only an empty editor and does not prove that the application deleted or failed to load an existing draft.\nRestore or seed the draft titled \"Returner-109aa5d9\" with body \"Saved work a3785da8-06a\" before rerunning the check.",
+      "credits": 14.9760975,
+      "runId": "run-0",
+      "objective": "Open the existing draft titled \"Returner-109aa5d9\". Verify that exact title and body \"Saved work a3785da8-06a\" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append \" EDITED\" to the body, save, reload, and verify the full edited body \"Saved work a3785da8-06a EDITED\". Release promise: My draft survives the release",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait 1000 ms for the draft editor to load existing draft data"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "failed",
+          "remark": "wait: Waiting because the requested existing draft cannot be opened"
+        }
+      ]
+    }
+  ]
+}

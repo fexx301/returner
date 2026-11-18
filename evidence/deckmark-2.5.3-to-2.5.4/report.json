@@ -1,0 +1,308 @@
+{
+  "promise": "A DeckMark note remains editable after upgrading from v2.5.3 to v2.5.4.",
+  "url": "http://127.0.0.1:58477",
+  "results": [
+    {
+      "name": "old baseline",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a new Markdown note with “Returner-ec2ac13a” and added “Saved work 366a4528-040” on a separate line.\nWaited for the note to save automatically, then reloaded it.\nConfirmed that both exact strings remained together in the reloaded note.",
+      "credits": 22.252525,
+      "runId": "run-0",
+      "objective": "Create a new Markdown note. Use \"Returner-ec2ac13a\" as the title or first heading and \"Saved work 366a4528-040\" as a separate line. Wait for local draft autosave, reload and verify both exact strings are in the same note.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58477"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking New file in the top toolbar"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "click: Clicking Create a new Markdown note button"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "type: Typing into the markdown editor"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait for local draft autosave to complete"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the same reloaded note contains the exact string \"Saved"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "assert: both exact strings \"Returner-ec2ac13a\" and \"Saved work 366a4528-040\" are in the "
+        }
+      ]
+    },
+    {
+      "name": "new user",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a Markdown note with the heading “New-Returner-ec2ac13a” and a separate line reading “Fresh Saved work 366a4528-040.”\nWaited for the note to save locally, then reloaded it.\nAfter the reload, both requested strings were still present in the same note.",
+      "credits": 24.320855,
+      "runId": "run-0",
+      "objective": "Create a new Markdown note. Use \"New-Returner-ec2ac13a\" as the title or first heading and \"Fresh Saved work 366a4528-040\" as a separate line. Wait for local draft autosave, reload and verify both exact strings are in the same note.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58477"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking New file in the top toolbar"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "click: Clicking Create a new Markdown note button"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "type: Typing title and content into the new Markdown note editor"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "wait: PRIMARY: Wait for the local draft autosave"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The same note contains the exact string \"Fresh Saved wo"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "assert: Both exact strings \"New-Returner-ec2ac13a\" and \"Fresh Saved work 366a4528-040\" a"
+        }
+      ]
+    },
+    {
+      "name": "returning user",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Opened the existing note containing “Returner-ec2ac13a” without recreating its content.\nConfirmed the note still included “Saved work 366a4528-040”, then appended “EDITED” and allowed the change to save.\nReloaded the note and confirmed that “Returner-ec2ac13a”, “Saved work 366a4528-040”, and “EDITED” were all present together.",
+      "credits": 35.94539999999999,
+      "runId": "run-0",
+      "objective": "Open the existing note containing \"Returner-ec2ac13a\". Confirm it still contains \"Saved work 366a4528-040\". Do not recreate missing content. Append EDITED to the note, wait for autosave, reload, and verify the original two strings and EDITED are together in the existing note. Release promise: A DeckMark note remains editable after upgrading from v2.5.3 to v2.5.4.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58477"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Open the existing note containing \"Returner-ec2ac13a\"; role=textbox; te"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The existing note still contains \"Saved work 366a4528-0"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: The existing note still contains \"Saved work 366a4528-040\"."
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "click: Clicking Append EDITED to the note"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Append EDITED to the note by moving the editor caret to the end"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Append EDITED to the note by pasting the prepared text at the editor ca"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "wait: PRIMARY: Append EDITED to the note and wait for autosave"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait 3000 ms for the note autosave to complete"
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "click: Clicking Reload button to refresh the existing note"
+        },
+        {
+          "step": 12,
+          "status": "running",
+          "remark": "Step 11"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "analyze: The existing note contains EDITED."
+        },
+        {
+          "step": 13,
+          "status": "running",
+          "remark": "Step 12"
+        },
+        {
+          "step": 13,
+          "status": "done",
+          "remark": "assert: The original two strings and EDITED are together in the existing note: \"Returner"
+        }
+      ]
+    }
+  ]
+}
