@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "bin": { "returner": "./src/returner.mjs" },
-  "engines": { "node": ">=22" }
+  "bin": {
+    "returner": "./src/returner.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
 }

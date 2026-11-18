@@ -1,19 +1,61 @@
 <!doctype html>
 <html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fieldnotes · version 2</title>
-<style>
-:root { font: 17px/1.55 system-ui; color:#213529; background:#f4f4eb }
-main { max-width:38rem; margin:8vh auto; padding:2rem }
-h1 { font: 3rem Georgia,serif; margin:0 }
-label,input,textarea { display:block; box-sizing:border-box; width:100% }
-label { margin:1.3rem 0 .4rem }
-input,textarea { border:1px solid #89948b; border-radius:.3rem; padding:.7rem; font:inherit }
-button { margin:1rem .7rem 0 0; padding:.6rem 1.3rem; font:inherit; background:#204735; color:white; border:0; border-radius:.3rem }
-</style>
-<main><h1>Fieldnotes</h1><p>Draft editor · version 2</p>
-<form><label for="title">Draft title</label><input id="title" required>
-<label for="body">Draft body</label><textarea id="body" rows="6" required></textarea>
-<button>Save draft</button><output aria-live="polite"></output></form></main>
-<script type="module" src="./draft.js"></script></html>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fieldnotes · version 2</title>
+  <style>
+    :root {
+      font: 17px/1.55 system-ui;
+      color: #213529;
+      background: #f4f4eb;
+    }
+    main {
+      max-width: 38rem;
+      margin: 8vh auto;
+      padding: 2rem;
+    }
+    h1 {
+      font:
+        3rem Georgia,
+        serif;
+      margin: 0;
+    }
+    label,
+    input,
+    textarea {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    label {
+      margin: 1.3rem 0 0.4rem;
+    }
+    input,
+    textarea {
+      border: 1px solid #89948b;
+      border-radius: 0.3rem;
+      padding: 0.7rem;
+      font: inherit;
+    }
+    button {
+      margin: 1rem 0.7rem 0 0;
+      padding: 0.6rem 1.3rem;
+      font: inherit;
+      background: #204735;
+      color: white;
+      border: 0;
+      border-radius: 0.3rem;
+    }
+  </style>
+  <main>
+    <h1>Fieldnotes</h1>
+    <p>Draft editor · version 2</p>
+    <form>
+      <label for="title">Draft title</label><input id="title" required />
+      <label for="body">Draft body</label
+      ><textarea id="body" rows="6" required></textarea>
+      <button>Save draft</button><output aria-live="polite"></output>
+    </form>
+  </main>
+  <script type="module" src="./draft.js"></script>
+</html>
