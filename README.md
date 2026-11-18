@@ -10,7 +10,13 @@ Returner runs one release twice in real Chrome with Kane CLI. The first browser 
 | [Fieldnotes, repaired v2 replayed from the same v1 snapshot](evidence/fieldnotes-after/report.json) | Passed | Edited original draft survived another browser restart |
 | [DeckMark v2.5.3 → v2.5.4](evidence/deckmark-2.5.3-to-2.5.4/report.json) | Passed | Found the original note, edited it and reloaded it |
 
-Open either evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. These results apply to the recorded draft flows.
+Open any evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. These results apply to the recorded draft flows.
+
+## Watch the walkthrough
+
+[Watch or download the narrated demo (3:11)](demo/returner-walkthrough.mp4) · [Read the transcript](demo/walkthrough.md)
+
+The video uses browser checkpoints captured by Kane during the actual runs. The first example shows the deliberately planted Fieldnotes regression and its repair. The second shows the DeckMark upgrade. You can watch the video and inspect the saved reports without signing in.
 
 ## Run the repair loop
 
