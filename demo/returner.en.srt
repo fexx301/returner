@@ -1,0 +1,242 @@
+1
+00:00:00,000 --> 00:00:04,020
+These are two browser runs against the same
+release of Fieldnotes.
+
+2
+00:00:04,020 --> 00:00:08,520
+On the left, a new user wrote a draft, saved it,
+and opened it again.
+
+3
+00:00:08,520 --> 00:00:12,340
+On the right, a returning user arrived with a
+draft from yesterday.
+
+4
+00:00:12,340 --> 00:00:13,720
+Both fields are empty.
+
+5
+00:00:13,720 --> 00:00:16,060
+This is a deliberately broken example.
+
+6
+00:00:16,060 --> 00:00:18,440
+The question Returner asks is simple.
+
+7
+00:00:18,440 --> 00:00:22,720
+Will yesterday's work survive today's release?
+
+8
+00:00:22,720 --> 00:00:26,520
+From the Returner repository, run npm run
+demo:repair.
+
+9
+00:00:26,520 --> 00:00:31,080
+With a colon between demo and repair, the command
+starts a local file server and gives
+
+10
+00:00:31,080 --> 00:00:33,120
+Kane two versions of the app.
+
+11
+00:00:33,120 --> 00:00:34,480
+Kane uses real Chrome.
+
+12
+00:00:34,480 --> 00:00:37,260
+Each run gets an isolated test profile.
+
+13
+00:00:37,260 --> 00:00:42,000
+You can see the browser checkpoints in this
+recording, taken from the actual Kane evidence
+
+14
+00:00:42,000 --> 00:00:43,720
+packs.
+
+15
+00:00:43,720 --> 00:00:46,920
+First, Kane opens version 1.
+
+16
+00:00:46,920 --> 00:00:52,720
+It types a fresh title and body, saves them,
+reloads the page, and checks both values.
+
+17
+00:00:52,720 --> 00:00:58,520
+The randomly chosen title ends in F939. Watch that
+same title come back later.
+
+18
+00:00:58,520 --> 00:01:03,360
+Returner keeps a copy of this closed browser
+profile so the repair can be tested from exactly
+
+19
+00:01:03,360 --> 00:01:06,560
+where this user started.
+
+20
+00:01:06,560 --> 00:01:10,120
+Now Returner serves version 2 at the same local
+address.
+
+21
+00:01:10,120 --> 00:01:14,040
+Changing the port would change the browser's
+storage origin and spoil the test.
+
+22
+00:01:14,040 --> 00:01:17,440
+A fresh profile can still create and reopen a
+draft.
+
+23
+00:01:17,440 --> 00:01:20,280
+Then Kane opens a copy of the old profile.
+
+24
+00:01:20,280 --> 00:01:25,560
+Its instruction is to find the existing draft, and
+to stop immediately if it is missing.
+
+25
+00:01:25,560 --> 00:01:29,960
+Typing the missing text back in would hide the
+regression.
+
+26
+00:01:29,960 --> 00:01:31,420
+Here is what Kane observed.
+
+27
+00:01:31,420 --> 00:01:33,660
+The title and body fields were empty.
+
+28
+00:01:33,660 --> 00:01:38,220
+That observation, the unchanged objective, and the
+earlier release's storage code go
+
+29
+00:01:38,220 --> 00:01:40,280
+directly to Codex.
+
+30
+00:01:40,280 --> 00:01:43,360
+Codex works on a disposable copy of the candidate
+app.
+
+31
+00:01:43,360 --> 00:01:47,380
+In this run it found that version 2 looked only
+under its new storage key.
+
+32
+00:01:47,380 --> 00:01:52,400
+It changed the lookup so an existing version 2
+draft takes priority, and an older draft
+
+33
+00:01:52,400 --> 00:01:55,400
+can still be opened.
+
+34
+00:01:55,400 --> 00:01:57,800
+The agent has finished its patch.
+
+35
+00:01:57,800 --> 00:01:59,860
+Returner now makes the release decision.
+
+36
+00:01:59,860 --> 00:02:03,220
+It starts again from the untouched version 1
+profile.
+
+37
+00:02:03,220 --> 00:02:08,620
+Kane finds the original title and body, appends
+the word edited, saves, and reloads.
+
+38
+00:02:08,620 --> 00:02:11,880
+Then Returner closes Chrome and opens another
+process.
+
+39
+00:02:11,880 --> 00:02:13,660
+This last check only reads.
+
+40
+00:02:13,660 --> 00:02:20,880
+On screen is the same draft, with its edited body
+still present. All three checks passed.
+
+41
+00:02:20,880 --> 00:02:23,980
+Fieldnotes shows the repair on a defect we
+introduced.
+
+42
+00:02:23,980 --> 00:02:28,980
+For a separate confirmation, we built two
+published releases of DeckMark, an open source
+
+43
+00:02:28,980 --> 00:02:30,440
+Markdown editor.
+
+44
+00:02:30,440 --> 00:02:35,920
+Kane created a note on version 2.5.3. On version
+2.5.4,
+
+45
+00:02:35,920 --> 00:02:41,320
+it opened that note, edited it, and confirmed the
+original content and the edit after reload.
+
+46
+00:02:41,320 --> 00:02:47,000
+This result applies to those two releases and this
+particular editing task.
+
+47
+00:02:47,000 --> 00:02:52,440
+The public repository includes the command, the
+example, the agent patch workflow, and
+
+48
+00:02:52,440 --> 00:02:54,000
+the recorded results.
+
+49
+00:02:54,000 --> 00:02:57,380
+You can open the reports locally even without
+running Kane.
+
+50
+00:02:57,380 --> 00:03:02,300
+To rehearse your own static app, point Returner at
+two build directories and describe the promise
+
+51
+00:03:02,300 --> 00:03:04,440
+your returning user depends on.
+
+52
+00:03:04,440 --> 00:03:08,700
+The two users can see the same release and have
+very different experiences.
+
+53
+00:03:08,700 --> 00:03:09,920
+Now you can test both.
