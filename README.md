@@ -20,7 +20,7 @@ With Node 22+, Chrome, signed-in Kane CLI and signed-in Codex CLI, run:
 npm run demo:repair
 ```
 
-Returner copies the deliberately broken Fieldnotes release into a new local workspace and runs it with both browser profiles. When the new user passes and the returning user fails, Codex receives the actual Kane finding and edits the copy. Returner independently replays the original marker and browser state against that repair, including the read-only check after restart. The terminal prints the evidence directories. This uses Kane credits and Codex access.
+Returner copies the deliberately broken Fieldnotes release into a new local workspace and runs it with both browser profiles. When the new user passes and the returning user fails, Codex receives the actual Kane finding and edits the copy. Returner independently replays the original marker and browser state against that repair, including the read-only check after restart. The terminal prints the evidence directories. This uses Kane credits and Codex access. [Recorded one-command run, including all six Kane results](evidence/one-command-repair.json).
 
 ## Run the demo
 
