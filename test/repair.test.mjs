@@ -33,7 +33,7 @@ prompt=$(cat)
 echo "$prompt" >> "${root}/prompts.log"
 echo "=====" >> "${root}/prompts.log"
 n=$(grep -c "=====" "${root}/prompts.log")
-[ "$n" -ge 2 ] && printf fixed > site/index.html
+[ "$n" -ge 2 ] && printf fixed > site/index.html && printf added > site/new-helper.js
 exit 0
 `, { mode: 0o755 });
   const repair = fileURLToPath(new URL("../src/repair.mjs", import.meta.url));
@@ -46,4 +46,7 @@ exit 0
   assert.match(prompts, /saved draft missing/, "the agent sees Kane's reason");
   assert.match(prompts.split("=====")[1], /earlier attempts did not satisfy Kane/, "attempt 2 sees attempt 1's replay");
   assert.equal(await readFile(join(root, "source", "site", "index.html"), "utf8"), "broken", "the original source is untouched");
+  const work = r.stdout.match(/^Repair workspace: (.+)$/m)[1];
+  const diff = await readFile(join(work, "repair.diff"), "utf8");
+  assert.match(diff, /new-helper\.js/, "files the agent creates are part of the patch");
 });

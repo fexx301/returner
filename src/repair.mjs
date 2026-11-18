@@ -20,12 +20,13 @@ const { values: a } = parseArgs({
     agent: { type: "string", default: "codex" },
     attempts: { type: "string", default: "3" },
     note: { type: "string", default: "" },
+    reference: { type: "string", multiple: true, default: [] },
   },
 });
 // The agent may only read and edit the disposable candidate; Returner owns builds and verdicts.
 const AGENTS = {
   codex: ["codex", ["exec", "--sandbox", "workspace-write", "--ephemeral", "--skip-git-repo-check", "-"]],
-  claude: ["claude", ["-p", "--permission-mode", "acceptEdits", "--allowedTools", "Read,Edit,Write,Glob,Grep"]],
+  claude: ["claude", ["-p", "--permission-mode", "acceptEdits", "--allowedTools", "Read,Edit,Write,Glob,Grep,Bash(npm run build:*),Bash(npm test:*),Bash(npx jest:*),Bash(npx tsc:*)"]],
 };
 const usage =
   'returner-repair --old ./v1-build --source ./v2-source [--build "npm run build"] [--serve dist] --promise "…" [--seed …] [--check …] [--agent codex|claude] [--attempts 3]';
@@ -66,6 +67,8 @@ async function main() {
   const candidate = join(work, "candidate");
   const skip = new Set(["node_modules", ".git", ".returner"]);
   await cp(resolve(a.source), candidate, { recursive: true, filter: (p) => !p.split("/").some((part) => skip.has(part)) });
+  // Read-only material from the previous release (old code or data) that the agent may consult.
+  for (const file of a.reference) await cp(resolve(file), join(candidate, ".returner-reference", file.split("/").pop()));
   // A throwaway git baseline gives an exact patch that respects the project's .gitignore.
   const git = (...args) => execute("git", ["-c", "user.name=returner", "-c", "user.email=returner@localhost", ...args], candidate, { capture: true });
   await git("init", "-q");
@@ -93,6 +96,7 @@ async function main() {
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
       describe(last.results.find((r) => r.name === "returning user")),
       a.note,
+      a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => f.split("/").pop()).join(", ")}. Read it; do not edit it.` : "",
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
@@ -108,7 +112,8 @@ async function main() {
     const outcome = { attempt: i, code: last.code, evidence: last.run, results: last.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (last.code === 0) {
-      await writeFile(join(work, "repair.diff"), (await git("diff")).out);
+      await git("add", "-A");
+      await writeFile(join(work, "repair.diff"), (await git("diff", "--cached")).out);
       console.log(`Kane passed the returning user after attempt ${i}. Patch: ${join(work, "repair.diff")}`);
       return 0;
     }
