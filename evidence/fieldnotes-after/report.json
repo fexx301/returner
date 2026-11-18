@@ -1,0 +1,266 @@
+{
+  "promise": "My draft survives the release",
+  "url": "http://127.0.0.1:58595",
+  "results": [
+    {
+      "name": "new user",
+      "session": "75494f07-627c-4858-9142-0844f64b1770",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the requested title “New-Returner-109aa5d9” and body “Fresh Saved work a3785da8-06a”.\nSaved the draft and reloaded the page.\nConfirmed that both the draft title and body remained visible after the reload.",
+      "credits": 11.162123999999999,
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"New-Returner-109aa5d9\" and body is \"Fresh Saved work a3785da8-06a\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "type: Typing draft title New-Returner-109aa5d9 in draft form"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Typing draft body text"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Reload the page"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The body \"Fresh Saved work a3785da8-06a\" remains visibl"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "assert: Both exact strings remain visible: title \"New-Returner-109aa5d9\" and body \"Fresh"
+        }
+      ]
+    },
+    {
+      "name": "returning user",
+      "session": "ce238646-52cb-40c0-a831-1e6acf9cb7ed",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Opened the existing draft titled “Returner-109aa5d9.”\nConfirmed that its original body was “Saved work a3785da8-06a,” then appended “ EDITED” and saved it.\nReloaded the page and confirmed the saved body was “Saved work a3785da8-06a EDITED,” so the draft was retained after the release.",
+      "credits": 28.557289999999995,
+      "runId": "run-0",
+      "objective": "Open the existing draft titled \"Returner-109aa5d9\". Verify that exact title and body \"Saved work a3785da8-06a\" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append \" EDITED\" to the body, save, reload, and verify the full edited body \"Saved work a3785da8-06a EDITED\". Release promise: My draft survives the release",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: existing draft titled \"Returner-109aa5d9\" is open; role=textbox; text=\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: The body \"Saved work a3785da8-06a\" is visible."
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "type: Typing EDITED into the draft body textbox"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking Save draft button to save the edited body"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Reload the page"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the full edited body is \"Saved work a3785da8-06a EDITED"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "assert: the full edited body is \"Saved work a3785da8-06a EDITED\""
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait for the reloaded draft editor to appear"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "wait: Waiting after confirming the reloaded draft shows the full edited body"
+        }
+      ]
+    },
+    {
+      "name": "saved edit",
+      "session": "590bd916-e54e-41fe-abe7-3ec95a23ef4c",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Reviewed the existing draft without making any changes or saving it.\nConfirmed the draft title is “Returner-109aa5d9”.\nConfirmed the draft body is exactly “Saved work a3785da8-06a EDITED”.",
+      "credits": 15.34038,
+      "runId": "run-0",
+      "objective": "Read the existing draft without typing or saving. Verify that its title equals \"Returner-109aa5d9\" and that the body field exactly equals \"Saved work a3785da8-06a EDITED\". Fail if either value differs.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:58595"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Read the existing draft title and body fields; role=text"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the body field exactly equals \"Saved work a3785da8-06a "
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the existing draft's title equals \"Returner-109aa5d9\" and the body field exactly"
+        }
+      ]
+    }
+  ]
+}

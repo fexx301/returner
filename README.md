@@ -7,6 +7,7 @@ Returner runs one release twice in real Chrome with Kane CLI. The first browser 
 | Recorded run | New user | Returning user |
 | --- | --- | --- |
 | [Fieldnotes, deliberately broken v2](evidence/fieldnotes-before/report.json) | Passed | Failed to find the v1 draft |
+| [Fieldnotes, repaired v2 replayed from the same v1 snapshot](evidence/fieldnotes-after/report.json) | Passed | Edited original draft survived another browser restart |
 | [DeckMark v2.5.3 → v2.5.4](evidence/deckmark-2.5.3-to-2.5.4/report.json) | Passed | Found the original note, edited it and reloaded it |
 
 Open either evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. These results apply to the recorded draft flows.
