@@ -22,10 +22,11 @@ export async function writeReport(directory, report) {
   );
   const labels = {
     "old baseline": "Before upgrade",
+    "saved edit": "Reopened after editing",
     "new user": "New user",
     "returning user": "Returning user",
   };
-  const cards = ["new user", "returning user", "old baseline"].map((name) => {
+  const cards = ["new user", "returning user", "saved edit", "old baseline"].map((name) => {
     const result = report.results.find((r) => r.name === name);
     if (!result) return "";
     return `<section><h2>${labels[name]}</h2><strong class="${escape(result.status)}">${escape(result.status)}</strong><p>${escape(result.summary || result.reason || "Kane did not return a complete result.")}</p><details><summary>Objective and observed steps</summary><p>${escape(result.objective)}</p><ol>${result.steps

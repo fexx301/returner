@@ -168,6 +168,18 @@ async function main() {
         " Release promise: " +
         state.promise,
     );
+    // For the built-in draft contract, independently read back the edited
+    // value from disk in a new Chrome process. A green action trace alone
+    // can disagree with the final field value.
+    if (returning === "pass" && state.check === findDraft) {
+      const persisted = await probe(
+        "saved edit",
+        working,
+        objective('Read the existing draft without typing or saving. Verify that its title equals "{title}" and that the body field exactly equals "{body} EDITED". Fail if either value differs.', state.title, state.body),
+      );
+      if (persisted === "inconclusive" || fresh === "inconclusive") return 2;
+      if (persisted === "fail") return 1;
+    }
     if ([fresh, returning].includes("inconclusive")) return 2;
     return fresh === "pass" && returning === "pass" ? 0 : 1;
   }
