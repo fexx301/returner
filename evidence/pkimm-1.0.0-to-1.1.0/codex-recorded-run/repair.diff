@@ -1,0 +1,207 @@
+diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx
+index 68d9fac..fb184e0 100644
+--- a/src/components/Assessment/Assessment.tsx
++++ b/src/components/Assessment/Assessment.tsx
+@@ -5,6 +5,7 @@ import { Overview } from "../Overview/Overview";
+ import { Report } from "../Report/Report";
+ import MaturityWidget from "../MaturityWidget/MaturityWidget"; // Import MaturityWidget
+ import { yamlParser } from "../../utils/yamlParser";
++import { restoreProgress } from "../../utils/restoreProgress";
+ import { generateURL, exportToYAML } from "../../utils/urlGenerator";
+ import { exportToPDF } from "../../utils/pdfGenerator";
+ import {
+@@ -57,40 +58,39 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     const useCaseDescription = urlHash.get("useCaseDescription");
+ 
+     const loadData = async () => {
+-      let initialData;
++      let initialData: AssessmentData | undefined;
+       if (src) {
+         const response = await fetch(src);
+         const yamlText = await response.text();
+-        initialData = yamlParser(yamlText);
++        initialData = yamlParser(yamlText) as AssessmentData;
+       }
+       setCurrentTab("overview");
++      let savedProgress: Record<string, ProgressData> | undefined;
++      let savedVersion: string | undefined;
+       if (encodedProgress) {
+         try {
+-          const decodedProgress = JSON.parse(atob(encodedProgress));
+-          setProgress(decodedProgress);
++          savedProgress = JSON.parse(atob(encodedProgress));
+           setCurrentTab("report");
+         } catch (error) {
+           console.error("Error decoding progress from URL:", error);
+-          if (initialData)
+-            setProgress(initProgress(initialData as AssessmentData));
+         }
+       } else {
+         const storedData = localStorage.getItem(STORAGE_KEY);
+         if (storedData) {
+-          const { progress, assessmentName, assessorName, useCaseDescription } =
+-            JSON.parse(storedData);
+-          setProgress(progress);
+-          setAssessmentName(assessmentName);
+-          setAssessorName(assessorName);
+-          setUseCaseDescription(useCaseDescription);
++          const saved = JSON.parse(storedData);
++          savedProgress = saved.progress;
++          savedVersion = saved.modelVersion;
++          setAssessmentName(saved.assessmentName);
++          setAssessorName(saved.assessorName);
++          setUseCaseDescription(saved.useCaseDescription);
+           setCurrentTab("report");
+-        } else {
+-          if (initialData)
+-            setProgress(initProgress(initialData as AssessmentData));
+         }
+       }
+ 
+-      if (initialData) setData(initialData as AssessmentData);
++      if (initialData) {
++        setProgress(restoreProgress(initialData, savedProgress, savedVersion));
++        setData(initialData);
++      }
+ 
+       if (assessmentName) setAssessmentName(atob(assessmentName));
+       if (assessorName) setAssessorName(atob(assessorName));
+@@ -117,12 +117,14 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+ 
+   useEffect(() => {
+     const handleStorageChange = (event: StorageEvent) => {
+-      if (event.key === STORAGE_KEY) {
++      if (event.key === STORAGE_KEY && data) {
+         const storedData = JSON.parse(event.newValue || "{}");
+-        setProgress(storedData.progress);
+-        setAssessmentName(storedData.assessmentName);
+-        setAssessorName(storedData.assessorName);
+-        setUseCaseDescription(storedData.useCaseDescription);
++        setProgress(
++          restoreProgress(data, storedData.progress, storedData.modelVersion),
++        );
++        setAssessmentName(storedData.assessmentName ?? "");
++        setAssessorName(storedData.assessorName ?? "");
++        setUseCaseDescription(storedData.useCaseDescription ?? "");
+       }
+     };
+ 
+@@ -131,11 +133,12 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     return () => {
+       window.removeEventListener("storage", handleStorageChange);
+     };
+-  }, []);
++  }, [data]);
+ 
+   useEffect(() => {
+     if (data) {
+       const saveData = {
++        modelVersion: data.version,
+         progress,
+         assessmentName,
+         assessorName,
+@@ -145,29 +148,6 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     }
+   }, [progress, assessmentName, assessorName, useCaseDescription, data]);
+ 
+-  function initProgress(
+-    parsedData: AssessmentData | null,
+-  ): Record<string, ProgressData> {
+-    return (
+-      parsedData?.modules.reduce(
+-        (acc, module) => {
+-          module.categories.map((category) => {
+-            const progressData = { ...defaultProgressData };
+-            const levelOne = category.levels.find(
+-              (level) => level.number === 1,
+-            );
+-            if (levelOne) {
+-              progressData.description = levelOne.description;
+-            }
+-            acc[`${module.id}.${category.id}`] = progressData;
+-          });
+-          return acc;
+-        },
+-        {} as Record<string, ProgressData>,
+-      ) || {}
+-    );
+-  }
+-
+   const handleLevelChange = (
+     moduleId: string,
+     categoryId: string,
+@@ -211,7 +191,7 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+   };
+ 
+   const handleReset = () => {
+-    setProgress(initProgress(data));
++    if (data) setProgress(restoreProgress(data));
+     setAssessmentName("");
+     setAssessorName("");
+     setUseCaseDescription("");
+diff --git a/src/types/types.ts b/src/types/types.ts
+index c7e2387..9e5f01c 100644
+--- a/src/types/types.ts
++++ b/src/types/types.ts
+@@ -20,6 +20,7 @@ export interface ModuleData {
+ }
+ 
+ export interface AssessmentData {
++  version?: string;
+   modules: ModuleData[];
+ }
+ 
+diff --git a/src/utils/restoreProgress.ts b/src/utils/restoreProgress.ts
+new file mode 100644
+index 0000000..0395ea7
+--- /dev/null
++++ b/src/utils/restoreProgress.ts
+@@ -0,0 +1,48 @@
++import LevelResult from "../enums/LevelResult";
++import { AssessmentData, ProgressData } from "../types/types";
++
++// Changed category keys, indexed by their 1.1.0 key. Some old keys were
++// reused, so always read from the original save while building the new map.
++const previousKeys: Record<string, string> = {
++  "M.6": "M.5", // Key management
++  "M.7": "M.6", // Certificate management
++  "O.10": "O.15", // Resilience
++  "O.11": "O.13", // Automation
++  "O.12": "O.7", // Interoperability
++  "O.13": "O.12", // Monitoring and auditing
++  "R.14": "R.10", // Sourcing
++  "R.15": "R.11", // Knowledge and training
++  "R.16": "R.14", // Awareness
++};
++
++export function restoreProgress(
++  model: AssessmentData,
++  saved: Record<string, ProgressData> = {},
++  savedVersion?: string,
++): Record<string, ProgressData> {
++  // Unversioned saves included every category. These keys only existed in
++  // the previous layout, so unversioned 1.1.0 saves can still load as-is.
++  const legacyLayout =
++    model.version === "1.1.0" &&
++    (savedVersion === "1.0.0" ||
++      (!savedVersion && ["M.5", "O.15", "R.10"].some((key) => key in saved)));
++
++  const progress: Record<string, ProgressData> = {};
++  for (const module of model.modules) {
++    for (const category of module.categories) {
++      const key = `${module.id}.${category.id}`;
++      const choice = saved[legacyLayout ? (previousKeys[key] ?? key) : key];
++      const level = choice?.level ?? 1;
++      const applicability = choice?.applicability ?? true;
++      progress[key] = {
++        level,
++        applicability,
++        result: LevelResult[applicability ? level : -1],
++        description:
++          category.levels.find((entry) => entry.number === level)
++            ?.description ?? "",
++      };
++    }
++  }
++  return progress;
++}
