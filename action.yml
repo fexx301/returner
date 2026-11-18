@@ -1,0 +1,85 @@
+name: Returner upgrade rehearsal
+description: Fail a release when users who saved work on the previous build lose it on the new one. Kane CLI runs both builds in real Chrome at one origin.
+branding:
+  icon: rotate-ccw
+  color: green
+inputs:
+  old:
+    description: Directory with the previous release's static build.
+    required: true
+  new:
+    description: Directory with the candidate release's static build.
+    required: true
+  promise:
+    description: What a returning user depends on, in plain English.
+    required: true
+  seed:
+    description: Kane objective that creates saved work on the old build. {title} and {body} are replaced with a random marker. Defaults to Returner's draft objective.
+    required: false
+  check:
+    description: Kane objective the returning user must pass on the new build. Defaults to Returner's draft objective.
+    required: false
+  testmu-username:
+    description: TestMu (LambdaTest) username. Pass it from a secret.
+    required: true
+  testmu-access-key:
+    description: TestMu (LambdaTest) access key. Pass it from a secret.
+    required: true
+  kane-cli-version:
+    description: kane-cli version to install.
+    default: "0.10.6"
+outputs:
+  verdict:
+    description: pass, fail (regression for returning users) or inconclusive.
+    value: ${{ steps.rehearse.outputs.verdict }}
+  report:
+    description: Directory holding report.html and report.json.
+    value: ${{ steps.rehearse.outputs.report }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install and sign in to Kane CLI
+      shell: bash
+      env:
+        LT_USERNAME: ${{ inputs.testmu-username }}
+        LT_ACCESS_KEY: ${{ inputs.testmu-access-key }}
+      run: |
+        npm install -g "@testmuai/kane-cli@${{ inputs.kane-cli-version }}" --no-audit --no-fund --loglevel=error
+        kane-cli login --username "$LT_USERNAME" --access-key "$LT_ACCESS_KEY" > /dev/null
+    - name: Rehearse the upgrade with a new and a returning user
+      id: rehearse
+      shell: bash
+      env:
+        OLD: ${{ inputs.old }}
+        NEW: ${{ inputs.new }}
+        PROMISE: ${{ inputs.promise }}
+        SEED: ${{ inputs.seed }}
+        CHECK: ${{ inputs.check }}
+      run: |
+        args=(--old "$OLD" --new "$NEW" --promise "$PROMISE")
+        [ -n "$SEED" ] && args+=(--seed "$SEED")
+        [ -n "$CHECK" ] && args+=(--check "$CHECK")
+        set +e
+        node "$GITHUB_ACTION_PATH/src/returner.mjs" "${args[@]}" | tee returner.log
+        code=${PIPESTATUS[0]}
+        set -e
+        run=$(sed -n 's/^Evidence: //p' returner.log | head -1)
+        mkdir -p returner-report
+        [ -n "$run" ] && cp "$run"/report.html "$run"/report.json returner-report/ 2>/dev/null || true
+        verdict=$([ "$code" = 0 ] && echo pass || ([ "$code" = 1 ] && echo fail || echo inconclusive))
+        echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+        echo "report=$PWD/returner-report" >> "$GITHUB_OUTPUT"
+        node "$GITHUB_ACTION_PATH/src/summary.mjs" returner-report/report.json "$verdict" >> "$GITHUB_STEP_SUMMARY" || true
+        echo "$code" > returner-report/exit-code
+    - name: Upload the report (never the browser profiles)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: returner-report
+        path: returner-report
+    - name: Fail on a returning-user regression or an inconclusive run
+      shell: bash
+      run: exit "$(cat returner-report/exit-code)"
