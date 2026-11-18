@@ -1,0 +1,113 @@
+diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx
+index 68d9fac..3100746 100644
+--- a/src/components/Assessment/Assessment.tsx
++++ b/src/components/Assessment/Assessment.tsx
+@@ -5,6 +5,7 @@ import { Overview } from "../Overview/Overview";
+ import { Report } from "../Report/Report";
+ import MaturityWidget from "../MaturityWidget/MaturityWidget"; // Import MaturityWidget
+ import { yamlParser } from "../../utils/yamlParser";
++import { migrateProgressFrom100 } from "../../utils/migrateProgress";
+ import { generateURL, exportToYAML } from "../../utils/urlGenerator";
+ import { exportToPDF } from "../../utils/pdfGenerator";
+ import {
+@@ -67,7 +68,10 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+       if (encodedProgress) {
+         try {
+           const decodedProgress = JSON.parse(atob(encodedProgress));
+-          setProgress(decodedProgress);
++          setProgress({
++            ...initProgress((initialData as AssessmentData) || null),
++            ...decodedProgress,
++          });
+           setCurrentTab("report");
+         } catch (error) {
+           console.error("Error decoding progress from URL:", error);
+@@ -77,9 +81,21 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+       } else {
+         const storedData = localStorage.getItem(STORAGE_KEY);
+         if (storedData) {
+-          const { progress, assessmentName, assessorName, useCaseDescription } =
+-            JSON.parse(storedData);
+-          setProgress(progress);
++          const {
++            progress,
++            assessmentName,
++            assessorName,
++            useCaseDescription,
++            modelVersion,
++          } = JSON.parse(storedData);
++          // Saves without modelVersion come from model 1.0.0, whose category ids differ.
++          const migrated = modelVersion
++            ? progress
++            : migrateProgressFrom100(progress || {});
++          setProgress({
++            ...initProgress((initialData as AssessmentData) || null),
++            ...migrated,
++          });
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+@@ -140,6 +156,7 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+         assessmentName,
+         assessorName,
+         useCaseDescription,
++        modelVersion: (data as { version?: string }).version || "1.1.0",
+       };
+       localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+     }
+diff --git a/src/utils/migrateProgress.test.ts b/src/utils/migrateProgress.test.ts
+new file mode 100644
+index 0000000..fc38b8e
+--- /dev/null
++++ b/src/utils/migrateProgress.test.ts
+@@ -0,0 +1,20 @@
++import { migrateProgressFrom100 } from "./migrateProgress";
++
++test("maps model 1.0.0 progress keys to 1.1.0", () => {
++  const p = (level: number) => ({
++    level,
++    result: "",
++    description: "",
++    applicability: true,
++  });
++  const out = migrateProgressFrom100({
++    "G.1": p(3),
++    "M.5": p(2),
++    "M.8": p(4),
++    "R.10": p(2),
++    "O.7": p(5),
++  });
++  expect(Object.keys(out).sort()).toEqual(["G.1", "M.6", "M.8", "O.12", "R.14"]);
++  expect(out["R.14"].level).toBe(2);
++  expect(out["M.8"].level).toBe(4);
++});
+diff --git a/src/utils/migrateProgress.ts b/src/utils/migrateProgress.ts
+new file mode 100644
+index 0000000..f682ea1
+--- /dev/null
++++ b/src/utils/migrateProgress.ts
+@@ -0,0 +1,24 @@
++import { ProgressData } from "../types/types";
++
++// Model 1.0.0 progress key -> model 1.1.0 key (1.1.0 added G.5 Cryptography and renumbered).
++const KEYS_FROM_100: Record<string, string> = {
++  "M.5": "M.6",
++  "M.6": "M.7",
++  "O.15": "O.10",
++  "O.13": "O.11",
++  "O.7": "O.12",
++  "O.12": "O.13",
++  "R.10": "R.14",
++  "R.11": "R.15",
++  "R.14": "R.16",
++};
++
++export const migrateProgressFrom100 = (
++  progress: Record<string, ProgressData>,
++): Record<string, ProgressData> =>
++  Object.fromEntries(
++    Object.entries(progress).map(([key, value]) => [
++      KEYS_FROM_100[key] || key,
++      value,
++    ]),
++  );

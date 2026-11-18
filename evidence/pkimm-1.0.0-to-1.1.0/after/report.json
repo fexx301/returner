@@ -1,0 +1,341 @@
+{
+  "promise": "My saved assessment survives the model update, and I see the new model",
+  "url": "http://127.0.0.1:64891",
+  "results": [
+    {
+      "name": "new user",
+      "session": "889c7c22-81af-4f65-b5df-3837101f1d70",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Updated the report with Assessment Name \"New-Returner-5ff8dd89\" and Assessor Name \"Fresh Saved work 4ad876c3-9a5\".\nSet Strategy and Vision to \"3 - Advanced\", Infrastructure management to \"4 - Managed\", and Sourcing to \"2 - Basic\".\nReloaded the page and confirmed that the report details and all selected maturity levels were retained.",
+      "credits": 41.2304825,
+      "runId": "run-0",
+      "objective": "Open the Report tab. Type \"New-Returner-5ff8dd89\" into the Assessment Name field and \"Fresh Saved work 4ad876c3-9a5\" into the Assessor Name field. Open the Governance tab and select level \"3 - Advanced\" for \"Strategy and Vision\". Open the Management tab and select level \"4 - Managed\" for \"Infrastructure management\". Open the Resources tab and select level \"2 - Basic\" for \"Sourcing\". Reload the page. Verify on the Report tab that the Assessment Name is exactly \"New-Returner-5ff8dd89\" and the Assessor Name is exactly \"Fresh Saved work 4ad876c3-9a5\", and verify on each tab that \"Strategy and Vision\" is \"3 - Advanced\", \"Infrastructure management\" is \"4 - Managed\" and \"Sourcing\" is \"2 - Basic\". If any level did not persist, fail.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:64891"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "type: Clicking the Report tab"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "scroll: Scrolling into view Assessor Name field"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "type: Typing Assessor name Fresh Saved work 4ad876c3-9a5"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "click: Clicking the Governance tab in the top navigation"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Selecting level 3 - Advanced for Strategy and Vision in Governance maturity"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "click: Clicking the Management tab in the top navigation"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "scroll: Scrolling to select level 4 - Managed in Infrastructure management"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "click: Clicking select level 4 - Managed for Infrastructure management"
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "click: Clicking the Resources tab in the top navigation"
+        },
+        {
+          "step": 12,
+          "status": "running",
+          "remark": "Step 11"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "click: Selecting level 2 - Basic for Sourcing in the Resources tab"
+        },
+        {
+          "step": 13,
+          "status": "running",
+          "remark": "Step 12"
+        },
+        {
+          "step": 13,
+          "status": "done",
+          "remark": "wait: PRIMARY: Reload the page | HINTS: refreshed Resources content is displayed"
+        },
+        {
+          "step": 14,
+          "status": "running",
+          "remark": "Step 13"
+        },
+        {
+          "step": 14,
+          "status": "done",
+          "remark": "analyze: \"Sourcing\" is \"2 - Basic\"."
+        },
+        {
+          "step": 15,
+          "status": "running",
+          "remark": "Step 14"
+        },
+        {
+          "step": 15,
+          "status": "done",
+          "remark": "assert: On the Report tab, the Assessment Name is exactly \"New-Returner-5ff8dd89\" and th"
+        },
+        {
+          "step": 16,
+          "status": "running",
+          "remark": "Step 15"
+        },
+        {
+          "step": 16,
+          "status": "done",
+          "remark": "analyze: Any level did not persist."
+        },
+        {
+          "step": 17,
+          "status": "running",
+          "remark": "Step 16"
+        },
+        {
+          "step": 18,
+          "status": "running",
+          "remark": "Step 17"
+        },
+        {
+          "step": 18,
+          "status": "done",
+          "remark": "wait: Waiting after all persistence checkpoints have passed"
+        }
+      ]
+    },
+    {
+      "name": "returning user",
+      "session": "edc28340-301c-4db2-ac03-1cc1eba62aa2",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Reviewed the Report, Governance, Management, and Resources tabs without changing any information.\nConfirmed the Report tab showed Assessment Name “Returner-5ff8dd89” and Assessor Name “Saved work 4ad876c3-9a5.”\nConfirmed Governance showed Strategy and Vision at “3 - Advanced” and listed the Cryptography category.\nConfirmed Management showed Infrastructure management at “4 - Managed.”\nConfirmed Resources showed Sourcing at “2 - Basic.”",
+      "credits": 55.0708825,
+      "runId": "run-0",
+      "objective": "Open the Report tab and verify the Assessment Name is exactly \"Returner-5ff8dd89\" and the Assessor Name is exactly \"Saved work 4ad876c3-9a5\". Open the Governance tab: verify \"Strategy and Vision\" is at level \"3 - Advanced\" and that a category named \"Cryptography\" is listed. Open the Management tab: verify \"Infrastructure management\" is at level \"4 - Managed\". Open the Resources tab: verify \"Sourcing\" is at level \"2 - Basic\". This is a read-only check: do not type, select or change anything. The check fails if any saved value is missing or different, or if Cryptography is not listed. Release promise: My saved assessment survives the model update, and I see the new model",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:64891"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Open the Report tab; role=button; text=\"Report\" | HINTS: container=top "
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: the Assessor Name is exactly \"Saved work 4ad876c3-9a5\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the Assessment Name is exactly \"Returner-5ff8dd89\" and the Assessor Name is exac"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "click: Clicking Governance in the top navigation"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "analyze: a category named \"Cryptography\" is listed"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "assert: \"Strategy and Vision\" is at level \"3 - Advanced\" and a category named \"Cryptogra"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "click: Clicking the Management tab in the top navigation"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "analyze: \"Infrastructure management\" is at level \"4 - Managed\""
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "assert: \"Infrastructure management\" is at level \"4 - Managed\""
+        },
+        {
+          "step": 12,
+          "status": "running",
+          "remark": "Step 11"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "click: Clicking the Resources tab"
+        },
+        {
+          "step": 13,
+          "status": "running",
+          "remark": "Step 12"
+        },
+        {
+          "step": 13,
+          "status": "done",
+          "remark": "analyze: \"Sourcing\" is at level \"2 - Basic\""
+        },
+        {
+          "step": 14,
+          "status": "running",
+          "remark": "Step 13"
+        },
+        {
+          "step": 14,
+          "status": "done",
+          "remark": "analyze: \"Sourcing\" is at level \"2 - Basic\""
+        },
+        {
+          "step": 15,
+          "status": "running",
+          "remark": "Step 14"
+        },
+        {
+          "step": 15,
+          "status": "done",
+          "remark": "assert: \"Sourcing\" is at level \"2 - Basic\""
+        }
+      ]
+    }
+  ]
+}

@@ -8,9 +8,11 @@ Returner runs one release twice in real Chrome with Kane CLI. The first browser 
 | --- | --- | --- |
 | [Fieldnotes, deliberately broken v2](evidence/fieldnotes-before/report.json) | Passed | Failed to find the v1 draft |
 | [Fieldnotes, repaired v2 replayed from the same v1 snapshot](evidence/fieldnotes-after/report.json) | Passed | Edited original draft survived another browser restart |
+| [PKI Consortium self-assessment, model 1.0.0 → 1.1.0](evidence/pkimm-1.0.0-to-1.1.0/) (real [issue #148](https://github.com/pkic/self-assessment/issues/148)) | Passed | [Blank page](evidence/pkimm-1.0.0-to-1.1.0/before/report.json) |
+| Same release after Claude Code's [repair](evidence/pkimm-1.0.0-to-1.1.0/repair.diff), replayed from the same v1 profile | Passed | [Names, three answers and the new Cryptography category all present](evidence/pkimm-1.0.0-to-1.1.0/after/report.json) |
 | [DeckMark v2.5.3 → v2.5.4](evidence/deckmark-2.5.3-to-2.5.4/report.json) | Passed | Found the original note, edited it and reloaded it |
 
-Open any evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. These results apply to the recorded draft flows.
+Open any evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. The PKIMM rows reproduce a regression reported upstream. [Method and disclosures](evidence/pkimm-1.0.0-to-1.1.0/README.md). These results apply to the recorded draft flows.
 
 ## Watch the walkthrough
 
