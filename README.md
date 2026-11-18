@@ -75,7 +75,7 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
     testmu-access-key: ${{ secrets.LT_ACCESS_KEY }}
 ```
 
-The action installs a pinned kane-cli, signs in with your TestMu key and runs the rehearsal in headless Chrome. It posts the verdict table to the job summary and uploads `report.html` and `report.json`. Browser profiles are never uploaded. The job fails on a returning-user regression (exit 1) or an inconclusive run (exit 2). Each run uses Kane credits. Build both releases in earlier steps, for example by checking out the previous tag into `previous-build`.
+The action installs a pinned kane-cli, signs in with your TestMu key and runs the rehearsal in headless Chrome. It posts the verdict table to the job summary and uploads `report.html` and `report.json`. Browser profiles are never uploaded. The job fails on a returning-user regression (exit 1) or an inconclusive run (exit 2). Each run uses Kane credits. Build both releases in earlier steps, for example by checking out the previous tag into `previous-build`. [`returner.yml`](.github/workflows/returner.yml) is a manual demo of both outcomes. In [this run](https://github.com/fexx301/returner/actions/runs/44353094616) the repaired Fieldnotes release passed. PKIMM 1.1.0 failed on the returning user, the regression from pkic/self-assessment#148. The first PKIMM attempt was inconclusive because Kane did not confirm the v1 baseline, and the rerun reproduced the regression.
 
 ## External confirmation
 
