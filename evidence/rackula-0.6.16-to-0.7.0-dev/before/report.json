@@ -1,0 +1,301 @@
+{
+  "promise": "My saved rack layout is still there after the upgrade",
+  "url": "http://127.0.0.1:51817",
+  "results": [
+    {
+      "name": "old baseline",
+      "session": "929ea7e5-ab0b-4383-ad42-ab0f4f99fcf0",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created the requested rack named \"Returner-ef5cab08\" with a height of 24U.\nReloaded the page.\nConfirmed that \"Returner-ef5cab08\" remained visible on the rack layout after the reload.",
+      "credits": 27.366042499999995,
+      "runId": "run-0",
+      "objective": "Create a rack named \"Returner-ef5cab08\" with a height of 24U: in the New Rack dialog or wizard, replace the rack name with \"Returner-ef5cab08\", choose 24U, and create it. Verify a rack named \"Returner-ef5cab08\" is shown on the canvas. Reload the page and verify the rack named \"Returner-ef5cab08\" is still shown.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:51817"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking New Rack button"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "click: Clicking Replace in the New Rack dialog"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "wait: queued plan (3 steps): type \"Rack Name\"; click \"24U\"; click \"Create\""
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Type \"Returner-ef5cab08\" into \"Rack Name\""
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Click \"24U\""
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "click: Click \"Create\""
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: a rack named \"Returner-ef5cab08\" is shown on the canvas"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: a rack named \"Returner-ef5cab08\" is shown on the canvas"
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "analyze: the rack named \"Returner-ef5cab08\" is still shown"
+        },
+        {
+          "step": 12,
+          "status": "running",
+          "remark": "Step 11"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "assert: the rack named \"Returner-ef5cab08\" is still shown"
+        }
+      ]
+    },
+    {
+      "name": "new user",
+      "session": "ae7a866c-d5f9-4254-bcc2-6d1e46a3636b",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a 24U rack named \"New-Returner-ef5cab08\" as requested.\nConfirmed that the new rack appeared on the canvas.\nReloaded the page and confirmed that \"New-Returner-ef5cab08\" was still shown.",
+      "credits": 27.907940000000004,
+      "runId": "run-0",
+      "objective": "Create a rack named \"New-Returner-ef5cab08\" with a height of 24U: in the New Rack dialog or wizard, replace the rack name with \"New-Returner-ef5cab08\", choose 24U, and create it. Verify a rack named \"New-Returner-ef5cab08\" is shown on the canvas. Reload the page and verify the rack named \"New-Returner-ef5cab08\" is still shown.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:51817"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Rack Name\"; click \"Next\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"New-Returner-ef5cab08\" into \"Rack Name\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "click: Click \"Next\""
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): click \"24U\"; click \"Create Rack\""
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Click \"24U\""
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "click: Click \"Create Rack\""
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: a rack named \"New-Returner-ef5cab08\" is shown on the canvas"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: a rack named \"New-Returner-ef5cab08\" is shown on the canvas"
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "analyze: the rack named \"New-Returner-ef5cab08\" is still shown"
+        },
+        {
+          "step": 12,
+          "status": "running",
+          "remark": "Step 11"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "assert: the rack named \"New-Returner-ef5cab08\" is still shown"
+        }
+      ]
+    },
+    {
+      "name": "returning user",
+      "session": "e7b90139-dea1-4276-9de7-a9006de40b16",
+      "status": "fail",
+      "code": 1,
+      "loaded": true,
+      "reason": "Final verification failed: \"the canvas shows the existing rack named \"Returner-ef5cab08\"\"",
+      "reasonCode": "assertion_error.final_verification",
+      "summary": "The run navigated to the app and immediately checked the canvas. The screenshots show Devices selected and Racks available but not selected, so the saved rack was never looked for in its intended view.\nUpdate the check to open the Racks view, wait for the rack list or canvas to load, and then verify that Returner-ef5cab08 is present. Investigate the startup console exception separately if it still occurs after the correct view is opened.",
+      "credits": 12.660979999999999,
+      "runId": "run-0",
+      "objective": "Verify that the canvas shows the existing rack named \"Returner-ef5cab08\". This is a read-only check: do not type, do not create a new rack, and do not change anything. The check fails if no rack named \"Returner-ef5cab08\" is shown. Release promise: My saved rack layout is still there after the upgrade",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:51817"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "analyze: ANALYZE(visual, 'the existing rack named \"Returner-ef5cab08\" is shown on the can"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "failed",
+          "remark": "assert: the canvas shows the existing rack named \"Returner-ef5cab08\""
+        }
+      ]
+    }
+  ]
+}

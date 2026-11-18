@@ -22,11 +22,12 @@ Returner rehearses a release as both users. It uses real Chrome, driven by [Kane
 | **Real regression:** PKI Consortium self-assessment, model 1.0.0 → 1.1.0 ([issue #148](https://github.com/pkic/self-assessment/issues/148)) | Pass | **Fail**: blank page, the app crashes while loading old saves | [report](evidence/pkimm-1.0.0-to-1.1.0/before/report.json) |
 | ↳ repaired by **Claude Code**, replayed from the same v1 profile | Pass | **Pass**: both names, all three answers and the new Cryptography category | [patch](evidence/pkimm-1.0.0-to-1.1.0/repair.diff) · [report](evidence/pkimm-1.0.0-to-1.1.0/after/report.json) |
 | ↳ one uninterrupted recorded run with **Codex** (20 min 6 s, fixed on attempt 1) | Pass | Fail → **Pass** | [patch](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/repair.diff) · [run](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/) |
+| **Real regression caught before release:** Rackula v0.6.16 → v0.7.0 development build ([issue #935](https://github.com/RackulaLives/Rackula/issues/935)) | Pass | **Fail**: the saved rack is gone and the app throws on load → **Pass** after Codex's repair | [before](evidence/rackula-0.6.16-to-0.7.0-dev/before/report.json) · [patch](evidence/rackula-0.6.16-to-0.7.0-dev/repair.diff) · [after](evidence/rackula-0.6.16-to-0.7.0-dev/after/report.json) |
 | **GitHub Actions** on `ubuntu-latest` | Fieldnotes repaired: pass | PKIMM 1.1.0: regression caught | [workflow run](https://github.com/fexx301/returner/actions/runs/44353094616) |
 | **Clean upgrade:** DeckMark v2.5.3 → v2.5.4, unmodified upstream builds | Pass | Pass: original note opened, edited and reloaded | [report](evidence/deckmark-2.5.3-to-2.5.4/report.json) |
 | **Fixture:** Fieldnotes, storage key deliberately renamed in v2 | Pass | Fail → **Pass** after Codex repair | [before](evidence/fieldnotes-before/report.json) · [after](evidence/fieldnotes-after/report.json) · [one command](evidence/one-command-repair.json) |
 
-Every browser observation comes from Kane. Each evidence folder has a `report.html` with the objectives, verdicts and step logs. [Method and disclosures for the PKIMM runs](evidence/pkimm-1.0.0-to-1.1.0/README.md).
+Every browser observation comes from Kane. Each evidence folder has a `report.html` with the objectives, verdicts and step logs. Method and disclosures: [PKIMM](evidence/pkimm-1.0.0-to-1.1.0/README.md), [Rackula](evidence/rackula-0.6.16-to-0.7.0-dev/README.md).
 
 ## How it works
 
@@ -67,6 +68,7 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
 | `npm run demo` | Fieldnotes: the new user passes and the returning user fails (exit 1) |
 | `npm run demo:repair` | Fieldnotes: Codex repairs it, and the replay passes |
 | `examples/pkimm/prepare.sh && examples/pkimm/run.sh codex` | The real PKI Consortium regression, fetched at pinned upstream revisions, repaired and replayed |
+| `examples/rackula/prepare.sh && examples/rackula/run.sh codex` | Rackula's v0.6.x autosave regression, built from pinned commits, repaired and replayed |
 
 **Add it to CI:**
 

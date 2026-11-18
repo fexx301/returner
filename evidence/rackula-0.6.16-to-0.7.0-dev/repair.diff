@@ -1,0 +1,41 @@
+diff --git a/src/lib/schemas/index.ts b/src/lib/schemas/index.ts
+index ee5719d..cb8240b 100644
+--- a/src/lib/schemas/index.ts
++++ b/src/lib/schemas/index.ts
+@@ -878,7 +878,11 @@ const LayoutSchemaBase = LayoutSchemaInput.transform((data) => {
+   const allDevices = racks.flatMap((r) => r.devices);
+ 
+   // Check if positions need migration (pre-0.7.0 format)
+-  const migratePositions = needsPositionMigration(data.version, allDevices);
++  // The single-rack format predates internal units, even when its version
++  // describes the file schema instead of the app release.
++  const migratePositions =
++    (!data.racks?.length && !!data.rack) ||
++    needsPositionMigration(data.version, allDevices);
+ 
+   // Generate IDs for racks missing them and migrate positions if needed
+   const racksWithIds = racks.map((rack) => ({
+diff --git a/src/lib/utils/session-storage.ts b/src/lib/utils/session-storage.ts
+index 9818b21..5bb490a 100644
+--- a/src/lib/utils/session-storage.ts
++++ b/src/lib/utils/session-storage.ts
+@@ -1,4 +1,5 @@
+ import type { Layout } from "$lib/types";
++import { LayoutSchema } from "$lib/schemas";
+ 
+ const STORAGE_KEY = "Rackula:autosave";
+ 
+@@ -29,7 +30,12 @@ export function loadSession(): Layout | null {
+     if (!serialized) {
+       return null;
+     }
+-    return JSON.parse(serialized) as Layout;
++    const saved = JSON.parse(serialized);
++    if (Array.isArray(saved?.racks)) {
++      return saved as Layout;
++    }
++    // Single-rack autosaves need the same migration as imported layouts.
++    return LayoutSchema.parse(saved) as Layout;
+   } catch (error) {
+     console.warn("[SessionStorage] Failed to load session:", error);
+     return null;
