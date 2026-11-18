@@ -14,9 +14,7 @@ Open any evidence folder’s `report.html` locally for the side-by-side view. Th
 
 ## Watch the walkthrough
 
-[Watch or download the narrated demo (3:11)](demo/returner-walkthrough.mp4) · [Read the transcript](demo/walkthrough.md) · [English captions](demo/returner.en.srt)
-
-The video uses browser checkpoints captured by Kane during the actual runs. The first example shows the deliberately planted Fieldnotes regression and its repair. The second shows the DeckMark upgrade. You can watch the video and inspect the saved reports without signing in.
+The narrated walkthrough will be linked here once it is published. It uses browser checkpoints captured by Kane during the recorded runs above. You can inspect the saved reports without signing in.
 
 ## Run the repair loop
 
