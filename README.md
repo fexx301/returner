@@ -56,7 +56,26 @@ Exit 0 means every required Kane check passed. Exit 1 means a release check fail
 
 ## Repair with a coding agent
 
-Give Codex the failed report and the candidate app directory. Ask it to repair the app and verify on a disposable profile using `kane-cli run --agent`. Keep the original objective and old-state snapshot intact. For the release decision run the independent Returner replay above. The checked-in fixture includes the broken and repaired candidates so a judge can repeat the comparison on their own generated marker.
+```sh
+node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build" --serve dist \
+  --promise "My draft survives the release" --agent claude --attempts 3
+```
+
+`repair.mjs` copies the candidate source to a disposable workspace, builds it and runs the rehearsal. When the new user passes and the returning user fails, it hands Kane's returning-user verdict (objective, reason, summary and steps) to Codex (`--agent codex`) or Claude Code (`--agent claude`). It then rebuilds and replays the returning user from the untouched baseline profile. A failed replay or build goes back to the agent for the next attempt. The agent edits only the disposable copy. Returner owns the build and the verdict. Each attempt's verdict is written to `attempt-N.json`, and a passing repair leaves its exact patch in `repair.diff`.
+
+## Use it in GitHub Actions
+
+```yaml
+- uses: fexx301/returner@main
+  with:
+    old: previous-build
+    new: dist
+    promise: My draft survives the release
+    testmu-username: ${{ secrets.LT_USERNAME }}
+    testmu-access-key: ${{ secrets.LT_ACCESS_KEY }}
+```
+
+The action installs a pinned kane-cli, signs in with your TestMu key and runs the rehearsal in headless Chrome. It posts the verdict table to the job summary and uploads `report.html` and `report.json`. Browser profiles are never uploaded. The job fails on a returning-user regression (exit 1) or an inconclusive run (exit 2). Each run uses Kane credits. Build both releases in earlier steps, for example by checking out the previous tag into `previous-build`.
 
 ## External confirmation
 
