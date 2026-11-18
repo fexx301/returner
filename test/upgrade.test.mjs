@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 // A local stand-in exercises the CLI's origin, snapshot and exit-code contract.
 // Live Kane evidence is recorded separately in evidence/.
 test("a replay uses the same origin and an untouched profile; partial runs are inconclusive", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "returner-contract-"));
+  const root = await mkdtemp(join(tmpdir(), "returner's contract-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   for (const build of ["old", "broken", "fixed"]) {
     await mkdir(join(root, build));
@@ -53,11 +53,18 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
   ]);
   assert.equal(first.status, 1, first.stderr);
   const baseline = first.stdout.match(/^Evidence: (.+)$/m)[1];
+  const failedReport = JSON.parse(await readFile(join(baseline, "report.json"), "utf8"));
+  assert.ok(first.stdout.includes(failedReport.replay), "terminal and report offer the same replay");
+  assert.match(failedReport.replay, /--replay/);
   const original = await readFile(
     join(baseline, "old-profile", "draft"),
     "utf8",
   );
-  const second = run(["--replay", baseline, "--new", "fixed"]);
+  await writeFile(join(root, "broken", "index.html"), "fixed");
+  const second = spawnSync("/bin/sh", ["-c", failedReport.replay], {
+    cwd: root, env: {...process.env, PATH: root + ":" + process.env.PATH},
+    encoding: "utf8", timeout: 30000,
+  });
   assert.equal(second.status, 0, second.stderr);
   assert.equal(
     await readFile(join(baseline, "old-profile", "draft"), "utf8"),

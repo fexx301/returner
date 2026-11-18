@@ -11,6 +11,7 @@
   },
   "scripts": {
     "demo": "node src/returner.mjs --old examples/draft/v1 --new examples/draft/v2-broken --promise \"My draft survives the release\"",
-    "test": "node --test"
+    "test": "node --test",
+    "demo:repair": "node src/demo-repair.mjs"
   }
 }

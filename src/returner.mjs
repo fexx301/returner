@@ -185,6 +185,12 @@ async function main() {
   }
   try {
     process.exitCode = await rehearse();
+    if (process.exitCode === 1) {
+      const argv = [process.execPath, resolve(process.argv[1]), "--replay", baseline, "--new", resolve(args.new)];
+      const command = argv.map(value => "'" + value.replaceAll("'", "'\\''") + "'").join(" ");
+      console.log("After repairing the candidate, replay this baseline:\n" + command);
+      await writeReport(run, {promise: state.promise, url, results, replay: command});
+    }
   } catch (error) {
     console.error(error.message);
     process.exitCode = 2;

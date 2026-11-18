@@ -12,6 +12,16 @@ Returner runs one release twice in real Chrome with Kane CLI. The first browser 
 
 Open either evidence folder’s `report.html` locally for the side-by-side view. The fixture has an intentional storage-key regression. The DeckMark run uses unmodified production builds from two upstream tags. These results apply to the recorded draft flows.
 
+## Run the repair loop
+
+With Node 22+, Chrome, signed-in Kane CLI and signed-in Codex CLI, run:
+
+```sh
+npm run demo:repair
+```
+
+Returner copies the deliberately broken Fieldnotes release into a new local workspace and runs it with both browser profiles. When the new user passes and the returning user fails, Codex receives the actual Kane finding and edits the copy. Returner independently replays the original marker and browser state against that repair, including the read-only check after restart. The terminal prints the evidence directories. This uses Kane credits and Codex access.
+
 ## Run the demo
 
 Requires Node 22+, Chrome, and a signed-in Kane CLI. The Node CLI has zero package dependencies. Each live rehearsal uses TestMu credits. [Kane installation and sign-in](https://www.testmuai.com/docs/kane-cli-introduction)
@@ -20,7 +30,7 @@ Requires Node 22+, Chrome, and a signed-in Kane CLI. The Node CLI has zero packa
 npm run demo
 ```
 
-This command runs against the broken fixture and should exit 1. Copy the evidence directory printed at startup. Replay it against the repaired release:
+This command runs against the broken fixture and should exit 1. Failed rehearsals print a shell-quoted replay command for the same candidate after a repair and include it in the local report. Copy the evidence directory printed at startup. Replay it against the repaired release:
 
 ```sh
 node src/returner.mjs --replay .returner/run-YOUR-ID --new examples/draft/v2
