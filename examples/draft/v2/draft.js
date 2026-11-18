@@ -1,7 +1,10 @@
 const key = "fieldnotes.v2";
 const title = document.querySelector("#title");
 const body = document.querySelector("#body");
-const saved = JSON.parse(localStorage.getItem(key) || "null");
+// Read the v1 draft on the first upgrade. Subsequent saves use the v2 key.
+const saved = JSON.parse(
+  localStorage.getItem(key) ?? localStorage.getItem("fieldnotes.v1") ?? "null",
+);
 
 if (saved) {
   title.value = saved.title;
