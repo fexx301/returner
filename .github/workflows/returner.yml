@@ -1,0 +1,41 @@
+name: Returner demo
+# Manual demo of the Returner action on two recorded scenarios. Each run uses TestMu Kane credits.
+on: workflow_dispatch
+jobs:
+  fieldnotes:
+    name: Fieldnotes · repaired v2 (expect pass)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          old: examples/draft/v1
+          new: examples/draft/v2
+          promise: My draft survives the release
+          testmu-username: ${{ secrets.LT_USERNAME }}
+          testmu-access-key: ${{ secrets.LT_ACCESS_KEY }}
+  pkimm:
+    name: PKIMM 1.0.0 → 1.1.0 · real regression from pkic/self-assessment#148 (expect fail)
+    runs-on: ubuntu-latest
+    continue-on-error: true  # this job demonstrates a caught regression
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch and build the pinned upstream releases
+        run: |
+          examples/pkimm/prepare.sh
+          cp examples/pkimm/.upstream/candidate-source/dist/self-assessment.js examples/pkimm/.upstream/candidate-source/site/
+      - uses: ./
+        with:
+          old: examples/pkimm/.upstream/v1
+          new: examples/pkimm/.upstream/candidate-source/site
+          promise: My saved assessment survives the model update, and I see the new model
+          # same objectives as examples/pkimm/run.sh
+          seed: >-
+            Open the Report tab. Type "{title}" into the Assessment Name field and "{body}" into the Assessor Name field. Open the Governance tab and select level "3 - Advanced" for "Strategy and Vision". Open the Management tab and select level "4 - Managed" for "Infrastructure management". Open the Resources tab and select level "2 - Basic" for "Sourcing". Reload the page. Verify on the Report tab that the Assessment Name is exactly "{title}" and the Assessor Name is exactly "{body}", and verify on each tab that "Strategy and Vision" is "3 - Advanced", "Infrastructure management" is "4 - Managed" and "Sourcing" is "2 - Basic". If any level did not persist, fail.
+          check: >-
+            Open the Report tab and verify the Assessment Name is exactly "{title}" and the Assessor Name is exactly "{body}". Open the Governance tab: verify "Strategy and Vision" is at level "3 - Advanced" and that a category named "Cryptography" is listed. Open the Management tab: verify "Infrastructure management" is at level "4 - Managed". Open the Resources tab: verify "Sourcing" is at level "2 - Basic". This is a read-only check: do not type, select or change anything. The check fails if any saved value is missing or different, or if Cryptography is not listed.
+          testmu-username: ${{ secrets.LT_USERNAME }}
+          testmu-access-key: ${{ secrets.LT_ACCESS_KEY }}
