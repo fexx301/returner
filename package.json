@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "returner": "./src/returner.mjs"
+    "returner": "./src/returner.mjs",
+    "returner-repair": "./src/repair.mjs"
   },
   "engines": {
     "node": ">=22"

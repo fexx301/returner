@@ -52,6 +52,12 @@ npm install -g @testmuai/kane-cli && kane-cli login
 node src/returner.mjs --old ./v1 --new ./v2 --promise "My draft survives the release"
 ```
 
+Or skip the clone and run it straight from GitHub:
+
+```sh
+npx github:fexx301/returner --old ./v1 --new ./v2 --promise "My draft survives the release"
+```
+
 The default task creates and reopens a draft with a title and body. For other apps, describe the task with `--seed` (create the saved work) and `--check` (what a returning user must still find). Returner fills in a fresh `{title}` and `{body}` marker on every run.
 
 **Repair with a coding agent** (needs a signed-in Codex CLI or Claude Code):
