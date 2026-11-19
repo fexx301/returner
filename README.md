@@ -13,7 +13,7 @@ Returner rehearses a release as both users. It uses real Chrome, driven by [Kane
 
 ## Watch the walkthrough
 
-**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/lkXpK282dQo)**. It covers the planted bug, the real PKI Consortium regression, an uninterrupted Codex run at 50× and the GitHub Action on a real runner. The reports below open locally without signing in.
+**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/iPpaQIgh1KI)**. It covers the planted bug, two real regressions (PKI Consortium and Rackula), an uninterrupted Codex run at 50× and the GitHub Action on a real runner. The reports below open locally without signing in.
 
 ## Proof
 
