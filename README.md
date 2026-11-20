@@ -1,5 +1,7 @@
 # Returner
 
+[![Tests](https://github.com/fexx301/returner/actions/workflows/test.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/test.yml) [![Returner demo](https://github.com/fexx301/returner/actions/workflows/returner.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/returner.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 **Release checks for the people who come back.**
 
 Browser tests usually start with an empty profile, so they only ever meet new users. The bugs that hurt returning users never show up there. A renamed storage key, a changed data model or a migration that forgets old saves can each lose or break the work people already have.
