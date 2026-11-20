@@ -180,7 +180,8 @@
           "status": "done",
           "remark": "wait: Waiting after all persistence checkpoints have passed"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -335,7 +336,8 @@
           "status": "done",
           "remark": "assert: \"Sourcing\" is at level \"2 - Basic\""
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

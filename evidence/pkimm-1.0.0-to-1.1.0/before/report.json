@@ -180,7 +180,8 @@
           "status": "done",
           "remark": "wait: Waiting after all persistence checkpoints pass"
         }
-      ]
+      ],
+      "shot": "shots/old-baseline.jpg"
     },
     {
       "name": "new user",
@@ -460,7 +461,8 @@
           "status": "done",
           "remark": "wait: Waiting 500 ms after all persistence checkpoints pass"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -535,7 +537,8 @@
           "status": "failed",
           "remark": "wait: Waiting because the self-assessment application failed to render"
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

@@ -125,7 +125,8 @@
           "status": "done",
           "remark": "assert: the rack named \"Returner-ef5cab08\" is still shown"
         }
-      ]
+      ],
+      "shot": "shots/old-baseline.jpg"
     },
     {
       "name": "new user",
@@ -250,7 +251,8 @@
           "status": "done",
           "remark": "assert: the rack named \"New-Returner-ef5cab08\" is still shown"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -295,7 +297,8 @@
           "status": "failed",
           "remark": "assert: the canvas shows the existing rack named \"Returner-ef5cab08\""
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

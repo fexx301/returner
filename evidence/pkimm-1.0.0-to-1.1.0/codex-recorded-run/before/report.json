@@ -200,7 +200,8 @@
           "status": "done",
           "remark": "wait: Waiting task completion verified after reload"
         }
-      ]
+      ],
+      "shot": "shots/old-baseline.jpg"
     },
     {
       "name": "new user",
@@ -480,7 +481,8 @@
           "status": "done",
           "remark": "wait: Waiting after all persistence checks passed"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -555,7 +557,8 @@
           "status": "failed",
           "remark": "wait: Waiting while the unloaded self-assessment component is checked"
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

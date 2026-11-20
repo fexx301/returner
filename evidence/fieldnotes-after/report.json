@@ -85,7 +85,8 @@
           "status": "done",
           "remark": "assert: Both exact strings remain visible: title \"New-Returner-109aa5d9\" and body \"Fresh"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -205,7 +206,8 @@
           "status": "done",
           "remark": "wait: Waiting after confirming the reloaded draft shows the full edited body"
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     },
     {
       "name": "saved edit",
@@ -260,7 +262,8 @@
           "status": "done",
           "remark": "assert: the existing draft's title equals \"Returner-109aa5d9\" and the body field exactly"
         }
-      ]
+      ],
+      "shot": "shots/saved-edit.jpg"
     }
   ]
 }

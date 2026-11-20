@@ -99,7 +99,8 @@
           "status": "done",
           "remark": "assert: Both exact strings \"Returner-109aa5d9\" and \"Saved work a3785da8-06a\" remain visi"
         }
-      ]
+      ],
+      "shot": "shots/old-baseline.jpg"
     },
     {
       "name": "new user",
@@ -198,7 +199,8 @@
           "status": "done",
           "remark": "assert: Both exact strings remain visible: title \"New-Returner-109aa5d9\" and body \"Fresh"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -242,7 +244,8 @@
           "status": "failed",
           "remark": "wait: Waiting because the requested existing draft cannot be opened"
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

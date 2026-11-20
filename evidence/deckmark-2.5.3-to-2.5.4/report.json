@@ -84,7 +84,8 @@
           "status": "done",
           "remark": "assert: both exact strings \"Returner-ec2ac13a\" and \"Saved work 366a4528-040\" are in the "
         }
-      ]
+      ],
+      "shot": "shots/old-baseline.jpg"
     },
     {
       "name": "new user",
@@ -168,7 +169,8 @@
           "status": "done",
           "remark": "assert: Both exact strings \"New-Returner-ec2ac13a\" and \"Fresh Saved work 366a4528-040\" a"
         }
-      ]
+      ],
+      "shot": "shots/new-user.jpg"
     },
     {
       "name": "returning user",
@@ -302,7 +304,8 @@
           "status": "done",
           "remark": "assert: The original two strings and EDITED are together in the existing note: \"Returner"
         }
-      ]
+      ],
+      "shot": "shots/returning-user.jpg"
     }
   ]
 }

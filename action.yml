@@ -69,6 +69,7 @@ runs:
         run=$(sed -n 's/^Evidence: //p' returner.log | head -1)
         mkdir -p returner-report
         [ -n "$run" ] && cp "$run"/report.html "$run"/report.json returner-report/ 2>/dev/null || true
+        [ -n "$run" ] && [ -d "$run/shots" ] && cp -R "$run/shots" returner-report/ || true
         verdict=$([ "$code" = 0 ] && echo pass || ([ "$code" = 1 ] && echo fail || echo inconclusive))
         echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
         echo "report=$PWD/returner-report" >> "$GITHUB_OUTPUT"

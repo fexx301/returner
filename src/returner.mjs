@@ -7,6 +7,7 @@ import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
 import { serve } from "./server.mjs";
 import { writeReport } from "./report.mjs";
+import { attachShot } from "./shots.mjs";
 
 const { values: args } = parseArgs({
   options: Object.fromEntries(
@@ -118,6 +119,7 @@ async function main() {
       objective: task,
       steps,
     };
+    if (result.session) result.shot = attachShot(result.session, run, name);
     results.push(result);
     await writeReport(run, { promise: state.promise, url, results });
     console.log(
