@@ -47,7 +47,7 @@ footer{margin-top:36px;color:var(--muted);font-size:13px}
 <div class="grid">
 <section class="card hero  fail">
   <header><div><h2>Returning user</h2><p class="role">Yesterday&#39;s profile on the new build</p></div><span class="pill fail">fail</span></header>
-  <div class="body"><figure><a class="shot" href="shots/returning-user.jpg"><img src="shots/returning-user.jpg" alt="Kane's final screenshot for the Returning user check" loading="lazy"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
+  <div class="body"><figure><a class="shot" href="shots/returning-user.jpg"><img src="shots/returning-user.jpg" alt="Kane's final screenshot for the Returning user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
   <p class="summary">The run navigated to the app and immediately checked the canvas. The screenshots show Devices selected and Racks available but not selected, so the saved rack was never looked for in its intended view.
 Update the check to open the Racks view, wait for the rack list or canvas to load, and then verify that Returner-ef5cab08 is present. Investigate the startup console exception separately if it still occurs after the correct view is opened.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Verify that the canvas shows the existing rack named &quot;Returner-ef5cab08&quot;. This is a read-only check: do not type, do not create a new rack, and do not change anything. The check fails if no rack named &quot;Returner-ef5cab08&quot; is shown. Release promise: My saved rack layout is still there after the upgrade</p><ol><li>navigate: Navigate to http://127.0.0.1:51817</li><li>analyze: ANALYZE(visual, &#39;the existing rack named &quot;Returner-ef5cab08&quot; is shown on the can</li><li>assert: the canvas shows the existing rack named &quot;Returner-ef5cab08&quot;</li></ol><p class="meta">12.7 Kane credits</p></details>
@@ -55,7 +55,7 @@ Update the check to open the Racks view, wait for the rack list or canvas to loa
 </section>
 <section class="card   pass">
   <header><div><h2>Before upgrade</h2><p class="role">Saves work on the previous build</p></div><span class="pill pass">pass</span></header>
-  <div class="body"><figure><a class="shot" href="shots/old-baseline.jpg"><img src="shots/old-baseline.jpg" alt="Kane's final screenshot for the Before upgrade check" loading="lazy"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
+  <div class="body"><figure><a class="shot" href="shots/old-baseline.jpg"><img src="shots/old-baseline.jpg" alt="Kane's final screenshot for the Before upgrade check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
   <p class="summary">Created the requested rack named &quot;Returner-ef5cab08&quot; with a height of 24U.
 Reloaded the page.
 Confirmed that &quot;Returner-ef5cab08&quot; remained visible on the rack layout after the reload.</p>
@@ -64,7 +64,7 @@ Confirmed that &quot;Returner-ef5cab08&quot; remained visible on the rack layout
 </section>
 <section class="card   pass">
   <header><div><h2>New user</h2><p class="role">Empty profile on the new build</p></div><span class="pill pass">pass</span></header>
-  <div class="body"><figure><a class="shot" href="shots/new-user.jpg"><img src="shots/new-user.jpg" alt="Kane's final screenshot for the New user check" loading="lazy"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
+  <div class="body"><figure><a class="shot" href="shots/new-user.jpg"><img src="shots/new-user.jpg" alt="Kane's final screenshot for the New user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
   <p class="summary">Created a 24U rack named &quot;New-Returner-ef5cab08&quot; as requested.
 Confirmed that the new rack appeared on the canvas.
 Reloaded the page and confirmed that &quot;New-Returner-ef5cab08&quot; was still shown.</p>

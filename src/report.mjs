@@ -35,7 +35,7 @@ export async function writeReport(directory, report) {
     const wide = r !== returning && supporting.length % 2 === 1 && r === supporting.at(-1);
     const steps = (r.steps || []).filter((s) => s.status !== "running").map((s) => `<li>${escape(s.remark)}</li>`).join("");
     const shot = r.shot
-      ? `<figure><a class="shot" href="${escape(r.shot)}"><img src="${escape(r.shot)}" alt="Kane's final screenshot for the ${escape(LABELS[r.name] || r.name)} check" loading="lazy"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure>`
+      ? `<figure><a class="shot" href="${escape(r.shot)}"><img src="${escape(r.shot)}" alt="Kane's final screenshot for the ${escape(LABELS[r.name] || r.name)} check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure>`
       : `<figure><div class="shot none">No screenshot recorded</div></figure>`;
     return `<section class="card ${r.name === "returning user" ? "hero" : ""} ${wide ? "wide" : ""} ${escape(r.status)}">
   <header><div><h2>${escape(LABELS[r.name] || r.name)}</h2><p class="role">${escape(ROLES[r.name] || "")}</p></div><span class="pill ${escape(r.status)}">${escape(r.status)}</span></header>
