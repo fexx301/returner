@@ -4,6 +4,10 @@
 
 **Release checks for the people who come back.** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
 
+[![A recorded 20-minute run at 50×: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/iPpaQIgh1KI?t=173)
+
+<sub>One real, uninterrupted run (PKI Consortium #148), replayed from its timestamped terminal output at 50×. Click for the narrated walkthrough.</sub>
+
 Browser tests usually start with an empty profile, so they only ever meet new users. The bugs that hurt returning users never show up there. A renamed storage key, a changed data model or a migration that forgets old saves can each lose or break the work people already have.
 
 Returner rehearses a release as both users. It uses real Chrome, driven by [Kane CLI](https://www.testmuai.com/docs/kane-cli-introduction).
