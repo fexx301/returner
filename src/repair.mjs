@@ -88,13 +88,22 @@ async function main() {
     return last.code === 0 ? 0 : 2;
   }
 
+  // The agent never sees a run's random marker, so it cannot hardcode the saved title or body to fake a pass.
+  const secrets = [];
+  const learn = async (run) => {
+    const state = JSON.parse(await readFile(join(run, "baseline.json"), "utf8").catch(() => "{}"));
+    for (const [value, label] of [[state.title, "<saved title>"], [state.body, "<saved body>"]]) if (value) secrets.push([value, label]);
+  };
+  const redact = (text) => secrets.reduce((t, [value, label]) => t.split(value).join(label), String(text));
+  await learn(baseline);
+  const fullRehearsal = () => rehearse(["--old", resolve(a.old), "--new", site, "--promise", a.promise, ...options], work);
   const attempts = [];
   const [program, args] = AGENTS[a.agent];
   for (let i = 1; i <= Number(a.attempts); i++) {
     const prompt = [
       "Repair the web application in the current directory.",
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
-      describe(last.results.find((r) => r.name === "returning user")),
+      redact(describe(last.results.find((r) => r.name === "returning user"))),
       a.note,
       a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => f.split("/").pop()).join(", ")}. Read it; do not edit it.` : "",
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
@@ -111,14 +120,27 @@ async function main() {
     last = await rehearse(["--replay", baseline, "--new", site], work);
     const outcome = { attempt: i, code: last.code, evidence: last.run, results: last.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
-    if (last.code === 0) {
+    if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
+    if (last.code !== 0) {
+      attempts.push(`Attempt ${i}: Kane still failed.\n${redact(describe(last.results.find((r) => r.name === "returning user")))}`);
+      continue;
+    }
+    // A passing replay must also hold for saved work the agent has never seen: rehearse again with a new marker.
+    console.log("Replay passed. Confirming with a fresh rehearsal and a new marker…");
+    const fresh = await fullRehearsal();
+    outcome.fresh = { code: fresh.code, evidence: fresh.run, results: fresh.results.map(({ name, status, reason }) => ({ name, status, reason })) };
+    await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
+    if (fresh.code === 0) {
       await git("add", "-A");
       await writeFile(join(work, "repair.diff"), (await git("diff", "--cached")).out);
-      console.log(`Kane passed the returning user after attempt ${i}. Patch: ${join(work, "repair.diff")}`);
+      console.log(`Kane passed the returning user after attempt ${i}, and a fresh rehearsal with a new marker confirmed it. Patch: ${join(work, "repair.diff")}`);
       return 0;
     }
-    if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
-    attempts.push(`Attempt ${i}: Kane still failed.\n${describe(last.results.find((r) => r.name === "returning user"))}`);
+    if (fresh.code === 2) return console.error("The fresh confirmation was inconclusive; stopping without a verdict."), 2;
+    if (fresh.run) await learn(fresh.run);
+    last = fresh;
+    console.log(`Attempt ${i} passed the replay but failed the fresh rehearsal; rejecting it.`);
+    attempts.push(`Attempt ${i}: the replay passed, but a fresh rehearsal with new saved work failed, so the fix does not hold for other users' data.\n${redact(describe(fresh.results.find((r) => r.name === "returning user")))}`);
   }
   console.error("Kane did not pass the returning user within the attempt limit.");
   return 1;
