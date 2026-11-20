@@ -109,6 +109,7 @@ async function main() {
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
+    await writeFile(join(work, `prompt-${i}.txt`), prompt); // exactly what the agent received, marker already redacted
     console.log(`Attempt ${i}/${a.attempts}: passing Kane's returning-user result to ${a.agent}…`);
     if ((await execute(program, args, candidate, { prompt })).code) return console.error(`${a.agent} exited before finishing.`), 2;
     const built = await build();

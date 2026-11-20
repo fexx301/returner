@@ -58,6 +58,9 @@ exit 0
   assert.match(prompts, /<saved title>/);
   assert.equal(await readFile(join(root, "source", "site", "index.html"), "utf8"), "broken", "the original source is untouched");
   assert.match(await readFile(join(work, "repair.diff"), "utf8"), /new-helper\.js/, "files the agent creates are part of the patch");
+  const saved = await readFile(join(work, "prompt-1.txt"), "utf8");
+  assert.match(saved, /saved draft missing/, "each prompt is saved with the run");
+  assert.ok(!saved.includes(marker));
 });
 
 test("a fix that hardcodes the saved marker passes the replay but is rejected by the fresh rehearsal", async (t) => {
