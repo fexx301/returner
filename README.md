@@ -11,23 +11,35 @@ Returner rehearses a release as both users. It uses real Chrome, driven by [Kane
 - **A closed repair loop.** Kane's failure goes to Codex or Claude Code. The agent patches a disposable copy, Returner rebuilds it, and Kane replays the returning user from the same snapshot until it passes or the attempts run out. The agent never grades its own fix.
 - **Runs locally or in CI.** It's one Node CLI with zero package dependencies, and it also ships as a GitHub Action.
 
+## Try it in 2 minutes
+
+Needs Node 22+, Chrome and a signed-in [Kane CLI](https://www.testmuai.com/docs/kane-cli-introduction).
+
+```sh
+git clone https://github.com/fexx301/returner && cd returner
+npm run demo          # Fieldnotes v1 → v2: the new user passes, the returning user fails (exit 1)
+npm run demo:repair   # Codex repairs it; Kane replays the same saved profile and passes (needs Codex CLI)
+```
+
+Then open a real regression, [PKI Consortium #148: before](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/before/report.html) and [after the repair](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/after/report.html).
+
 ## Watch the walkthrough
 
-**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/iPpaQIgh1KI)**. It covers the planted bug, two real regressions (PKI Consortium and Rackula), an uninterrupted Codex run at 50× and the GitHub Action on a real runner. The reports below open locally without signing in.
+**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/iPpaQIgh1KI)**. It covers the planted bug, two real regressions (PKI Consortium and Rackula), an uninterrupted Codex run at 50× and the GitHub Action on a real runner. Jump straight to the closed loop: [Kane's finding → Codex → replay (1:22)](https://youtu.be/iPpaQIgh1KI?t=82) · [an uninterrupted recorded run at 50× (2:53)](https://youtu.be/iPpaQIgh1KI?t=173).
 
 ## Proof
 
 | Run | New user | Returning user | Evidence |
 | --- | --- | --- | --- |
-| **Real regression:** PKI Consortium self-assessment, model 1.0.0 → 1.1.0 ([issue #148](https://github.com/pkic/self-assessment/issues/148)) | Pass | **Fail**: blank page, the app crashes while loading old saves | [report](evidence/pkimm-1.0.0-to-1.1.0/before/report.json) |
-| ↳ repaired by **Claude Code**, replayed from the same v1 profile | Pass | **Pass**: both names, all three answers and the new Cryptography category | [patch](evidence/pkimm-1.0.0-to-1.1.0/repair.diff) · [report](evidence/pkimm-1.0.0-to-1.1.0/after/report.json) |
+| **Real regression:** PKI Consortium self-assessment, model 1.0.0 → 1.1.0 ([issue #148](https://github.com/pkic/self-assessment/issues/148)) | Pass | **Fail**: blank page, the app crashes while loading old saves | [report](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/before/report.html) |
+| ↳ repaired by **Claude Code**, replayed from the same v1 profile | Pass | **Pass**: both names, all three answers and the new Cryptography category | [patch](evidence/pkimm-1.0.0-to-1.1.0/repair.diff) · [report](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/after/report.html) |
 | ↳ one uninterrupted recorded run with **Codex** (20 min 6 s, fixed on attempt 1) | Pass | Fail → **Pass** | [patch](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/repair.diff) · [run](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/) |
-| **Real regression caught before release:** Rackula v0.6.16 → v0.7.0 development build ([issue #935](https://github.com/RackulaLives/Rackula/issues/935)) | Pass | **Fail**: the saved rack is gone and the app throws on load → **Pass** after Codex's repair | [before](evidence/rackula-0.6.16-to-0.7.0-dev/before/report.json) · [patch](evidence/rackula-0.6.16-to-0.7.0-dev/repair.diff) · [after](evidence/rackula-0.6.16-to-0.7.0-dev/after/report.json) |
+| **Real regression caught before release:** Rackula v0.6.16 → v0.7.0 development build ([issue #935](https://github.com/RackulaLives/Rackula/issues/935)) | Pass | **Fail**: the saved rack is gone and the app throws on load → **Pass** after Codex's repair | [before](https://fexx301.github.io/returner/evidence/rackula-0.6.16-to-0.7.0-dev/before/report.html) · [patch](evidence/rackula-0.6.16-to-0.7.0-dev/repair.diff) · [after](https://fexx301.github.io/returner/evidence/rackula-0.6.16-to-0.7.0-dev/after/report.html) |
 | **GitHub Actions** on `ubuntu-latest` | Fieldnotes repaired: pass | PKIMM 1.1.0: regression caught | [workflow run](https://github.com/fexx301/returner/actions/runs/44353094616) |
-| **Clean upgrade:** DeckMark v2.5.3 → v2.5.4, unmodified upstream builds | Pass | Pass: original note opened, edited and reloaded | [report](evidence/deckmark-2.5.3-to-2.5.4/report.json) |
-| **Fixture:** Fieldnotes, storage key deliberately renamed in v2 | Pass | Fail → **Pass** after Codex repair | [before](evidence/fieldnotes-before/report.json) · [after](evidence/fieldnotes-after/report.json) · [one command](evidence/one-command-repair.json) |
+| **Clean upgrade:** DeckMark v2.5.3 → v2.5.4, unmodified upstream builds | Pass | Pass: original note opened, edited and reloaded | [report](https://fexx301.github.io/returner/evidence/deckmark-2.5.3-to-2.5.4/report.html) |
+| **Fixture:** Fieldnotes, storage key deliberately renamed in v2 | Pass | Fail → **Pass** after Codex repair | [before](https://fexx301.github.io/returner/evidence/fieldnotes-before/report.html) · [after](https://fexx301.github.io/returner/evidence/fieldnotes-after/report.html) · [one command](evidence/one-command-repair.json) |
 
-Every browser observation comes from Kane. Each evidence folder has a `report.html` with the objectives, verdicts and step logs. Method and disclosures: [PKIMM](evidence/pkimm-1.0.0-to-1.1.0/README.md), [Rackula](evidence/rackula-0.6.16-to-0.7.0-dev/README.md).
+Every browser observation comes from Kane. Report links open the rendered `report.html` (objectives, verdicts and Kane's step logs); the JSON sits next to each one. Method and disclosures: [PKIMM](evidence/pkimm-1.0.0-to-1.1.0/README.md), [Rackula](evidence/rackula-0.6.16-to-0.7.0-dev/README.md).
 
 ## How it works
 
@@ -35,7 +47,8 @@ Every browser observation comes from Kane. Each evidence folder has a `report.ht
 2. **Ship today.** The new build is served at the same address, so the browser's storage still belongs to the same origin.
 3. **New user (control).** A fresh profile performs the same task.
 4. **Returning user (the check).** A copy of the snapshot opens the new build. Kane must find the original marker, and it fails rather than recreating anything that's missing.
-5. **Repair and replay.** On a failure, `repair.mjs` hands Kane's verdict to the coding agent, rebuilds and replays step 4 from the same snapshot. The verdict always comes from the replay.
+5. **Repair and replay.** On a failure, `repair.mjs` hands Kane's verdict to the coding agent, rebuilds and replays step 4 from the same snapshot.
+6. **No faked fixes.** The agent never sees the run's marker: it is redacted from everything Kane's verdict passes along. A passing replay must also survive a fresh rehearsal with brand-new saved work, so a fix that hardcodes the saved data is rejected and sent back to the agent. `npm test` includes a cheating agent that does exactly that.
 
 ## Quick start
 
@@ -108,6 +121,7 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 - **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage, IndexedDB and cookies.
 - **Kane credits:** the recorded runs used about 11–95 credits per Kane run. Longer objectives cost more.
 - **Kane verdicts can be inconclusive.** Returner reports exit 2 instead of guessing. The first PKIMM attempt in the Actions run was inconclusive, and the rerun reproduced the regression.
+- **Recorded runs predate the anti-cheat steps.** The marker redaction and fresh-rehearsal confirmation were added on Nov 20. The recorded repairs ran before that, but their patches contain no marker strings (check the diffs).
 - **The repairs are specific.** The PKIMM repairs map the categories for this one model change. Upstream's v2.0.0 later shipped a general migration.
 - **Service workers:** a navigation served entirely from a service worker can come back inconclusive, because Returner also checks that its server received a document request.
 
