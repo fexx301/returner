@@ -27,9 +27,17 @@ export async function writeReport(directory, report) {
   await writeFile(join(directory, "report.json"), JSON.stringify(report, null, 2));
   const results = ORDER.map((name) => report.results.find((r) => r.name === name)).filter(Boolean);
   const returning = report.results.find((r) => r.name === "returning user");
-  const overall = report.results.some((r) => r.status === "inconclusive") ? "inconclusive"
-    : returning?.status === "fail" ? "fail" : report.results.every((r) => r.status === "pass") ? "pass" : "inconclusive";
-  const headline = { pass: "Returning users keep their work", fail: "Returning users lose their work", inconclusive: "Not enough evidence for a verdict" }[overall];
+  // Live runs pass the CLI's final verdict. Older reports without one are judged only when the returning user ran.
+  const failed = report.results.filter((r) => r.status === "fail");
+  const overall = report.verdict
+    || (!returning ? "running"
+      : report.results.some((r) => r.status === "inconclusive") ? "inconclusive"
+      : failed.length ? "fail" : "pass");
+  const headline = overall === "running" ? "Rehearsal in progress"
+    : overall === "pass" ? "Returning users keep their work"
+    : overall === "inconclusive" ? "Not enough evidence for a verdict"
+    : returning?.status === "fail" ? "Returning users lose their work"
+    : `Release check failed: ${failed.map((r) => LABELS[r.name] || r.name).join(", ") || "see the checks below"}`;
   const supporting = results.filter((r) => r.name !== "returning user");
   const cards = results.map((r) => {
     const wide = r !== returning && supporting.length % 2 === 1 && r === supporting.at(-1);
@@ -40,7 +48,7 @@ export async function writeReport(directory, report) {
     return `<section class="card ${r.name === "returning user" ? "hero" : ""} ${wide ? "wide" : ""} ${escape(r.status)}">
   <header><div><h2>${escape(LABELS[r.name] || r.name)}</h2><p class="role">${escape(ROLES[r.name] || "")}</p></div><span class="pill ${escape(r.status)}">${escape(r.status)}</span></header>
   <div class="body">${shot}<div class="text">
-  <p class="summary">${escape(r.summary || r.reason || "Kane did not return a complete result.")}</p>
+  <p class="summary"><span class="who">Kane's summary</span>${escape(r.summary || r.reason || "Kane did not return a complete result.")}</p>
   <details><summary>Kane objective and steps</summary><p class="objective">${escape(r.objective)}</p><ol>${steps}</ol>${r.credits ? `<p class="meta">${Number(r.credits).toFixed(1)} Kane credits</p>` : ""}</details>
   </div></div>
 </section>`;
@@ -57,7 +65,8 @@ body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-s
 .kicker{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
 .verdict{display:flex;gap:20px;align-items:center;margin:14px 0 6px}
 .verdict .dot{flex:none;width:18px;height:18px;border-radius:50%}
-.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}.verdict.running .dot{background:var(--muted)}
+.who{display:block;font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;letter-spacing:-.025em;margin:0}
 .promise{font-size:19px;color:var(--muted);margin:8px 0 0}
 .meta{font:13px ui-monospace,Menlo,monospace;color:var(--muted)}

@@ -54,7 +54,8 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
   assert.equal(first.status, 1, first.stderr);
   const baseline = first.stdout.match(/^Evidence: (.+)$/m)[1];
   const failedReport = JSON.parse(await readFile(join(baseline, "report.json"), "utf8"));
-  assert.ok(first.stdout.includes(failedReport.replay), "terminal and report offer the same replay");
+  assert.match(first.stdout, /--replay/, "the terminal prints the exact replay command");
+  assert.ok(!failedReport.replay.includes(process.execPath) && !failedReport.replay.includes(root), "the shared report carries no absolute local paths");
   assert.match(failedReport.replay, /--replay/);
   const original = await readFile(
     join(baseline, "old-profile", "draft"),

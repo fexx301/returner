@@ -53,6 +53,8 @@ async function rehearse(args, cwd) {
   return { code, run, results: report.results || [] };
 }
 
+// Every check that did not pass, so a failed control or read-only reopen reaches the agent too.
+const failing = (results) => results.filter((r) => r.status !== "pass");
 const describe = (r) =>
   [`Kane objective: ${r?.objective}`, `Kane verdict: ${r?.status} — ${r?.reason || "no reason"}`, `Kane summary: ${r?.summary || ""}`,
    "Kane steps:", ...(r?.steps || []).filter((s) => s.status !== "running").map((s) => `- ${s.status}: ${s.remark}`)].join("\n");
@@ -100,15 +102,16 @@ async function main() {
   const attempts = [];
   const [program, args] = AGENTS[a.agent];
   for (let i = 1; i <= Number(a.attempts); i++) {
-    const prompt = [
+    let prompt = [
       "Repair the web application in the current directory.",
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
-      redact(describe(last.results.find((r) => r.name === "returning user"))),
+      failing(last.results).map((r) => `Check "${r.name}":\n${describe(r)}`).join("\n\n"),
       a.note,
       a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => f.split("/").pop()).join(", ")}. Read it; do not edit it.` : "",
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
+    prompt = redact(prompt); // covers Kane's findings, earlier attempts and build output alike
     await writeFile(join(work, `prompt-${i}.txt`), prompt); // exactly what the agent received, marker already redacted
     console.log(`Attempt ${i}/${a.attempts}: passing Kane's returning-user result to ${a.agent}…`);
     if ((await execute(program, args, candidate, { prompt })).code) return console.error(`${a.agent} exited before finishing.`), 2;
@@ -123,7 +126,7 @@ async function main() {
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
     if (last.code !== 0) {
-      attempts.push(`Attempt ${i}: Kane still failed.\n${redact(describe(last.results.find((r) => r.name === "returning user")))}`);
+      attempts.push(`Attempt ${i}: Kane still failed.\n${failing(last.results).map(describe).join("\n\n")}`);
       continue;
     }
     // A passing replay must also hold for saved work the agent has never seen: rehearse again with a new marker.
@@ -141,7 +144,7 @@ async function main() {
     if (fresh.run) await learn(fresh.run);
     last = fresh;
     console.log(`Attempt ${i} passed the replay but failed the fresh rehearsal; rejecting it.`);
-    attempts.push(`Attempt ${i}: the replay passed, but a fresh rehearsal with new saved work failed, so the fix does not hold for other users' data.\n${redact(describe(fresh.results.find((r) => r.name === "returning user")))}`);
+    attempts.push(`Attempt ${i}: the replay passed, but a fresh rehearsal with new saved work failed, so the fix does not hold for other users' data.\n${failing(fresh.results).map(describe).join("\n\n")}`);
   }
   console.error("Kane did not pass the returning user within the attempt limit.");
   return 1;

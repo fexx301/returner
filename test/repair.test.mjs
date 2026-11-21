@@ -76,3 +76,33 @@ exit 0
   assert.match(r.stderr, /did not pass the returning user within the attempt limit/);
   assert.match(prompts.split("=====")[1], /fresh rehearsal with new saved work failed/, "the rejection is fed back to the agent");
 });
+
+// The advertised front door, npm run demo:repair, must go through the same safeguards.
+async function demoRepair(codexScript) {
+  const root = await mkdtemp(join(tmpdir(), "returner-demo-repair-"));
+  await writeFile(join(root, "kane-cli"), kane, { mode: 0o755 });
+  await writeFile(join(root, "codex"), codexScript(root), { mode: 0o755 });
+  const entry = fileURLToPath(new URL("../src/demo-repair.mjs", import.meta.url));
+  const r = spawnSync(process.execPath, [entry], { cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH }, encoding: "utf8", timeout: 120000 });
+  return { root, r };
+}
+
+test("npm run demo:repair rejects a hardcoded fix and accepts an honest one only after a fresh rehearsal", async (t) => {
+  const cheat = await demoRepair((root) => `#!/bin/sh
+cat > /dev/null
+for f in ../.returner/run-*/baseline.json; do node -e "process.stdout.write(require('$PWD/'+process.argv[1]).title)" "$f" > index.html && break; done
+exit 0
+`);
+  t.after(() => rm(cheat.root, { recursive: true, force: true }));
+  assert.equal(cheat.r.status, 1, cheat.r.stdout + cheat.r.stderr);
+  assert.match(cheat.r.stdout, /passed the replay but failed the fresh rehearsal; rejecting it/);
+
+  const honest = await demoRepair(() => `#!/bin/sh
+cat > /dev/null
+printf fixed > index.html
+exit 0
+`);
+  t.after(() => rm(honest.root, { recursive: true, force: true }));
+  assert.equal(honest.r.status, 0, honest.r.stdout + honest.r.stderr);
+  assert.match(honest.r.stdout, /a fresh rehearsal with a new marker confirmed it/);
+});

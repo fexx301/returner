@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { mkdtemp, mkdir, cp, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
@@ -187,12 +187,18 @@ async function main() {
   }
   try {
     process.exitCode = await rehearse();
+    // The report's verdict is the CLI's verdict; reports written mid-run are marked in progress.
+    const verdict = { 0: "pass", 1: "fail", 2: "inconclusive" }[process.exitCode] ?? "inconclusive";
+    let replay;
     if (process.exitCode === 1) {
-      const argv = [process.execPath, resolve(process.argv[1]), "--replay", baseline, "--new", resolve(args.new)];
-      const command = argv.map(value => "'" + value.replaceAll("'", "'\\''") + "'").join(" ");
+      const quote = (value) => "'" + value.replaceAll("'", "'\\''") + "'";
+      const command = [process.execPath, resolve(process.argv[1]), "--replay", baseline, "--new", resolve(args.new)].map(quote).join(" ");
       console.log("After repairing the candidate, replay this baseline:\n" + command);
-      await writeReport(run, {promise: state.promise, url, results, replay: command});
+      // Shared reports carry a portable command: relative paths, no local Node or home directory.
+      const rel = (p) => relative(process.cwd(), p) || ".";
+      replay = ["node", rel(resolve(process.argv[1])), "--replay", rel(baseline), "--new", rel(resolve(args.new))].map(quote).join(" ");
     }
+    await writeReport(run, { promise: state.promise, url, results, verdict, replay });
   } catch (error) {
     console.error(error.message);
     process.exitCode = 2;
