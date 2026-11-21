@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try Returner · be yesterday's user</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<meta name="description" content="Save a draft in the real Fieldnotes v1, then open the real v2: watch a returning user's work vanish, and come back after the fix. The same check Returner runs with Kane CLI.">
+<style>
+:root{
+  --ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--soft:#f5f3ee;
+  --pass:#1e8a4c;--fail:#c83f1a;--accent:#141517;--code:#17181b;--codeink:#e9e6df;
+  --ring:0 0 0 3px rgba(30,138,76,.35);
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#121315;--card:#1b1d20;--ink:#f1efe8;--muted:#a9a69e;--line:#2e3135;--soft:#222428;
+  --pass:#3fbf75;--fail:#ff7a52;--accent:#f1efe8;--code:#0d0e10;--ring:0 0 0 3px rgba(63,191,117,.4);
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:40px 20px 72px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.nav{display:flex;gap:16px;font-size:14px}.nav a{color:var(--muted);text-decoration:none}.nav a:hover{color:var(--ink)}
+h1{font-size:clamp(36px,6vw,68px);line-height:1;letter-spacing:-.04em;margin:28px 0 14px;max-width:14ch}
+.lede{font-size:19px;color:var(--muted);max-width:60ch;margin:0}
+.lede b{color:var(--ink)}
+.rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:34px 0 22px;list-style:none;padding:0}
+.rail li{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card);display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);transition:border-color .2s,color .2s}
+.rail li .dot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 12px ui-monospace,Menlo,monospace;background:var(--soft);color:var(--muted)}
+.rail li.now{border-color:var(--ink);color:var(--ink)}.rail li.now .dot{background:var(--ink);color:var(--ground)}
+.rail li.done .dot{background:var(--pass);color:#fff}.rail li.bad .dot{background:var(--fail);color:#fff}
+.stage{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.browser{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 30px 60px -36px rgba(0,0,0,.45)}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--soft)}
+.lights{display:flex;gap:6px}.lights i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.addr{flex:1;min-width:0;font:13px ui-monospace,Menlo,monospace;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ver{font:700 12px ui-monospace,Menlo,monospace;padding:5px 9px;border-radius:7px;background:var(--ink);color:var(--ground);white-space:nowrap}
+.ver.broken{background:var(--fail);color:#fff}.ver.fixed{background:var(--pass);color:#fff}
+iframe{display:block;width:100%;height:680px;border:0;background:#f4f4eb}
+.panel{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.kicker{font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h2{font-size:26px;letter-spacing:-.02em;margin:0 0 8px;line-height:1.15}
+h2:focus{outline:none}
+.card p{margin:0 0 10px}.card p:last-child{margin-bottom:0}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button{font:600 15px ui-sans-serif,system-ui,sans-serif;border-radius:10px;padding:11px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.primary{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}
+.verdict{border-radius:14px;padding:16px 18px;border:2px solid var(--line);background:var(--card);display:none}
+.verdict.show{display:block}
+.verdict.pass{border-color:var(--pass)}.verdict.fail{border-color:var(--fail)}
+.verdict .head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.pill{font:700 12px ui-monospace,Menlo,monospace;letter-spacing:.08em;padding:5px 10px;border-radius:999px;color:#fff}
+.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}
+.verdict strong{font-size:18px}
+.verdict p{margin:0;color:var(--muted);font-size:14px}
+.inspect{font:13px/1.6 ui-monospace,Menlo,monospace;background:var(--code);color:var(--codeink);border-radius:12px;padding:12px 14px;overflow-x:auto}
+.inspect .k{color:#9fd5b0}.inspect .none{color:#8a8780}.inspect .row{white-space:pre-wrap;overflow-wrap:anywhere}
+.inspect .lbl{color:#a9a69e;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px}
+.kane{display:flex;flex-direction:column;gap:12px}
+.kane img{width:100%;aspect-ratio:700/560;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block}
+.kane p{font-size:14px;color:var(--muted);margin:0}
+.kane .tag{display:inline-block;font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;padding:3px 8px;border-radius:999px;color:#fff;margin-bottom:6px}
+.fix{font:12.5px/1.6 ui-monospace,Menlo,monospace;background:var(--code);color:var(--codeink);border-radius:10px;padding:12px 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.fix .add{color:#9fd5b0}.fix .del{color:#ff9c7e}
+.note{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:12px}
+.warn{display:none;background:var(--card);border:2px solid var(--fail);border-radius:12px;padding:14px 16px;margin-top:18px}
+.warn.show{display:block}
+.after{margin-top:42px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.after a{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;transition:border-color .2s}
+.after a:hover{border-color:var(--ink)}
+.after b{display:block;font-size:17px;margin-bottom:4px}.after span{color:var(--muted);font-size:14px}
+footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:980px){.stage{grid-template-columns:1fr}iframe{height:620px}.after{grid-template-columns:1fr}}
+@media (max-width:620px){.wrap{padding:24px 16px 56px}.rail{grid-template-columns:1fr}iframe{height:600px}h1{margin-top:20px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <a class="brand" href="../">Returner · live demo</a>
+    <nav class="nav" aria-label="Project"><a href="../">Results</a><a href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a></nav>
+  </div>
+
+  <h1>Be yesterday's user.</h1>
+  <p class="lede">Below are the <b>real builds</b> of a small draft editor: version 1, a broken version 2 and a repaired version 2. They run at the same address, so they share <b>your browser's storage</b>, just like an app you upgrade in place. Save a draft, ship the upgrade and see what a returning user sees. This is the check Returner automates with Kane CLI in real Chrome.</p>
+
+  <div id="warn" class="warn" role="alert"><strong>Your browser is blocking storage for this page</strong> (for example a private window or strict tracking protection). The demo app saves drafts in localStorage, so it can't remember anything here. Try a normal window, or watch the <a href="https://youtu.be/iPpaQIgh1KI?t=28">recorded walkthrough</a>.</div>
+
+  <ol class="rail" aria-label="Demo steps">
+    <li id="r1" class="now"><span class="dot">1</span>Yesterday: save a draft on v1</li>
+    <li id="r2"><span class="dot">2</span>Today: ship the broken v2</li>
+    <li id="r3"><span class="dot">3</span>Today: ship the repaired v2</li>
+  </ol>
+
+  <section class="stage">
+    <div class="browser">
+      <div class="bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="addr" id="addr">fexx301.github.io/returner/examples/draft/v1/</span><span class="ver" id="ver">v1</span></div>
+      <iframe id="app" title="Fieldnotes, the demo app" src="../examples/draft/v1/index.html"></iframe>
+    </div>
+
+    <div class="panel">
+      <div class="card">
+        <p class="kicker" id="kicker">Step 1 of 3 · Yesterday</p>
+        <h2 id="title" tabindex="-1">Write a draft and save it</h2>
+        <div id="copy">
+          <p>Type a title and a body in the app on the left, then press <b>Save draft</b>. Or let the page fill in a unique draft for you, then press Save in the app yourself.</p>
+        </div>
+        <div class="actions" id="actions">
+          <button type="button" id="fill">Fill a sample draft</button>
+          <button type="button" class="primary" id="next" disabled>Ship version 2 →</button>
+        </div>
+      </div>
+
+      <div class="verdict" id="verdict" role="status" aria-live="polite">
+        <div class="head"><span class="pill" id="vpill"></span><strong id="vhead"></strong></div>
+        <p id="vbody"></p>
+      </div>
+
+      <div class="inspect" aria-label="What is stored in your browser for this address">
+        <span class="lbl">Your browser's storage for this address · live</span>
+        <div class="row" id="s1"></div>
+        <div class="row" id="s2"></div>
+      </div>
+
+      <div class="card" id="kanecard">
+        <p class="kicker">What Kane recorded at this step · <a href="#" id="kreport">full report</a></p>
+        <div class="kane">
+          <a id="kshot" href="#"><img id="kimg" src="" alt=""></a>
+          <div><span class="tag" id="ktag"></span><p id="ktext"></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions" style="margin-top:18px">
+    <button type="button" id="reset">Reset the demo</button>
+  </div>
+
+  <section class="after" aria-label="Go further">
+    <a href="../"><b>Two real regressions →</b><span>PKI Consortium and Rackula, each with Kane's screenshots, the agent's patch and the passing replay.</span></a>
+    <a href="https://youtu.be/iPpaQIgh1KI?t=173"><b>A 20-minute repair, recorded →</b><span>Kane finds the bug, Codex patches it, Kane replays the saved profile, sped up 50×.</span></a>
+    <a href="https://github.com/fexx301/returner#try-it"><b>Run it on your builds →</b><span><code>npx github:fexx301/returner --old ./v1 --new ./v2 --promise "…"</code></span></a>
+  </section>
+
+  <footer>In this demo the check is done by this page, in your browser, by reading the app's fields. Returner does the same with Kane CLI driving real Chrome: it keeps yesterday's browser profile as an untouched snapshot, runs a new user and the returning user side by side, and hands any failure to a coding agent whose fix must pass Kane's replay. The screenshots on the right come from that recorded run.</footer>
+</main>
+
+<script>
+(() => {
+  const V1 = "fieldnotes.v1", V2 = "fieldnotes.v2";
+  const $ = (id) => document.getElementById(id);
+  const app = $("app");
+  let step = 1;
+
+  let storage = null;
+  try { const t = "__returner_probe__"; localStorage.setItem(t, "1"); localStorage.removeItem(t); storage = localStorage; } catch { $("warn").classList.add("show"); }
+  const read = (k) => { try { return JSON.parse(storage?.getItem(k) || "null"); } catch { return null; } };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  // Live storage view: the whole mechanism in two lines.
+  function inspect() {
+    for (const [id, key] of [["s1", V1], ["s2", V2]]) {
+      const v = read(key);
+      $(id).innerHTML = `<span class="k">${key}</span> → ` + (v ? esc(JSON.stringify(v)) : '<span class="none">(nothing saved)</span>');
+    }
+  }
+  setInterval(inspect, 600); inspect();
+
+  const KANE = {
+    1: { shot: "shots/step1.jpg", report: "../evidence/fieldnotes-before/report.html", tag: ["PASS", "pass"],
+         text: "Kane, as yesterday's user on v1: created a draft with a random title and body, saved it, reloaded, and confirmed both were still there. Returner then kept that closed browser profile untouched." },
+    2: { shot: "shots/step2.jpg", report: "../evidence/fieldnotes-before/report.html", tag: ["FAIL", "fail"],
+         text: "Kane, as the returning user on broken v2: “Checked editor fields after loading; both are blank and no existing requested draft is available.” A new user on the same build passed, so a clean-profile test would have shipped this." },
+    3: { shot: "shots/step3.jpg", report: "../evidence/fieldnotes-after/report.html", tag: ["PASS", "pass"],
+         text: "Kane replayed the same untouched profile on the repaired v2: it found the original draft, appended EDITED, saved and reloaded. A separate Chrome process then confirmed the edit, read-only." },
+  };
+  const STEPS = {
+    1: { kicker: "Step 1 of 3 · Yesterday", title: "Write a draft and save it", ver: ["v1", ""], path: "examples/draft/v1/",
+         copy: `<p>Type a title and a body in the app on the left, then press <b>Save draft</b>. Or let the page fill in a unique draft for you, then press Save in the app yourself.</p>` },
+    2: { kicker: "Step 2 of 3 · Today, broken release", title: "Version 2 shipped. Where's your draft?", ver: ["v2 · broken", "broken"], path: "examples/draft/v2-broken/",
+         copy: `<p>Same address, same browser, new build. Version 2 renamed its storage key to <code>fieldnotes.v2</code> and never looks for the old one. Your draft is still in your browser (see the storage view), the app just can't find it.</p><p class="note">A brand-new user saves and reopens drafts fine on this build. That's why tests that start from an empty profile ship it.</p>` },
+    3: { kicker: "Step 3 of 3 · Today, repaired release", title: "The fix: read the old key on upgrade", ver: ["v2 · repaired", "fixed"], path: "examples/draft/v2/",
+         copy: `<p>One fallback lets version 2 read a version 1 draft the first time it opens:</p><div class="fix"><span class="del">- const saved = JSON.parse(localStorage.getItem(key) || "null");</span>\n<span class="add">+ const saved = JSON.parse(</span>\n<span class="add">+   localStorage.getItem(key) ?? localStorage.getItem("fieldnotes.v1") ?? "null");</span></div><p style="margin-top:10px">In Returner's loop, Kane's finding went to Codex, which made this change in a throwaway copy. Then Kane replayed the untouched saved profile to decide.</p>` },
+  };
+
+  function verdict(kind, head, body) {
+    const v = $("verdict");
+    v.className = "verdict show " + kind;
+    $("vpill").className = "pill " + kind; $("vpill").textContent = kind === "pass" ? "PASS" : "FAIL";
+    $("vhead").textContent = head; $("vbody").textContent = body;
+  }
+  function clearVerdict() { $("verdict").className = "verdict"; }
+
+  function render() {
+    const s = STEPS[step], k = KANE[step];
+    $("kicker").textContent = s.kicker; $("title").textContent = s.title; $("copy").innerHTML = s.copy;
+    $("ver").textContent = s.ver[0]; $("ver").className = "ver " + s.ver[1];
+    $("addr").textContent = "fexx301.github.io/returner/" + s.path;
+    $("kimg").src = k.shot; $("kimg").alt = "Kane's screenshot for step " + step; $("kshot").href = k.shot; $("kreport").href = k.report;
+    $("ktag").textContent = k.tag[0]; $("ktag").style.background = `var(--${k.tag[1]})`; $("ktext").textContent = k.text;
+    $("fill").hidden = step !== 1;
+    $("next").textContent = step === 1 ? "Ship version 2 →" : step === 2 ? "Ship the repaired version 2 →" : "Start over";
+    $("next").disabled = step === 1 && !read(V1);
+    for (let i = 1; i <= 3; i++) $("r" + i).className = i < step ? (i === 2 ? "bad" : "done") : i === step ? "now" : "";
+    clearVerdict();
+  }
+
+  // After each build loads, check what a returning user sees, the same way Kane reads the fields.
+  app.addEventListener("load", () => {
+    let doc; try { doc = app.contentDocument; } catch { return; }
+    if (!doc) return;
+    doc.addEventListener("submit", () => setTimeout(() => {
+      inspect();
+      if (step === 1 && read(V1)) { $("next").disabled = false; verdict("pass", "Saved. You're yesterday's user now.", "Your draft is in this browser under fieldnotes.v1. Next, ship the upgrade."); }
+    }, 0));
+    const saved = read(V1); if (step === 1 || !saved) return;
+    const t = doc.querySelector("#title"), b = doc.querySelector("#body");
+    const ok = t && b && t.value === saved.title && b.value === saved.body;
+    if (step === 2) {
+      if (ok) verdict("pass", "Your draft is here?", "That's unexpected for this build. Did the storage get changed? Reset the demo and try again.");
+      else verdict("fail", "Your draft is gone.", `You saved “${saved.title}” on v1. Version 2 opened with empty fields: a returning user just lost their work, while a new user would see nothing wrong.`);
+    }
+    if (step === 3) {
+      if (ok) verdict("pass", "Your draft is back.", `“${saved.title}” and its body loaded from your v1 save. Returning users keep their work.`);
+      else if (read(V2)) verdict("pass", "The repaired build shows your newer draft.", "You saved a draft on the broken v2, and current saves take priority over the old v1 one. Reset the demo to see the upgrade path on its own.");
+      else verdict("fail", "Still missing.", "The repaired build didn't load your v1 draft. Reset the demo and try again.");
+    }
+  });
+
+  function go(n) {
+    step = n; render();
+    const path = STEPS[n].path;
+    app.src = "../" + path + "index.html";
+    $("title").focus({ preventScroll: true });
+  }
+
+  $("next").addEventListener("click", () => { if (step === 3) { reset(); return; } go(step + 1); });
+  $("fill").addEventListener("click", () => {
+    const doc = app.contentDocument; if (!doc) return;
+    const id = Math.random().toString(16).slice(2, 8);
+    const t = doc.querySelector("#title"), b = doc.querySelector("#body");
+    if (t && b) { t.value = "Trip notes " + id; b.value = "Pack the charger. Book the 9:40 train. Draft " + id + "."; t.focus(); }
+    verdict("pass", "Filled in. Now press Save draft in the app.", "The page typed for you; saving is the app's own button, exactly as a user would do it.");
+  });
+  function reset() {
+    try { storage?.removeItem(V1); storage?.removeItem(V2); } catch {}
+    inspect(); go(1);
+  }
+  $("reset").addEventListener("click", reset);
+  render();
+})();
+</script>
+</body>
+</html>

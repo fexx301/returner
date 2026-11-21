@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/fexx301/returner/actions/workflows/test.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/test.yml) [![Returner demo](https://github.com/fexx301/returner/actions/workflows/returner.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/returner.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**Release checks for the people who come back.** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
+**Release checks for the people who come back.** · **[Try it live in your browser →](https://fexx301.github.io/returner/try/)** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
 
 [![A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/iPpaQIgh1KI?t=173)
 

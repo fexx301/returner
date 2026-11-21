@@ -103,7 +103,7 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <p class="kicker">Returner · built with Kane CLI for the Kane CLI Online Hackathon</p>
 <h1>Release checks for the people who come back.</h1>
 <p class="lede">Browser tests start with an empty profile, so they only meet new users. Returner rehearses each release as a new user and as a returning user with yesterday's saved work, in real Chrome via Kane CLI. When the returning user breaks, a coding agent repairs it, and Kane replays the exact same saved profile to decide.</p>
-<p class="cta"><a class="primary" href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/iPpaQIgh1KI">4-minute walkthrough</a><a href="https://youtu.be/iPpaQIgh1KI?t=173">Recorded run at 50×</a></p>
+<p class="cta"><a class="primary" href="try/">Try it live in your browser</a><a href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/iPpaQIgh1KI">4-minute walkthrough</a><a href="https://youtu.be/iPpaQIgh1KI?t=173">Recorded run at 50×</a></p>
 <div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>4</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
 ${loops.map(strip).join("\n")}
 <section class="loop"><header class="lh"><div><p class="tag">Clean upgrade · unmodified upstream builds</p><h2>DeckMark v2.5.3 → v2.5.4</h2><p class="sub">An open-source Markdown editor: the returning user's note survives</p></div><p class="links"><a href="evidence/deckmark-2.5.3-to-2.5.4/report.html">Report</a></p></header>
