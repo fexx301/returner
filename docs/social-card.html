@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Source for docs/social-preview.png (1280×640). Re-render with headless Chrome at that viewport. -->
+<html lang="en"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}html,body{margin:0;width:1280px;height:640px;overflow:hidden}
+body{background:#eceae4;color:#141517;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;grid-template-columns:560px 1fr;gap:40px;padding:64px 64px 56px}
+.left{display:flex;flex-direction:column;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;font:700 15px ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:#5e5c57}
+.mark{width:40px;height:40px;border-radius:10px;background:#141517;display:grid;place-items:center}
+h1{font-size:96px;line-height:.95;letter-spacing:-.05em;margin:0}
+.tag{font-size:34px;line-height:1.15;letter-spacing:-.02em;margin:18px 0 0;max-width:18ch}
+.foot{font:600 16px ui-monospace,Menlo,monospace;color:#5e5c57;white-space:nowrap}
+.foot b{color:#141517}
+.right{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:center}
+.win{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.45);border:3px solid}
+.win.ok{border-color:#1e8a4c}.win.bad{border-color:#c83f1a}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f3f2ee;font:700 17px ui-sans-serif,system-ui,sans-serif}
+.pill{font:800 14px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#fff;padding:5px 10px;border-radius:999px}
+.ok .pill{background:#1e8a4c}.bad .pill{background:#c83f1a}
+.win img{display:block;width:100%;aspect-ratio:700/560;object-fit:cover}
+.cap{grid-column:1/-1;text-align:center;font:600 17px ui-monospace,Menlo,monospace;color:#5e5c57;margin-top:6px}
+</style></head><body>
+<div class="left">
+  <div class="brand"><span class="mark"><svg width="24" height="24" viewBox="0 0 32 32"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner · built with Kane CLI</div>
+  <div><h1>Returner</h1><p class="tag">Release checks for the people who come back.</p></div>
+  <div class="foot">Real Chrome · coding-agent repair · <b>fexx301.github.io/returner</b></div>
+</div>
+<div class="right">
+  <div class="win ok"><div class="bar">New user<span class="pill">PASS</span></div><img src="card-new.jpg" alt=""></div>
+  <div class="win bad"><div class="bar">Returning user<span class="pill">FAIL</span></div><img src="card-returning.jpg" alt=""></div>
+  <div class="cap">Same release. Yesterday's draft is gone.</div>
+</div>
+</body></html>

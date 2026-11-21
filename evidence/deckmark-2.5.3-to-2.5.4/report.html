@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <title>Returner report · Returning users keep their work</title>
 <style>
 :root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--warn:#9a6a08}
@@ -10,7 +11,8 @@ body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-s
 .kicker{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
 .verdict{display:flex;gap:20px;align-items:center;margin:14px 0 6px}
 .verdict .dot{flex:none;width:18px;height:18px;border-radius:50%}
-.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}.verdict.running .dot{background:var(--muted)}
+.who{display:block;font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;letter-spacing:-.025em;margin:0}
 .promise{font-size:19px;color:var(--muted);margin:8px 0 0}
 .meta{font:13px ui-monospace,Menlo,monospace;color:var(--muted)}
@@ -48,7 +50,7 @@ footer{margin-top:36px;color:var(--muted);font-size:13px}
 <section class="card hero  pass">
   <header><div><h2>Returning user</h2><p class="role">Yesterday&#39;s profile on the new build</p></div><span class="pill pass">pass</span></header>
   <div class="body"><figure><a class="shot" href="shots/returning-user.jpg"><img src="shots/returning-user.jpg" alt="Kane's final screenshot for the Returning user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">Opened the existing note containing “Returner-ec2ac13a” without recreating its content.
+  <p class="summary"><span class="who">Kane's summary</span>Opened the existing note containing “Returner-ec2ac13a” without recreating its content.
 Confirmed the note still included “Saved work 366a4528-040”, then appended “EDITED” and allowed the change to save.
 Reloaded the note and confirmed that “Returner-ec2ac13a”, “Saved work 366a4528-040”, and “EDITED” were all present together.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Open the existing note containing &quot;Returner-ec2ac13a&quot;. Confirm it still contains &quot;Saved work 366a4528-040&quot;. Do not recreate missing content. Append EDITED to the note, wait for autosave, reload, and verify the original two strings and EDITED are together in the existing note. Release promise: A DeckMark note remains editable after upgrading from v2.5.3 to v2.5.4.</p><ol><li>navigate: Navigate to http://127.0.0.1:58477</li><li>wait: PRIMARY: Open the existing note containing &quot;Returner-ec2ac13a&quot;; role=textbox; te</li><li>analyze: ANALYZE(textual_visual, &#39;The existing note still contains &quot;Saved work 366a4528-0</li><li>assert: The existing note still contains &quot;Saved work 366a4528-040&quot;.</li><li>click: Clicking Append EDITED to the note</li><li>press_key: PRIMARY: Append EDITED to the note by moving the editor caret to the end</li><li>press_key: PRIMARY: Append EDITED to the note by pasting the prepared text at the editor ca</li><li>wait: PRIMARY: Append EDITED to the note and wait for autosave</li><li>wait: PRIMARY: wait 3000 ms for the note autosave to complete</li><li>click: Clicking Reload button to refresh the existing note</li><li>analyze: The existing note contains EDITED.</li><li>assert: The original two strings and EDITED are together in the existing note: &quot;Returner</li></ol><p class="meta">35.9 Kane credits</p></details>
@@ -57,7 +59,7 @@ Reloaded the note and confirmed that “Returner-ec2ac13a”, “Saved work 366a
 <section class="card   pass">
   <header><div><h2>Before upgrade</h2><p class="role">Saves work on the previous build</p></div><span class="pill pass">pass</span></header>
   <div class="body"><figure><a class="shot" href="shots/old-baseline.jpg"><img src="shots/old-baseline.jpg" alt="Kane's final screenshot for the Before upgrade check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">Created a new Markdown note with “Returner-ec2ac13a” and added “Saved work 366a4528-040” on a separate line.
+  <p class="summary"><span class="who">Kane's summary</span>Created a new Markdown note with “Returner-ec2ac13a” and added “Saved work 366a4528-040” on a separate line.
 Waited for the note to save automatically, then reloaded it.
 Confirmed that both exact strings remained together in the reloaded note.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Create a new Markdown note. Use &quot;Returner-ec2ac13a&quot; as the title or first heading and &quot;Saved work 366a4528-040&quot; as a separate line. Wait for local draft autosave, reload and verify both exact strings are in the same note.</p><ol><li>navigate: Navigate to http://127.0.0.1:58477</li><li>click: Clicking New file in the top toolbar</li><li>click: Clicking Create a new Markdown note button</li><li>type: Typing into the markdown editor</li><li>wait: PRIMARY: wait for local draft autosave to complete</li><li>analyze: ANALYZE(textual_visual, &#39;the same reloaded note contains the exact string &quot;Saved</li><li>assert: both exact strings &quot;Returner-ec2ac13a&quot; and &quot;Saved work 366a4528-040&quot; are in the </li></ol><p class="meta">22.3 Kane credits</p></details>
@@ -66,7 +68,7 @@ Confirmed that both exact strings remained together in the reloaded note.</p>
 <section class="card   pass">
   <header><div><h2>New user</h2><p class="role">Empty profile on the new build</p></div><span class="pill pass">pass</span></header>
   <div class="body"><figure><a class="shot" href="shots/new-user.jpg"><img src="shots/new-user.jpg" alt="Kane's final screenshot for the New user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">Created a Markdown note with the heading “New-Returner-ec2ac13a” and a separate line reading “Fresh Saved work 366a4528-040.”
+  <p class="summary"><span class="who">Kane's summary</span>Created a Markdown note with the heading “New-Returner-ec2ac13a” and a separate line reading “Fresh Saved work 366a4528-040.”
 Waited for the note to save locally, then reloaded it.
 After the reload, both requested strings were still present in the same note.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Create a new Markdown note. Use &quot;New-Returner-ec2ac13a&quot; as the title or first heading and &quot;Fresh Saved work 366a4528-040&quot; as a separate line. Wait for local draft autosave, reload and verify both exact strings are in the same note.</p><ol><li>navigate: Navigate to http://127.0.0.1:58477</li><li>click: Clicking New file in the top toolbar</li><li>click: Clicking Create a new Markdown note button</li><li>type: Typing title and content into the new Markdown note editor</li><li>wait: PRIMARY: Wait for the local draft autosave</li><li>analyze: ANALYZE(textual_visual, &#39;The same note contains the exact string &quot;Fresh Saved wo</li><li>assert: Both exact strings &quot;New-Returner-ec2ac13a&quot; and &quot;Fresh Saved work 366a4528-040&quot; a</li></ol><p class="meta">24.3 Kane credits</p></details>

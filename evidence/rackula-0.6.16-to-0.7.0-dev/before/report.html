@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <title>Returner report · Returning users lose their work</title>
 <style>
 :root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--warn:#9a6a08}
@@ -10,7 +11,8 @@ body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-s
 .kicker{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
 .verdict{display:flex;gap:20px;align-items:center;margin:14px 0 6px}
 .verdict .dot{flex:none;width:18px;height:18px;border-radius:50%}
-.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}.verdict.running .dot{background:var(--muted)}
+.who{display:block;font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;letter-spacing:-.025em;margin:0}
 .promise{font-size:19px;color:var(--muted);margin:8px 0 0}
 .meta{font:13px ui-monospace,Menlo,monospace;color:var(--muted)}
@@ -48,7 +50,7 @@ footer{margin-top:36px;color:var(--muted);font-size:13px}
 <section class="card hero  fail">
   <header><div><h2>Returning user</h2><p class="role">Yesterday&#39;s profile on the new build</p></div><span class="pill fail">fail</span></header>
   <div class="body"><figure><a class="shot" href="shots/returning-user.jpg"><img src="shots/returning-user.jpg" alt="Kane's final screenshot for the Returning user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">The run navigated to the app and immediately checked the canvas. The screenshots show Devices selected and Racks available but not selected, so the saved rack was never looked for in its intended view.
+  <p class="summary"><span class="who">Kane's summary</span>The run navigated to the app and immediately checked the canvas. The screenshots show Devices selected and Racks available but not selected, so the saved rack was never looked for in its intended view.
 Update the check to open the Racks view, wait for the rack list or canvas to load, and then verify that Returner-ef5cab08 is present. Investigate the startup console exception separately if it still occurs after the correct view is opened.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Verify that the canvas shows the existing rack named &quot;Returner-ef5cab08&quot;. This is a read-only check: do not type, do not create a new rack, and do not change anything. The check fails if no rack named &quot;Returner-ef5cab08&quot; is shown. Release promise: My saved rack layout is still there after the upgrade</p><ol><li>navigate: Navigate to http://127.0.0.1:51817</li><li>analyze: ANALYZE(visual, &#39;the existing rack named &quot;Returner-ef5cab08&quot; is shown on the can</li><li>assert: the canvas shows the existing rack named &quot;Returner-ef5cab08&quot;</li></ol><p class="meta">12.7 Kane credits</p></details>
   </div></div>
@@ -56,7 +58,7 @@ Update the check to open the Racks view, wait for the rack list or canvas to loa
 <section class="card   pass">
   <header><div><h2>Before upgrade</h2><p class="role">Saves work on the previous build</p></div><span class="pill pass">pass</span></header>
   <div class="body"><figure><a class="shot" href="shots/old-baseline.jpg"><img src="shots/old-baseline.jpg" alt="Kane's final screenshot for the Before upgrade check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">Created the requested rack named &quot;Returner-ef5cab08&quot; with a height of 24U.
+  <p class="summary"><span class="who">Kane's summary</span>Created the requested rack named &quot;Returner-ef5cab08&quot; with a height of 24U.
 Reloaded the page.
 Confirmed that &quot;Returner-ef5cab08&quot; remained visible on the rack layout after the reload.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Create a rack named &quot;Returner-ef5cab08&quot; with a height of 24U: in the New Rack dialog or wizard, replace the rack name with &quot;Returner-ef5cab08&quot;, choose 24U, and create it. Verify a rack named &quot;Returner-ef5cab08&quot; is shown on the canvas. Reload the page and verify the rack named &quot;Returner-ef5cab08&quot; is still shown.</p><ol><li>navigate: Navigate to http://127.0.0.1:51817</li><li>click: Clicking New Rack button</li><li>click: Clicking Replace in the New Rack dialog</li><li>wait: queued plan (3 steps): type &quot;Rack Name&quot;; click &quot;24U&quot;; click &quot;Create&quot;</li><li>type: Type &quot;Returner-ef5cab08&quot; into &quot;Rack Name&quot;</li><li>click: Click &quot;24U&quot;</li><li>click: Click &quot;Create&quot;</li><li>analyze: a rack named &quot;Returner-ef5cab08&quot; is shown on the canvas</li><li>assert: a rack named &quot;Returner-ef5cab08&quot; is shown on the canvas</li><li>analyze: the rack named &quot;Returner-ef5cab08&quot; is still shown</li><li>assert: the rack named &quot;Returner-ef5cab08&quot; is still shown</li></ol><p class="meta">27.4 Kane credits</p></details>
@@ -65,7 +67,7 @@ Confirmed that &quot;Returner-ef5cab08&quot; remained visible on the rack layout
 <section class="card   pass">
   <header><div><h2>New user</h2><p class="role">Empty profile on the new build</p></div><span class="pill pass">pass</span></header>
   <div class="body"><figure><a class="shot" href="shots/new-user.jpg"><img src="shots/new-user.jpg" alt="Kane's final screenshot for the New user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
-  <p class="summary">Created a 24U rack named &quot;New-Returner-ef5cab08&quot; as requested.
+  <p class="summary"><span class="who">Kane's summary</span>Created a 24U rack named &quot;New-Returner-ef5cab08&quot; as requested.
 Confirmed that the new rack appeared on the canvas.
 Reloaded the page and confirmed that &quot;New-Returner-ef5cab08&quot; was still shown.</p>
   <details><summary>Kane objective and steps</summary><p class="objective">Create a rack named &quot;New-Returner-ef5cab08&quot; with a height of 24U: in the New Rack dialog or wizard, replace the rack name with &quot;New-Returner-ef5cab08&quot;, choose 24U, and create it. Verify a rack named &quot;New-Returner-ef5cab08&quot; is shown on the canvas. Reload the page and verify the rack named &quot;New-Returner-ef5cab08&quot; is still shown.</p><ol><li>navigate: Navigate to http://127.0.0.1:51817</li><li>wait: queued plan (2 steps): type &quot;Rack Name&quot;; click &quot;Next&quot;</li><li>type: Type &quot;New-Returner-ef5cab08&quot; into &quot;Rack Name&quot;</li><li>click: Click &quot;Next&quot;</li><li>wait: queued plan (2 steps): click &quot;24U&quot;; click &quot;Create Rack&quot;</li><li>click: Click &quot;24U&quot;</li><li>click: Click &quot;Create Rack&quot;</li><li>analyze: a rack named &quot;New-Returner-ef5cab08&quot; is shown on the canvas</li><li>assert: a rack named &quot;New-Returner-ef5cab08&quot; is shown on the canvas</li><li>analyze: the rack named &quot;New-Returner-ef5cab08&quot; is still shown</li><li>assert: the rack named &quot;New-Returner-ef5cab08&quot; is still shown</li></ol><p class="meta">27.9 Kane credits</p></details>

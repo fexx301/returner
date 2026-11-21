@@ -63,7 +63,17 @@ function strip(l) {
 const deck = check("evidence/deckmark-2.5.3-to-2.5.4", "returning user");
 const page = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <title>Returner · results</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Returner · release checks for the people who come back">
+<meta property="og:description" content="Real regressions caught with Kane CLI, repaired by a coding agent and verified by replaying the same saved browser profile.">
+<meta property="og:url" content="https://fexx301.github.io/returner/">
+<meta property="og:image" content="https://fexx301.github.io/returner/docs/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fexx301.github.io/returner/docs/social-preview.png">
 <meta name="description" content="Release checks for the people who come back: real regressions caught with Kane CLI, repaired by a coding agent, verified by replay.">
 <style>
 :root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--code:#17181b;--codeink:#e9e6df}
