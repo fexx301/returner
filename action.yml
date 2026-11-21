@@ -25,6 +25,9 @@ inputs:
   testmu-access-key:
     description: TestMu (LambdaTest) access key. Pass it from a secret.
     required: true
+  expect:
+    description: Verdict this job requires, pass (default) or fail. Use fail to demonstrate a known regression; an inconclusive run never satisfies either.
+    default: pass
   kane-cli-version:
     description: kane-cli version to install.
     default: "0.10.6"
@@ -81,6 +84,11 @@ runs:
       with:
         name: returner-report-${{ github.job }}
         path: returner-report
-    - name: Fail on a returning-user regression or an inconclusive run
+    - name: Require the expected verdict
       shell: bash
-      run: exit "$(cat returner-report/exit-code)"
+      env:
+        EXPECT: ${{ inputs.expect }}
+        VERDICT: ${{ steps.rehearse.outputs.verdict }}
+      run: |
+        echo "Returner verdict: $VERDICT (expected: $EXPECT)"
+        [ "$VERDICT" = "$EXPECT" ]

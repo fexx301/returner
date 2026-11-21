@@ -17,7 +17,6 @@ jobs:
   pkimm:
     name: PKIMM 1.0.0 → 1.1.0 · real regression from pkic/self-assessment#148 (expect fail)
     runs-on: ubuntu-latest
-    continue-on-error: true  # this job demonstrates a caught regression
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,6 +28,7 @@ jobs:
           cp examples/pkimm/.upstream/candidate-source/dist/self-assessment.js examples/pkimm/.upstream/candidate-source/site/
       - uses: ./
         with:
+          expect: fail  # passes only when Returner reproduces the regression; errors or inconclusive runs fail the job
           old: examples/pkimm/.upstream/v1
           new: examples/pkimm/.upstream/candidate-source/site
           promise: My saved assessment survives the model update, and I see the new model
