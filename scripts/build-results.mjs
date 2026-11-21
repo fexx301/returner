@@ -26,7 +26,9 @@ function patchExcerpt(diff) {
 
 const loops = [
   { title: "PKI Consortium self-assessment", tag: "Real regression · shipped in a release", issue: ["pkic/self-assessment#148", "https://github.com/pkic/self-assessment/issues/148"],
-    change: "Assessment model 1.0.0 → 1.1.0", agent: "Claude Code", before: "evidence/pkimm-1.0.0-to-1.1.0/before", after: "evidence/pkimm-1.0.0-to-1.1.0/after", diff: "evidence/pkimm-1.0.0-to-1.1.0/repair.diff" },
+    change: "Assessment model 1.0.0 → 1.1.0", agent: "Claude Code",
+    note: "The loop's own replay of this patch came back inconclusive: Kane read the instruction \"fail immediately without typing\" as an order to stop. The check was reworded as a plain read-only rule with the same requirements, and the patch was replayed by hand from the same saved profile. The patch also treats every unversioned save as a 1.0.0 save, so users who first saved on the shipped 1.1.0 release could lose an answer. For a loop with no human step, see the uninterrupted Codex run below.",
+    before: "evidence/pkimm-1.0.0-to-1.1.0/before", after: "evidence/pkimm-1.0.0-to-1.1.0/after", diff: "evidence/pkimm-1.0.0-to-1.1.0/repair.diff" },
   { title: "The same regression, one uninterrupted run", tag: "Recorded run · 20 min 6 s · fixed on attempt 1", issue: ["pkic/self-assessment#148", "https://github.com/pkic/self-assessment/issues/148"],
     change: "Assessment model 1.0.0 → 1.1.0", agent: "Codex", before: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/before", after: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/after", diff: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/repair.diff" },
   { title: "Rackula rack designer", tag: "Real regression · caught by its maintainers before release", issue: ["RackulaLives/Rackula#935", "https://github.com/RackulaLives/Rackula/issues/935"],
@@ -40,13 +42,17 @@ function strip(l) {
   const diff = l.diff ? readFileSync(join(root, l.diff), "utf8")
     : spawnSync("git", ["diff", "--no-index", "--", ...l.fixture], { cwd: root, encoding: "utf8" }).stdout.replace(/b\/examples\/draft\/v2\//g, "b/");
   const p = patchExcerpt(diff);
+  // Kane's own console capture, when the evidence folder carries one, is the clearest failure line.
+  const consoleFile = join(root, l.before, "console-errors.ndjson");
+  const consoleLine = existsSync(consoleFile) ? JSON.parse(readFileSync(consoleFile, "utf8").split("\n")[0]).text : null;
   const shot = (dir, r) => r?.shot ? `<a class="img" href="${dir}/${r.shot}"><img src="${dir}/${r.shot}" alt="Kane's final screenshot"></a>` : "";
   return `<section class="loop">
   <header class="lh"><div><p class="tag">${esc(l.tag)}</p><h2>${esc(l.title)}</h2>
   <p class="sub">${esc(l.change)}${l.issue ? ` · <a href="${l.issue[1]}">${esc(l.issue[0])}</a>` : ""} · repaired by ${esc(l.agent)}</p></div>
   <p class="links"><a href="${l.before}/report.html">Before report</a><a href="${l.after}/report.html">After report</a>${l.diff ? `<a href="https://github.com/fexx301/returner/blob/main/${l.diff}">Full patch</a>` : `<a href="https://github.com/fexx301/returner/tree/main/examples/draft">Fixture source</a>`}</p></header>
+  ${l.note ? `<p class="note">${esc(l.note)}</p>` : ""}
   <ol class="steps">
-    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3>${shot(l.before, fail)}<p>${esc(clip(failLine(fail), 150))}</p></li>
+    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3>${shot(l.before, fail)}<p>${esc(clip(consoleLine ? `Console: ${consoleLine}` : failLine(fail), 150))}</p></li>
     <li class="step"><span class="n">2</span><h3>Kane's finding goes to the agent</h3><blockquote>${esc(clip(fail?.summary || fail?.reason, 330))}</blockquote><p class="fine">Plus the unchanged objective and the release promise. The agent edits a disposable copy only.</p></li>
     <li class="step"><span class="n">3</span><h3>${l.diff ? `${esc(l.agent)}'s patch` : "The fix (as committed in the fixture)"}</h3><p class="files">${p.files.map(esc).join("<br>")}</p><pre>${p.lines.map(esc).join("\n")}${p.more ? `\n… ${p.more} more added lines` : ""}</pre></li>
     <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3>${shot(l.after, pass)}<p>${esc(clip(pass?.summary, 170))}</p></li>
@@ -88,6 +94,7 @@ h3{font-size:15px;margin:0;line-height:1.3}
 blockquote{margin:0;padding:10px 12px;border-left:3px solid var(--fail);background:var(--ground);border-radius:6px;font-size:14px;overflow-wrap:anywhere}
 .fine{color:var(--muted);font-size:13px!important}.files{font:12px ui-monospace,Menlo,monospace;color:var(--muted)}
 pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;padding:10px 12px;font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto}
+.note{margin:14px 0 0;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:14px;color:var(--muted)}
 .clean{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:center}
 .notes{margin-top:34px;color:var(--muted);font-size:14px;max-width:80ch}.notes li{margin:4px 0}
 @media (max-width:980px) and (min-width:621px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.step:nth-child(2)::after{display:none}}

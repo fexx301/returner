@@ -4,9 +4,9 @@
 
 **Release checks for the people who come back.** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
 
-[![A recorded 20-minute run at 50×: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/iPpaQIgh1KI?t=173)
+[![A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/iPpaQIgh1KI?t=173)
 
-<sub>One real, uninterrupted run (PKI Consortium #148), replayed from its timestamped terminal output at 50×. Click for the narrated walkthrough.</sub>
+<sub>One real, uninterrupted 20-minute run (PKI Consortium #148), condensed to 15 seconds (about 81×) from its timestamped terminal output. Click for the narrated walkthrough, which shows it at 50×.</sub>
 
 Browser tests usually start with an empty profile, so they only ever meet new users. The bugs that hurt returning users never show up there. A renamed storage key, a changed data model or a migration that forgets old saves can each lose or break the work people already have.
 
@@ -17,15 +17,19 @@ Returner rehearses a release as both users. It uses real Chrome, driven by [Kane
 - **A closed repair loop.** Kane's failure goes to Codex or Claude Code. The agent patches a disposable copy, Returner rebuilds it, and Kane replays the returning user from the same snapshot until it passes or the attempts run out. The agent never grades its own fix.
 - **Runs locally or in CI.** It's one Node CLI with zero package dependencies, and it also ships as a GitHub Action.
 
-## Try it in 2 minutes
+## Try it
 
-Needs Node 22+, Chrome and a signed-in [Kane CLI](https://www.testmuai.com/docs/kane-cli-introduction).
+Needs Node 22+, Chrome and a signed-in [Kane CLI](https://www.testmuai.com/docs/kane-cli-introduction). The two commands below take about 7 minutes and about 120 Kane credits in total.
 
 ```sh
 git clone https://github.com/fexx301/returner && cd returner
-npm run demo          # Fieldnotes v1 → v2: the new user passes, the returning user fails (exit 1)
-npm run demo:repair   # Codex repairs it; Kane replays the same saved profile and passes (needs Codex CLI)
+npm run demo   # ~3.5 min, ~60 credits. Fieldnotes v1 → v2: the new user passes, the returning user fails (exit 1)
+node src/returner.mjs --replay .returner/run-XXXXXX --new examples/draft/v2
+               # ~3.5 min, ~60 credits. Paste the run folder that npm run demo printed after "Evidence:".
+               # Same port, marker and saved profile; the repaired v2 passes (exit 0)
 ```
+
+`npm run demo` also prints a replay command pointing at `examples/draft/v2-broken`, for when you repair that copy in place. To have an agent do the repair, run `npm run demo:repair` (needs a signed-in Codex CLI; it runs several Kane checks, so it takes longer and costs more).
 
 Then open a real regression, [PKI Consortium #148: before](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/before/report.html) and [after the repair](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/after/report.html).
 
@@ -54,7 +58,7 @@ Every browser observation comes from Kane. Report links open the rendered `repor
 3. **New user (control).** A fresh profile performs the same task.
 4. **Returning user (the check).** A copy of the snapshot opens the new build. Kane must find the original marker, and it fails rather than recreating anything that's missing.
 5. **Repair and replay.** On a failure, `repair.mjs` hands Kane's verdict to the coding agent, rebuilds and replays step 4 from the same snapshot.
-6. **No faked fixes.** The agent never sees the run's marker: it is redacted from everything Kane's verdict passes along. A passing replay must also survive a fresh rehearsal with brand-new saved work, so a fix that hardcodes the saved data is rejected and sent back to the agent. `npm test` includes a cheating agent that does exactly that.
+6. **No faked fixes.** Returner never puts the run's marker in the agent's prompt: it is redacted from Kane's findings, earlier attempts and build output. A passing replay must also survive a fresh rehearsal with brand-new saved work, so a fix that hardcodes one user's saved data is rejected and sent back to the agent. `npm test` includes a cheating agent that reads the hidden marker from disk and is still rejected, through both `repair.mjs` and `npm run demo:repair`. The fresh rehearsal changes the marker, not the rest of the task (see Limitations).
 
 ## Quick start
 
@@ -125,9 +129,10 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 
 - **Static browser builds on localhost.** Server-rendered apps and sign-in flows aren't covered yet.
 - **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage, IndexedDB and cookies.
-- **Kane credits:** the recorded runs used about 11–95 credits per Kane run. Longer objectives cost more.
+- **Kane credits:** the recorded runs used about 5–95 credits per Kane run. Longer objectives cost more.
 - **Kane verdicts can be inconclusive.** Returner reports exit 2 instead of guessing. The first PKIMM attempt in the Actions run was inconclusive, and the rerun reproduced the regression.
-- **Recorded runs predate the anti-cheat steps.** The marker redaction and fresh-rehearsal confirmation were added on Nov 20. The recorded repairs ran before that, but their patches contain no marker strings (check the diffs).
+- **Recorded runs predate the anti-cheat steps.** The marker redaction and fresh-rehearsal confirmation were added on Nov 20, and `npm run demo:repair` uses them from Nov 21. The recorded repairs ran before that, but their patches contain no marker strings (check the diffs).
+- **Fresh rehearsals vary the marker, not the whole task.** The PKIMM objectives always save the same three answer levels, so a patch that hard-wired those exact levels, rather than the marker, would not be caught by the fresh rehearsal.
 - **The repairs are specific.** The PKIMM repairs map the categories for this one model change. Upstream's v2.0.0 later shipped a general migration.
 - **Service workers:** a navigation served entirely from a service worker can come back inconclusive, because Returner also checks that its server received a document request.
 
