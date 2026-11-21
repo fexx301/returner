@@ -7,7 +7,14 @@
 @media (prefers-color-scheme:dark){:root{--ground:#141517;--card:#1d1f22;--ink:#f1efe8;--muted:#a9a69e;--line:#2e3034;--pass:#3fbf75;--fail:#ff7a52;--warn:#e0b04a}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:40px 20px 64px}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px}
+.site{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line)}
+.siteinner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.mk{width:28px;height:28px;border-radius:8px;background:#141517;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.sitenav{display:flex;gap:18px;font-size:14px;align-items:center}.sitenav a{color:var(--muted);text-decoration:none}.sitenav a:hover{color:var(--ink)}
+.sitenav a.go{color:var(--ground);background:var(--ink);padding:7px 12px;border-radius:8px;font-weight:600}
+a:focus-visible,summary:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--pass) 45%,transparent);border-radius:6px}
 .kicker{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
 .verdict{display:flex;gap:20px;align-items:center;margin:14px 0 6px}
 .verdict .dot{flex:none;width:18px;height:18px;border-radius:50%}
@@ -41,7 +48,8 @@ ol{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--muted)}li{overflo
 footer{margin-top:36px;color:var(--muted);font-size:13px}
 @media (max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:28px 16px 48px}.card.hero .body,.card.wide .body{grid-template-columns:1fr}}
 </style></head>
-<body><main class="wrap">
+<body><header class="site"><div class="siteinner"><a class="logo" href="https://fexx301.github.io/returner/"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a><nav class="sitenav" aria-label="Site"><a href="https://fexx301.github.io/returner/">All results</a><a class="go" href="https://fexx301.github.io/returner/try/">Try it live</a></nav></div></header>
+<main class="wrap">
 <p class="kicker">Returner · upgrade rehearsal with Kane CLI</p>
 <div class="verdict pass"><span class="dot" aria-hidden="true"></span><h1>Returning users keep their work</h1></div>
 <p class="promise">Promise: “My saved rack layout is still there after the upgrade”</p>

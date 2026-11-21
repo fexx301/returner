@@ -31,10 +31,15 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 .wrap{max-width:1240px;margin:0 auto;padding:40px 20px 72px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-.brand{font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none}
-.nav{display:flex;gap:16px;font-size:14px}.nav a{color:var(--muted);text-decoration:none}.nav a:hover{color:var(--ink)}
-h1{font-size:clamp(36px,6vw,68px);line-height:1;letter-spacing:-.04em;margin:28px 0 14px;max-width:14ch}
+.site{position:sticky;top:0;z-index:20;background:var(--ground);background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.siteinner{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none}
+.mk{width:28px;height:28px;border-radius:8px;background:#141517;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.sitenav{display:flex;gap:20px;font-size:14px;align-items:center}.sitenav a{color:var(--muted);text-decoration:none}.sitenav a:hover{color:var(--ink)}
+.here{color:var(--ground);background:var(--ink);padding:7px 12px;border-radius:8px;font-weight:600}
+@media (max-width:620px){.sitenav a:not(.keep){display:none}.siteinner{padding:10px 16px}}
+.brand{font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:clamp(36px,6vw,68px);line-height:1;letter-spacing:-.04em;margin:14px 0 14px;max-width:14ch;text-wrap:balance}
 .lede{font-size:19px;color:var(--muted);max-width:60ch;margin:0}
 .lede b{color:var(--ink)}
 .rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:34px 0 22px;list-style:none;padding:0}
@@ -85,6 +90,7 @@ button:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}
 .after a{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;transition:border-color .2s}
 .after a:hover{border-color:var(--ink)}
 .after b{display:block;font-size:17px;margin-bottom:4px}.after span{color:var(--muted);font-size:14px}
+.runit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.runit code{display:block;margin-top:6px;font:12.5px/1.5 ui-monospace,Menlo,monospace;background:var(--code);color:var(--codeink);border-radius:8px;padding:10px 12px;overflow-wrap:anywhere}
 footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:980px){.stage{grid-template-columns:1fr}iframe{height:620px}.after{grid-template-columns:1fr}}
@@ -92,11 +98,10 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
 </style>
 </head>
 <body>
+<header class="site"><div class="siteinner"><a class="logo" href="../"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a>
+<nav class="sitenav" aria-label="Site"><a href="../" class="keep">Results</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a><a href="https://github.com/fexx301/returner">GitHub</a><span class="here" aria-current="page">Live demo</span></nav></div></header>
 <main class="wrap">
-  <div class="top">
-    <a class="brand" href="../">Returner · live demo</a>
-    <nav class="nav" aria-label="Project"><a href="../">Results</a><a href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a></nav>
-  </div>
+  <p class="brand">Live demo · real builds · your browser</p>
 
   <h1>Be yesterday's user.</h1>
   <p class="lede">Below are the <b>real builds</b> of a small draft editor: version 1, a broken version 2 and a repaired version 2. They run at the same address, so they share <b>your browser's storage</b>, just like an app you upgrade in place. Save a draft, ship the upgrade and see what a returning user sees. This is the check Returner automates with Kane CLI in real Chrome.</p>
@@ -156,7 +161,7 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
   <section class="after" aria-label="Go further">
     <a href="../"><b>Two real regressions →</b><span>PKI Consortium and Rackula, each with Kane's screenshots, the agent's patch and the passing replay.</span></a>
     <a href="https://youtu.be/iPpaQIgh1KI?t=173"><b>A 20-minute repair, recorded →</b><span>Kane finds the bug, Codex patches it, Kane replays the saved profile, sped up 50×.</span></a>
-    <a href="https://github.com/fexx301/returner#try-it"><b>Run it on your builds →</b><span><code>npx github:fexx301/returner --old ./v1 --new ./v2 --promise "…"</code></span></a>
+    <div class="runit"><b>Run it on your builds</b><code id="npx">npx github:fexx301/returner --old ./v1 --new ./v2 --promise "my work survives"</code><div class="actions" style="margin-top:10px"><button type="button" id="copy">Copy command</button><a href="https://github.com/fexx301/returner#try-it" style="font-size:14px;align-self:center">How it works →</a></div><span class="sr" id="copied" aria-live="polite"></span></div>
   </section>
 
   <footer>In this demo the check is done by this page, in your browser, by reading the app's fields. Returner does the same with Kane CLI driving real Chrome: it keeps yesterday's browser profile as an untouched snapshot, runs a new user and the returning user side by side, and hands any failure to a coding agent whose fix must pass Kane's replay. The screenshots on the right come from that recorded run.</footer>
@@ -264,6 +269,11 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
     inspect(); go(1);
   }
   $("reset").addEventListener("click", reset);
+  $("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("npx").textContent); $("copy").textContent = "Copied ✓"; $("copied").textContent = "Command copied"; }
+    catch { const r = document.createRange(); r.selectNodeContents($("npx")); getSelection().removeAllRanges(); getSelection().addRange(r); $("copy").textContent = "Selected, press Copy"; }
+    setTimeout(() => { $("copy").textContent = "Copy command"; }, 2200);
+  });
   render();
 })();
 </script>
