@@ -5,12 +5,12 @@ import { basename, join, relative, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
-import { serve } from "./server.mjs";
+import { isUrl, serve } from "./server.mjs";
 import { writeReport } from "./report.mjs";
 import { attachShot, consoleErrors } from "./shots.mjs";
 
 const usage =
-  'returner --old ./v1 --new ./v2 --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2';
+  'returner --old ./v1 --new ./v2 --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
 let args;
 try {
   ({ values: args } = parseArgs({
@@ -205,11 +205,11 @@ async function main() {
     let replay;
     if (process.exitCode === 1) {
       const quote = (value) => "'" + value.replaceAll("'", "'\\''") + "'";
-      const command = [process.execPath, resolve(process.argv[1]), "--replay", baseline, "--new", resolve(args.new)].map(quote).join(" ");
+      const command = [process.execPath, resolve(process.argv[1]), "--replay", baseline, "--new", isUrl(args.new) ? args.new : resolve(args.new)].map(quote).join(" ");
       console.log("After repairing the candidate, replay this baseline:\n" + command);
       // Shared reports carry a portable command: relative paths, no local Node or home directory.
       const rel = (p) => relative(process.cwd(), p) || ".";
-      replay = ["node", rel(resolve(process.argv[1])), "--replay", rel(baseline), "--new", rel(resolve(args.new))].map(quote).join(" ");
+      replay = ["node", rel(resolve(process.argv[1])), "--replay", rel(baseline), "--new", isUrl(args.new) ? args.new : rel(resolve(args.new))].map(quote).join(" ");
     }
     await writeReport(run, { promise: state.promise, url, results, verdict, replay });
   } catch (error) {

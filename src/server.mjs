@@ -1,4 +1,5 @@
-import { createServer } from "node:http";
+import { createServer, request } from "node:http";
+import { request as requestTls } from "node:https";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 
@@ -25,10 +26,32 @@ const types = {
   ".yml": "text/yaml",
 };
 
+export const isUrl = (target) => /^https?:\/\//i.test(target);
+
 export async function serve(port) {
   let root;
+  let upstream; // a running app (URL) instead of a static folder
   let documents = 0;
+  let origin;
+  // Proxy mode: Chrome only ever sees Returner's origin, so cookies and storage saved on the old app reach the new one.
+  function proxy(req, res) {
+    const target = new URL(req.url, upstream.origin);
+    const headers = { ...req.headers, host: target.host };
+    for (const h of ["origin", "referer"]) if (headers[h]) headers[h] = headers[h].replace(origin, upstream.origin);
+    const out = (target.protocol === "https:" ? requestTls : request)(target, { method: req.method, headers }, (up) => {
+      // Any document response from the app counts, a 500 too: the browser reached the new build.
+      if (req.method === "GET" && req.headers["sec-fetch-dest"] === "document") documents++;
+      const back = { ...up.headers };
+      if (back.location?.startsWith(upstream.origin)) back.location = back.location.slice(upstream.origin.length) || "/";
+      if (back["set-cookie"]) back["set-cookie"] = back["set-cookie"].map((c) => c.replace(/;\s*domain=[^;]*/gi, ""));
+      res.writeHead(up.statusCode, back);
+      up.pipe(res);
+    });
+    out.on("error", () => res.headersSent ? res.destroy() : res.writeHead(502).end("Returner could not reach " + upstream.origin));
+    req.pipe(out);
+  }
   const server = createServer(async (req, res) => {
+    if (upstream) return proxy(req, res);
     try {
       if (!["GET", "HEAD"].includes(req.method)) throw Error();
       const pathname = decodeURIComponent(
@@ -63,12 +86,20 @@ export async function serve(port) {
     server.once("error", fail);
     server.listen(port, "127.0.0.1", ok);
   });
+  origin = "http://127.0.0.1:" + server.address().port;
   return {
     port: server.address().port,
-    async use(dir) {
-      root = await realpath(dir);
-      await stat(resolve(root, "index.html"));
+    async use(target) {
       documents = 0;
+      if (isUrl(target)) {
+        upstream = new URL(target);
+        // Fails the run (exit 2) when the app isn't up; any HTTP answer, even an error page, means it is.
+        await fetch(upstream.origin, { redirect: "manual" }).catch(() => { throw Error(`Nothing is answering at ${upstream.origin}. Start the app first.`); });
+        return;
+      }
+      upstream = undefined;
+      root = await realpath(target);
+      await stat(resolve(root, "index.html"));
     },
     documents: () => documents,
     close: () => server.close(),
