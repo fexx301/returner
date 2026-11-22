@@ -1,0 +1,22 @@
+{
+  "baseline": "…/returner-holdout/.returner/run-Fi8BBK",
+  "attempts": [
+    {
+      "attempt": 1,
+      "code": 1,
+      "evidence": "…/returner-holdout/.returner/run-kNFElW",
+      "results": [
+        {
+          "name": "new user",
+          "status": "pass",
+          "reason": "Objective completed"
+        },
+        {
+          "name": "returning user",
+          "status": "fail",
+          "reason": "Final verification failed: \"\"Sourcing\" is at level \"4 - Managed\".\""
+        }
+      ]
+    }
+  ]
+}

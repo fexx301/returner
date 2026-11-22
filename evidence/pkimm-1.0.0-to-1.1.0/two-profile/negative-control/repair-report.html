@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<title>Returner repair report · Repair did not satisfy Kane</title>
+<style>
+:root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--warn:#9a6a08;--code:#17181b;--codeink:#e9e6df}
+@media (prefers-color-scheme:dark){:root{--ground:#121315;--card:#1c1e21;--ink:#f1efe8;--muted:#a9a69e;--line:#2d3034;--pass:#3fbf75;--fail:#ff7a52;--warn:#e0b04a;--code:#0d0e10}}
+*{box-sizing:border-box}body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit}.wrap{max-width:1240px;margin:0 auto;padding:32px 20px 64px}
+.site{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line)}
+.siteinner{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none}
+.mk{width:28px;height:28px;border-radius:8px;background:#141517;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.sitenav{display:flex;gap:18px;font-size:14px;align-items:center}.sitenav a{color:var(--muted);text-decoration:none}.sitenav a:hover{color:var(--ink)}
+.kicker{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.verdict{display:flex;gap:16px;align-items:center;margin:12px 0 6px}.verdict .dot{width:18px;height:18px;border-radius:50%;flex:none}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}
+h1{font-size:clamp(28px,4.4vw,46px);line-height:1.06;letter-spacing:-.025em;margin:0}
+.promise{font-size:19px;color:var(--muted);margin:8px 0 0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.badge{font:600 12px ui-monospace,Menlo,monospace;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted)}
+.badge.pass{border-color:var(--pass);color:var(--pass)}
+.badge.fail{border-color:var(--fail);color:var(--fail)}
+.links{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 0;font-size:14px}.links a{color:var(--muted)}.links a:hover{color:var(--ink)}
+.steps{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.step.fail{border-color:var(--fail);border-width:2px}.step.pass{border-color:var(--pass);border-width:2px}
+.n{font:700 12px ui-monospace,Menlo,monospace;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ground);color:var(--muted)}
+.fail .n{background:var(--fail);color:#fff}.pass .n{background:var(--pass);color:#fff}
+h2{font-size:16px;margin:0;line-height:1.3}.step p{margin:0;font-size:14px;overflow-wrap:anywhere}
+.img{display:block;border-radius:8px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/10;background:var(--ground)}
+.img img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
+.crash{padding:8px 10px;border-radius:8px;border:1px solid color-mix(in srgb,var(--fail) 35%,var(--line));background:color-mix(in srgb,var(--fail) 7%,transparent);font:12px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+blockquote{margin:0;padding:10px 12px;border-left:3px solid var(--fail);background:var(--ground);border-radius:6px;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.files{font:12px ui-monospace,Menlo,monospace;color:var(--muted)}
+pre.diff{margin:0;background:var(--code);color:var(--codeink);border-radius:10px;padding:12px 14px;font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto}
+pre.diff .add{color:#9fd5b0}pre.diff .del{color:#ff9c7e}pre.diff .hunk{color:#8ab4f8}pre.diff .hdr{color:#a9a69e}
+details{border-top:1px solid var(--line);padding-top:8px;font-size:13px}summary{cursor:pointer;color:var(--muted)}
+details pre{margin:8px 0 0;background:var(--code);color:var(--codeink);border-radius:8px;padding:10px 12px;font:12px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto}
+.panel{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.panel h3{margin:0 0 12px;font-size:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.pill{font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff}
+.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}.pill.inconclusive{background:var(--warn)}
+.fine{color:var(--muted);font-size:13px!important}
+footer{margin-top:32px;color:var(--muted);font-size:13px}
+@media (max-width:980px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.steps{grid-template-columns:1fr}.wrap{padding:24px 16px 48px}}
+</style></head><body>
+<header class="site"><div class="siteinner"><a class="logo" href="https://fexx301.github.io/returner/"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a><nav class="sitenav" aria-label="Site"><a href="https://fexx301.github.io/returner/">All results</a><a href="https://fexx301.github.io/returner/try/">Try it live</a></nav></div></header>
+<main class="wrap">
+<p class="kicker">Returner · closed repair loop</p>
+<div class="verdict fail"><span class="dot" aria-hidden="true"></span><h1>Repair did not satisfy Kane</h1></div>
+<p class="promise">Promise: “My saved assessment survives the model update, and I see the new model”</p>
+<div class="badges"><span class="badge fail">Holdout user (Profile B): fail</span><span class="badge">Agent: DELIBERATE TEST CASE (incomplete 3 / 4 / 2 patch)</span><span class="badge">1 attempt</span></div>
+<nav class="links" aria-label="Artifacts"><a href="before/report.html">Before report</a><a href="after/report.html">After replay report</a><a href="profile-b-baseline/report.html">Profile B baseline</a><a href="profile-b-after/report.html">Profile B replay report</a><a href="incomplete-342.patch">incomplete-342.patch</a><a href="prompt-1.txt">prompt-1.txt</a></nav>
+
+<ol class="steps">
+  <li class="step fail">
+    <span class="n">1</span>
+    <h2>Returning user fails</h2>
+    <a class="img" href="before/shots/returning-user.jpg"><img src="before/shots/returning-user.jpg" alt="Kane's returning-user failure screenshot"></a>
+    <div class="crash">Console: Cannot read properties of undefined (reading &#39;result&#39;)
+Console: Failed to load resource: the server responded with a status of 404 (Not Found)</div>
+    <p>The reloaded page remained blank, so required Report tab values could not be verified.</p>
+    <p class="fine">Both releases use localStorage: assessmentData</p>
+  </li>
+  <li class="step">
+    <span class="n">2</span>
+    <h2>Kane's finding goes to DELIBERATE TEST CASE (incomplete 3 / 4 / 2 patch)</h2>
+    <blockquote>The page crashes while loading because it tries to read a result from something that is missing.
+Fix the reload path to handle missing saved-result data safely and show the assessment page; then rerun the read-only saved-assessment check.
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)</blockquote>
+    <p class="fine">The run's random marker is redacted before the prompt reaches the agent. Edits stay inside a disposable copy.</p>
+    <details><summary>Exact redacted prompt</summary><pre>Repair the web application in the current directory.
+
+Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: My saved assessment survives the model update, and I see the new model
+
+Check &quot;returning user&quot;:
+Kane objective: Reload the page. On the Report tab, verify the Assessment Name is exactly &quot;&lt;saved title&gt;&quot; and the Assessor Name is exactly &quot;&lt;saved body&gt;&quot;. Open the Governance tab: verify &quot;Strategy and Vision&quot; is at level &quot;3 - Advanced&quot; and a category named &quot;Cryptography&quot; is listed. Open the Management tab: verify &quot;Infrastructure management&quot; is at level &quot;4 - Managed&quot;. Open the Resources tab: verify &quot;Sourcing&quot; is at level &quot;2 - Basic&quot;. This is a read-only check: do not type, select or change anything. Release promise: My saved assessment survives the model update, and I see the new model
+Kane verdict: fail — The reloaded page remained blank, so required Report tab values could not be verified.
+Kane summary: The page crashes while loading because it tries to read a result from something that is missing.
+Fix the reload path to handle missing saved-result data safely and show the assessment page; then rerun the read-only saved-assessment check.
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)
+Kane steps:
+- done: navigate: Navigate to http://127.0.0.1:54428
+- done: wait: PRIMARY: wait 800 ms after reloading the page
+- done: analyze: ANALYZE(unknown, &#39;The Assessor Name is exactly &quot;&lt;saved body&gt;&quot; on the 
+- failed: wait: Waiting after checkpoint verification failed
+Browser console errors Kane recorded:
+- Cannot read properties of undefined (reading &#39;result&#39;)
+- Failed to load resource: the server responded with a status of 404 (Not Found)
+
+Browser state keys observed via Chrome DevTools (names only, no values):
+Both releases use localStorage: assessmentData
+- Before upgrade: localStorage: assessmentData
+- New user: localStorage: assessmentData
+- Returning user: localStorage: assessmentData
+
+DELIBERATE TEST CASE: incomplete 3 / 4 / 2 patch.
+
+Reference material from the previous release is in .returner-reference/: data-1.0.0.yaml. Read it; do not edit it.
+
+Fix the application source so returning users keep their saved work and also get this release&#39;s behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner rebuilds with `test -d node_modules || npm ci --no-audit --no-fund --loglevel=error; npm run build --silent &amp;&amp; cp dist/self-assessment.js site/` and replays the returning user from the untouched browser state with the same Kane objective.</pre></details>
+  </li>
+  <li class="step">
+    <span class="n">3</span>
+    <h2>DELIBERATE TEST CASE (incomplete 3 / 4 / 2 patch)&#39;s patch</h2>
+    <p class="files">src/components/Assessment/Assessment.tsx</p>
+    <pre class="diff"><span class="hunk">diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">--- a/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">+++ b/src/components/Assessment/Assessment.tsx</span>
+<span class="hunk">@@ -79,7 +79,34 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+         if (storedData) {
+           const { progress, assessmentName, assessorName, useCaseDescription } =
+             JSON.parse(storedData);
+<span class="del">-          setProgress(progress);</span>
+<span class="add">+          if (initialData &amp;&amp; !progress?.[&quot;G.5&quot;]) {</span>
+<span class="add">+            // DELIBERATE TEST CASE (incomplete patch): stops the v1.1.0 crash</span>
+<span class="add">+            // by restoring fixed 3 / 4 / 2 levels for every v1.0.0 user instead</span>
+<span class="add">+            // of migrating each user&#39;s actual saved answers.</span>
+<span class="add">+            const migrated = initProgress(initialData as AssessmentData);</span>
+<span class="add">+            const setFixed = (key: string, level: number) =&gt; {</span>
+<span class="add">+              const [modId, catId] = key.split(&quot;.&quot;);</span>
+<span class="add">+              const cat = (initialData as AssessmentData).modules</span>
+<span class="add">+                .find((m) =&gt; m.id === modId)</span>
+<span class="add">+                ?.categories.find((c) =&gt; c.id === catId);</span>
+<span class="add">+              if (migrated[key] &amp;&amp; cat) {</span>
+<span class="add">+                migrated[key] = {</span>
+<span class="add">+                  ...migrated[key],</span>
+<span class="add">+                  level,</span>
+<span class="add">+                  result: LevelResult[level],</span>
+<span class="add">+                  description:</span>
+<span class="add">+                    cat.levels.find((l) =&gt; l.number === level)?.description ||</span>
+<span class="add">+                    migrated[key].description,</span>
+<span class="add">+                };</span>
+<span class="add">+              }</span>
+<span class="add">+            };</span>
+<span class="add">+            setFixed(&quot;G.1&quot;, 3);</span>
+<span class="add">+            setFixed(&quot;M.8&quot;, 4);</span>
+<span class="add">+            setFixed(&quot;R.14&quot;, 2);</span>
+<span class="add">+            setProgress(migrated);</span>
+<span class="add">+          } else {</span>
+<span class="add">+            setProgress(progress);</span>
+<span class="add">+          }</span>
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+</pre>
+  </li>
+  <li class="step ">
+    <span class="n">4</span>
+    <h2>Replay verdict</h2>
+    <a class="img" href="after/shots/returning-user.jpg"><img src="after/shots/returning-user.jpg" alt="Kane's replay screenshot"></a>
+    <p>Completed the requested read-only review by reloading the assessment and opening the Governance, Management, and Resources tabs.
+Confirmed the Report details: Assessment Name was “Returner-a4b5cb56” and Assessor Name was “Saved work 9967a1be-f49.”
+Confirmed Governance showed Strategy and Vision at “3 - Advanced” and included the Cryptography category.
+Confirmed Management showed Infrastructure management at “4 - Managed,” and Resources showed Sourcing at “2 - Basic.”
+Finished on the Resources tab without changing any information.</p>
+    <p class="fine">Holdout user (Profile B): <strong>fail</strong> — Final verification failed: &quot;&quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.&quot;</p>
+    <a class="img" href="profile-b-after/shots/returning-user.jpg"><img src="profile-b-after/shots/returning-user.jpg" alt="Kane's Profile B holdout replay screenshot"></a>
+    
+  </li>
+</ol>
+
+<section class="panel"><h3>Full patch (repair.diff)</h3><pre class="diff"><span class="hunk">diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">--- a/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">+++ b/src/components/Assessment/Assessment.tsx</span>
+<span class="hunk">@@ -79,7 +79,34 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+         if (storedData) {
+           const { progress, assessmentName, assessorName, useCaseDescription } =
+             JSON.parse(storedData);
+<span class="del">-          setProgress(progress);</span>
+<span class="add">+          if (initialData &amp;&amp; !progress?.[&quot;G.5&quot;]) {</span>
+<span class="add">+            // DELIBERATE TEST CASE (incomplete patch): stops the v1.1.0 crash</span>
+<span class="add">+            // by restoring fixed 3 / 4 / 2 levels for every v1.0.0 user instead</span>
+<span class="add">+            // of migrating each user&#39;s actual saved answers.</span>
+<span class="add">+            const migrated = initProgress(initialData as AssessmentData);</span>
+<span class="add">+            const setFixed = (key: string, level: number) =&gt; {</span>
+<span class="add">+              const [modId, catId] = key.split(&quot;.&quot;);</span>
+<span class="add">+              const cat = (initialData as AssessmentData).modules</span>
+<span class="add">+                .find((m) =&gt; m.id === modId)</span>
+<span class="add">+                ?.categories.find((c) =&gt; c.id === catId);</span>
+<span class="add">+              if (migrated[key] &amp;&amp; cat) {</span>
+<span class="add">+                migrated[key] = {</span>
+<span class="add">+                  ...migrated[key],</span>
+<span class="add">+                  level,</span>
+<span class="add">+                  result: LevelResult[level],</span>
+<span class="add">+                  description:</span>
+<span class="add">+                    cat.levels.find((l) =&gt; l.number === level)?.description ||</span>
+<span class="add">+                    migrated[key].description,</span>
+<span class="add">+                };</span>
+<span class="add">+              }</span>
+<span class="add">+            };</span>
+<span class="add">+            setFixed(&quot;G.1&quot;, 3);</span>
+<span class="add">+            setFixed(&quot;M.8&quot;, 4);</span>
+<span class="add">+            setFixed(&quot;R.14&quot;, 2);</span>
+<span class="add">+            setProgress(migrated);</span>
+<span class="add">+          } else {</span>
+<span class="add">+            setProgress(progress);</span>
+<span class="add">+          }</span>
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+</pre></section>
+<section class="panel"><h3>Attempts</h3><table><thead><tr><th>Attempt</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr>
+    <td>#1</td>
+    <td><span class="pill fail">fail</span></td>
+    <td>Profile A passed, but holdout user (Profile B) failed: Final verification failed: &quot;&quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.&quot; — patch rejected.</td>
+  </tr></tbody></table></section>
+
+<footer>Every verdict and screenshot comes from Kane CLI. The agent never grades its own fix.</footer>
+</main></body></html>

@@ -78,8 +78,8 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <figure style="margin:0"><div class="frame"><div class="fbar"><i></i><i></i><i></i><span>examples/pkimm/run.sh codex · recorded</span></div><a href="https://youtu.be/iPpaQIgh1KI?t=173"><img src="docs/loop.gif" alt="A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes"></a></div>
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
-<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>5</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
-<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
+<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>6</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
+<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#pkimm-two-profile">PKIMM two-profile</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
 <section class="loop" id="pkimm">
   <header class="lh"><div><p class="tag">Real regression · shipped in a release</p><h2>PKI Consortium self-assessment</h2>
   <p class="sub">Assessment model 1.0.0 → 1.1.0 · <a href="https://github.com/pkic/self-assessment/issues/148">pkic/self-assessment#148</a> · repaired by Claude Code</p></div>
@@ -125,6 +125,29 @@ evidence: console_error: Cannot read properties of undefined (reading &#39;resul
   &quot;R.15&quot;: &quot;R.11&quot;, // Knowledge and training
 … 56 more added lines</pre></li>
     <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3><a class="img" href="evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/after/shots/returning-user.jpg"><img src="evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/after/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Reviewed the Report, Governance, Management, and Resources sections without changing any values. Confirmed the assessment name is “Returner-433e1172” and the assessor na…</p></li>
+  </ol>
+</section>
+<section class="loop" id="pkimm-two-profile">
+  <header class="lh"><div><p class="tag">Two-profile holdout · attempt 2 + fresh rehearsal</p><h2>PKI Consortium #148: two-profile holdout check</h2>
+  <p class="sub">Assessment model 1.0.0 → 1.1.0 (Profile A 3/4/2 + holdout Profile B 5/1/4) · <a href="https://github.com/pkic/self-assessment/issues/148">pkic/self-assessment#148</a> · repaired by Codex</p></div>
+  <p class="links"><a href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/before/report.html">Before report</a><a href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/after/report.html">After report</a><a href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/fresh/report.html">Fresh rehearsal</a><a href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/repair-report.html">Repair report</a><a href="https://github.com/fexx301/returner/blob/main/evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/repair.diff">Full patch</a></p></header>
+  <p class="note">Verified at commit c752cc7. Profile B&#39;s saved snapshot and expected answers (5 / 1 default / 4) stayed outside Codex&#39;s workspace and prompts. Attempt 1 migrated the data but failed Kane&#39;s Governance checkpoint on non-semantic level divs; attempt 2 added accessible radio inputs and passed Profile A, holdout Profile B, and a fresh rehearsal. A separate deliberate negative control (an incomplete 3 / 4 / 2 patch) passed Profile A, failed Profile B on Sourcing, and was rejected overall (exit 1).</p>
+  <ol class="steps">
+    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3><a class="img" href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/before/shots/returning-user.jpg"><img src="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/before/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Console: Cannot read properties of undefined (reading &#39;result&#39;)</p></li>
+    <li class="step"><span class="n">2</span><h3>Kane's finding goes to the agent</h3><blockquote>The page hits an error while starting up and never displays the assessment interface. Fix the startup path that reads the missing result value, then reload and confirm t…</blockquote><details class="more"><summary>Kane's full finding</summary><p>The page hits an error while starting up and never displays the assessment interface.
+Fix the startup path that reads the missing result value, then reload and confirm that the Report, Governance, Management, and Resources tabs render with the saved assessment.
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)</p></details><p class="fine">Plus the unchanged objective and the release promise. The agent edits a disposable copy only.</p></li>
+    <li class="step"><span class="n">3</span><h3>Codex's patch</h3><p class="files">src/components/Assessment/Assessment.tsx<br>src/components/Category/Category.module.scss<br>src/components/Category/Category.tsx<br>src/components/Module/Module.module.scss<br>src/components/Module/Module.tsx<br>src/types/types.ts<br>src/utils/assessmentProgress.ts</p><pre>    let initialData: AssessmentData | null = null;
+    initialData = yamlParser(yamlText) as AssessmentData;
+    setProgress(restoreProgress(initialData, decodedProgress));
+    setProgress(restoreProgress(initialData));
+    const {
+    progress,
+    modelVersion,
+    assessmentName,
+    assessorName,
+… 142 more added lines</pre></li>
+    <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3><a class="img" href="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/after/shots/returning-user.jpg"><img src="evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/after/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Completed the requested read-only review by reloading the page and opening the Governance, Management, and Resources tabs. Confirmed on the Report tab that the assessmen…</p></li>
   </ol>
 </section>
 <section class="loop" id="rackula">

@@ -1,0 +1,51 @@
+Repair the web application in the current directory.
+
+Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: My saved assessment survives the model update, and I see the new model
+
+Check "returning user":
+Kane objective: Reload the page. On the Report tab, verify the Assessment Name is exactly "<saved title>" and the Assessor Name is exactly "<saved body>". Open the Governance tab: verify "Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptography" is listed. Open the Management tab: verify "Infrastructure management" is at level "4 - Managed". Open the Resources tab: verify "Sourcing" is at level "2 - Basic". This is a read-only check: do not type, select or change anything. Release promise: My saved assessment survives the model update, and I see the new model
+Kane verdict: fail — Checkpoint assertion failed: ""Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptography" is listed."
+Kane summary: The run's own observations say that Cryptography is listed, and the captured Governance page shows Strategy and Vision highlighted at 3 - Advanced. The combined automated check nevertheless failed, so the test did not reliably interpret the page state.
+Review the combined Governance assertion and its page-state handling. Make it verify the visible selected maturity level and the Cryptography category independently after the Governance content has finished loading.
+Kane steps:
+- done: navigate: Navigate to http://127.0.0.1:56719
+- done: click: Clicking Open the Report tab
+- done: click: PRIMARY: Open the Report tab; role=button; text="Report" | HINTS: container=top 
+- done: analyze: ANALYZE(textual_visual, 'The Assessor Name is exactly "<saved body>".
+- done: assert: The Assessment Name is exactly "<saved title>" and the Assessor Name is exac
+- done: click: PRIMARY: Open the Governance tab; role=button; text="Governance" | HINTS: contai
+- done: analyze: A category named "Cryptography" is listed.
+- done: analyze: A category named "Cryptography" is listed.
+- failed: assert: "Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptogra
+Browser console errors Kane recorded:
+- Failed to load resource: the server responded with a status of 404 (Not Found)
+
+Browser state keys observed via Chrome DevTools (names only, no values):
+Storage keys diverged: v2 new user wrote localStorage: assessmentData
+- New user: localStorage: assessmentData
+- Returning user: localStorage: assessmentData
+
+This release of the app loads model data 1.1.0 (site/assessment-data.yaml), which adds a Governance category and renumbers others. The previous release used model data 1.0.0. Migrate each user's actual saved answers rather than hard-coding any fixed levels. Do not edit site/ or the model data.
+
+Reference material from the previous release is in .returner-reference/: data-1.0.0.yaml. Read it; do not edit it.
+
+Your earlier attempts did not satisfy Kane:
+Attempt 1: Kane still failed.
+Kane objective: Reload the page. On the Report tab, verify the Assessment Name is exactly "<saved title>" and the Assessor Name is exactly "<saved body>". Open the Governance tab: verify "Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptography" is listed. Open the Management tab: verify "Infrastructure management" is at level "4 - Managed". Open the Resources tab: verify "Sourcing" is at level "2 - Basic". This is a read-only check: do not type, select or change anything. Release promise: My saved assessment survives the model update, and I see the new model
+Kane verdict: fail — Checkpoint assertion failed: ""Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptography" is listed."
+Kane summary: The run's own observations say that Cryptography is listed, and the captured Governance page shows Strategy and Vision highlighted at 3 - Advanced. The combined automated check nevertheless failed, so the test did not reliably interpret the page state.
+Review the combined Governance assertion and its page-state handling. Make it verify the visible selected maturity level and the Cryptography category independently after the Governance content has finished loading.
+Kane steps:
+- done: navigate: Navigate to http://127.0.0.1:56719
+- done: click: Clicking Open the Report tab
+- done: click: PRIMARY: Open the Report tab; role=button; text="Report" | HINTS: container=top 
+- done: analyze: ANALYZE(textual_visual, 'The Assessor Name is exactly "<saved body>".
+- done: assert: The Assessment Name is exactly "<saved title>" and the Assessor Name is exac
+- done: click: PRIMARY: Open the Governance tab; role=button; text="Governance" | HINTS: contai
+- done: analyze: A category named "Cryptography" is listed.
+- done: analyze: A category named "Cryptography" is listed.
+- failed: assert: "Strategy and Vision" is at level "3 - Advanced" and a category named "Cryptogra
+Browser console errors Kane recorded:
+- Failed to load resource: the server responded with a status of 404 (Not Found)
+
+Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner rebuilds with `test -d node_modules || npm ci --no-audit --no-fund --loglevel=error; npm run build --silent && cp dist/self-assessment.js site/` and replays the returning user from the untouched browser state with the same Kane objective.

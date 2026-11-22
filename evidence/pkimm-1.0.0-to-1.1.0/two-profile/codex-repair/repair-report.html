@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<title>Returner repair report · Repaired and confirmed</title>
+<style>
+:root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--warn:#9a6a08;--code:#17181b;--codeink:#e9e6df}
+@media (prefers-color-scheme:dark){:root{--ground:#121315;--card:#1c1e21;--ink:#f1efe8;--muted:#a9a69e;--line:#2d3034;--pass:#3fbf75;--fail:#ff7a52;--warn:#e0b04a;--code:#0d0e10}}
+*{box-sizing:border-box}body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit}.wrap{max-width:1240px;margin:0 auto;padding:32px 20px 64px}
+.site{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line)}
+.siteinner{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none}
+.mk{width:28px;height:28px;border-radius:8px;background:#141517;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.sitenav{display:flex;gap:18px;font-size:14px;align-items:center}.sitenav a{color:var(--muted);text-decoration:none}.sitenav a:hover{color:var(--ink)}
+.kicker{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.verdict{display:flex;gap:16px;align-items:center;margin:12px 0 6px}.verdict .dot{width:18px;height:18px;border-radius:50%;flex:none}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}
+h1{font-size:clamp(28px,4.4vw,46px);line-height:1.06;letter-spacing:-.025em;margin:0}
+.promise{font-size:19px;color:var(--muted);margin:8px 0 0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.badge{font:600 12px ui-monospace,Menlo,monospace;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted)}
+.badge.pass{border-color:var(--pass);color:var(--pass)}
+.badge.fail{border-color:var(--fail);color:var(--fail)}
+.links{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 0;font-size:14px}.links a{color:var(--muted)}.links a:hover{color:var(--ink)}
+.steps{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.step.fail{border-color:var(--fail);border-width:2px}.step.pass{border-color:var(--pass);border-width:2px}
+.n{font:700 12px ui-monospace,Menlo,monospace;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ground);color:var(--muted)}
+.fail .n{background:var(--fail);color:#fff}.pass .n{background:var(--pass);color:#fff}
+h2{font-size:16px;margin:0;line-height:1.3}.step p{margin:0;font-size:14px;overflow-wrap:anywhere}
+.img{display:block;border-radius:8px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/10;background:var(--ground)}
+.img img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
+.crash{padding:8px 10px;border-radius:8px;border:1px solid color-mix(in srgb,var(--fail) 35%,var(--line));background:color-mix(in srgb,var(--fail) 7%,transparent);font:12px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+blockquote{margin:0;padding:10px 12px;border-left:3px solid var(--fail);background:var(--ground);border-radius:6px;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.files{font:12px ui-monospace,Menlo,monospace;color:var(--muted)}
+pre.diff{margin:0;background:var(--code);color:var(--codeink);border-radius:10px;padding:12px 14px;font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto}
+pre.diff .add{color:#9fd5b0}pre.diff .del{color:#ff9c7e}pre.diff .hunk{color:#8ab4f8}pre.diff .hdr{color:#a9a69e}
+details{border-top:1px solid var(--line);padding-top:8px;font-size:13px}summary{cursor:pointer;color:var(--muted)}
+details pre{margin:8px 0 0;background:var(--code);color:var(--codeink);border-radius:8px;padding:10px 12px;font:12px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto}
+.panel{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.panel h3{margin:0 0 12px;font-size:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.pill{font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff}
+.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}.pill.inconclusive{background:var(--warn)}
+.fine{color:var(--muted);font-size:13px!important}
+footer{margin-top:32px;color:var(--muted);font-size:13px}
+@media (max-width:980px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.steps{grid-template-columns:1fr}.wrap{padding:24px 16px 48px}}
+</style></head><body>
+<header class="site"><div class="siteinner"><a class="logo" href="https://fexx301.github.io/returner/"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a><nav class="sitenav" aria-label="Site"><a href="https://fexx301.github.io/returner/">All results</a><a href="https://fexx301.github.io/returner/try/">Try it live</a></nav></div></header>
+<main class="wrap">
+<p class="kicker">Returner · closed repair loop</p>
+<div class="verdict pass"><span class="dot" aria-hidden="true"></span><h1>Repaired and confirmed</h1></div>
+<p class="promise">Promise: “My saved assessment survives the model update, and I see the new model”</p>
+<div class="badges"><span class="badge pass">Untouched replay passed</span><span class="badge pass">Holdout user (Profile B): pass</span><span class="badge pass">Fresh rehearsal confirmed</span><span class="badge">Agent: Codex</span><span class="badge">2 attempts</span></div>
+<nav class="links" aria-label="Artifacts"><a href="before/report.html">Before report</a><a href="after/report.html">After replay report</a><a href="profile-b-baseline/report.html">Profile B baseline</a><a href="profile-b-after/report.html">Profile B replay report</a><a href="fresh/report.html">Fresh confirmation report</a><a href="repair.diff">repair.diff</a><a href="prompt-1.txt">prompt-1.txt</a></nav>
+
+<ol class="steps">
+  <li class="step fail">
+    <span class="n">1</span>
+    <h2>Returning user fails</h2>
+    <a class="img" href="before/shots/returning-user.jpg"><img src="before/shots/returning-user.jpg" alt="Kane's returning-user failure screenshot"></a>
+    <div class="crash">Console: Cannot read properties of undefined (reading &#39;result&#39;)
+Console: Failed to load resource: the server responded with a status of 404 (Not Found)</div>
+    <p>After reloads and waits, the page is blank with no Report, Governance, Management, or Resources tab.</p>
+    <p class="fine">Both releases use localStorage: assessmentData</p>
+  </li>
+  <li class="step">
+    <span class="n">2</span>
+    <h2>Kane's finding goes to Codex</h2>
+    <blockquote>The page hits an error while starting up and never displays the assessment interface.
+Fix the startup path that reads the missing result value, then reload and confirm that the Report, Governance, Management, and Resources tabs render with the saved assessment.
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)</blockquote>
+    <p class="fine">The run's random marker is redacted before the prompt reaches the agent. Edits stay inside a disposable copy.</p>
+    <details><summary>Exact redacted prompt</summary><pre>Repair the web application in the current directory.
+
+Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: My saved assessment survives the model update, and I see the new model
+
+Check &quot;returning user&quot;:
+Kane objective: Reload the page. On the Report tab, verify the Assessment Name is exactly &quot;&lt;saved title&gt;&quot; and the Assessor Name is exactly &quot;&lt;saved body&gt;&quot;. Open the Governance tab: verify &quot;Strategy and Vision&quot; is at level &quot;3 - Advanced&quot; and a category named &quot;Cryptography&quot; is listed. Open the Management tab: verify &quot;Infrastructure management&quot; is at level &quot;4 - Managed&quot;. Open the Resources tab: verify &quot;Sourcing&quot; is at level &quot;2 - Basic&quot;. This is a read-only check: do not type, select or change anything. Release promise: My saved assessment survives the model update, and I see the new model
+Kane verdict: fail — After reloads and waits, the page is blank with no Report, Governance, Management, or Resources tab.
+Kane summary: The page hits an error while starting up and never displays the assessment interface.
+Fix the startup path that reads the missing result value, then reload and confirm that the Report, Governance, Management, and Resources tabs render with the saved assessment.
+evidence: console_error: Cannot read properties of undefined (reading &#39;result&#39;)
+Kane steps:
+- done: navigate: Navigate to http://127.0.0.1:56719
+- done: press_key: PRIMARY: Reload the page
+- done: wait: PRIMARY: wait for the Report tab to load
+- done: wait: PRIMARY: wait for the Report tab to load
+- failed: wait: Waiting while checking for the Report tab
+Browser console errors Kane recorded:
+- Cannot read properties of undefined (reading &#39;result&#39;)
+- Failed to load resource: the server responded with a status of 404 (Not Found)
+
+Browser state keys observed via Chrome DevTools (names only, no values):
+Both releases use localStorage: assessmentData
+- Before upgrade: localStorage: assessmentData
+- New user: localStorage: assessmentData
+- Returning user: localStorage: assessmentData
+
+This release of the app loads model data 1.1.0 (site/assessment-data.yaml), which adds a Governance category and renumbers others. The previous release used model data 1.0.0. Migrate each user&#39;s actual saved answers rather than hard-coding any fixed levels. Do not edit site/ or the model data.
+
+Reference material from the previous release is in .returner-reference/: data-1.0.0.yaml. Read it; do not edit it.
+
+Fix the application source so returning users keep their saved work and also get this release&#39;s behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner rebuilds with `test -d node_modules || npm ci --no-audit --no-fund --loglevel=error; npm run build --silent &amp;&amp; cp dist/self-assessment.js site/` and replays the returning user from the untouched browser state with the same Kane objective.</pre></details>
+  </li>
+  <li class="step">
+    <span class="n">3</span>
+    <h2>Codex&#39;s patch</h2>
+    <p class="files">src/components/Assessment/Assessment.tsx<br>src/components/Category/Category.module.scss<br>src/components/Category/Category.tsx<br>src/components/Module/Module.module.scss<br>src/components/Module/Module.tsx<br>src/types/types.ts<br>src/utils/assessmentProgress.ts</p>
+    <pre class="diff"><span class="hunk">diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx</span>
+index 68d9fac..1f567f0 100644
+<span class="hdr">--- a/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">+++ b/src/components/Assessment/Assessment.tsx</span>
+<span class="hunk">@@ -4,6 +4,7 @@ import { SpiderChart } from &quot;../SpiderChart/SpiderChart&quot;;</span>
+ import { Overview } from &quot;../Overview/Overview&quot;;
+ import { Report } from &quot;../Report/Report&quot;;
+ import MaturityWidget from &quot;../MaturityWidget/MaturityWidget&quot;; // Import MaturityWidget
+<span class="add">+import { restoreProgress } from &quot;../../utils/assessmentProgress&quot;;</span>
+ import { yamlParser } from &quot;../../utils/yamlParser&quot;;
+ import { generateURL, exportToYAML } from &quot;../../utils/urlGenerator&quot;;
+ import { exportToPDF } from &quot;../../utils/pdfGenerator&quot;;
+<span class="hunk">@@ -57,40 +58,43 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     const useCaseDescription = urlHash.get(&quot;useCaseDescription&quot;);
+ 
+     const loadData = async () =&gt; {
+<span class="del">-      let initialData;</span>
+<span class="add">+      let initialData: AssessmentData | null = null;</span>
+       if (src) {
+         const response = await fetch(src);
+         const yamlText = await response.text();
+<span class="del">-        initialData = yamlParser(yamlText);</span>
+<span class="add">+        initialData = yamlParser(yamlText) as AssessmentData;</span>
+       }
+       setCurrentTab(&quot;overview&quot;);
+       if (encodedProgress) {
+         try {
+           const decodedProgress = JSON.parse(atob(encodedProgress));
+<span class="del">-          setProgress(decodedProgress);</span>
+<span class="add">+          setProgress(restoreProgress(initialData, decodedProgress));</span>
+           setCurrentTab(&quot;report&quot;);
+         } catch (error) {
+           console.error(&quot;Error decoding progress from URL:&quot;, error);
+<span class="del">-          if (initialData)</span>
+<span class="del">-            setProgress(initProgress(initialData as AssessmentData));</span>
+<span class="add">+          setProgress(restoreProgress(initialData));</span>
+         }
+       } else {
+         const storedData = localStorage.getItem(STORAGE_KEY);
+         if (storedData) {
+<span class="del">-          const { progress, assessmentName, assessorName, useCaseDescription } =</span>
+<span class="del">-            JSON.parse(storedData);</span>
+<span class="del">-          setProgress(progress);</span>
+<span class="add">+          const {</span>
+<span class="add">+            progress,</span>
+<span class="add">+            modelVersion,</span>
+<span class="add">+            assessmentName,</span>
+<span class="add">+            assessorName,</span>
+<span class="add">+            useCaseDescription,</span>
+<span class="add">+          } = JSON.parse(storedData);</span>
+<span class="add">+          setProgress(restoreProgress(initialData, progress, modelVersion));</span>
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+           setCurrentTab(&quot;report&quot;);
+         } else {
+<span class="del">-          if (initialData)</span>
+<span class="del">-            setProgress(initProgress(initialData as AssessmentData));</span>
+<span class="add">+          setProgress(restoreProgress(initialData));</span>
+         }
+       }
+ 
+<span class="del">-      if (initialData) setData(initialData as AssessmentData);</span>
+<span class="add">+      if (initialData) setData(initialData);</span>
+ 
+       if (assessmentName) setAssessmentName(atob(assessmentName));
+       if (assessorName) setAssessorName(atob(assessorName));
+<span class="hunk">@@ -117,12 +121,14 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+ 
+   useEffect(() =&gt; {
+     const handleStorageChange = (event: StorageEvent) =&gt; {
+<span class="del">-      if (event.key === STORAGE_KEY) {</span>
+<span class="add">+      if (event.key === STORAGE_KEY &amp;&amp; data) {</span>
+         const storedData = JSON.parse(event.newValue || &quot;{}&quot;);
+<span class="del">-        setProgress(storedData.progress);</span>
+<span class="del">-        setAssessmentName(storedData.assessmentName);</span>
+<span class="del">-        setAssessorName(storedData.assessorName);</span>
+<span class="del">-        setUseCaseDescription(storedData.useCaseDescription);</span>
+<span class="add">+        setProgress(</span>
+<span class="add">+          restoreProgress(data, storedData.progress, storedData.modelVersion),</span>
+<span class="add">+        );</span>
+<span class="add">+        setAssessmentName(storedData.assessmentName ?? &quot;&quot;);</span>
+<span class="add">+        setAssessorName(storedData.assessorName ?? &quot;&quot;);</span>
+<span class="add">+        setUseCaseDescription(storedData.useCaseDescription ?? &quot;&quot;);</span>
+       }
+     };
+ 
+<span class="hunk">@@ -131,11 +137,12 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     return () =&gt; {
+       window.removeEventListener(&quot;storage&quot;, handleStorageChange);
+     };
+<span class="del">-  }, []);</span>
+<span class="add">+  }, [data]);</span>
+ 
+   useEffect(() =&gt; {
+     if (data) {
+       const saveData = {
+<span class="add">+        modelVersion: data.version,</span>
+         progress,
+         assessmentName,
+         assessorName,
+<span class="hunk">@@ -145,29 +152,6 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     }
+   }, [progress, assessmentName, assessorName, useCaseDescription, data]);
+ 
+<span class="del">-  function initProgress(</span>
+<span class="del">-    parsedData: AssessmentData | null,</span>
+<span class="del">-  ): Record&lt;string, ProgressData&gt; {</span>
+<span class="del">-    return (</span>
+<span class="del">-      parsedData?.modules.reduce(</span>
+<span class="del">-        (acc, module) =&gt; {</span>
+<span class="del">-          module.categories.map((category) =&gt; {</span>
+<span class="del">-            const progressData = { ...defaultProgressData };</span>
+<span class="del">-            const levelOne = category.levels.find(</span>
+<span class="del">-              (level) =&gt; level.number === 1,</span>
+<span class="del">-            );</span>
+<span class="del">-            if (levelOne) {</span>
+<span class="del">-              progressData.description = levelOne.description;</span>
+<span class="del">-            }</span>
+<span class="del">-            acc[`${module.id}.${category.id}`] = progressData;</span>
+<span class="del">-          });</span>
+<span class="del">-          return acc;</span>
+<span class="del">-        },</span>
+<span class="del">-        {} as Record&lt;string, ProgressData&gt;,</span>
+<span class="del">-      ) || {}</span>
+<span class="del">-    );</span>
+<span class="del">-  }</span>
+<span class="del">-</span>
+   const handleLevelChange = (
+     moduleId: string,
+     categoryId: string,
+<span class="hunk">@@ -211,7 +195,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+   };
+ 
+   const handleReset = () =&gt; {
+<span class="del">-    setProgress(initProgress(data));</span>
+<span class="add">+    setProgress(restoreProgress(data));</span>
+     setAssessmentName(&quot;&quot;);
+     setAssessorName(&quot;&quot;);
+     setUseCaseDescription(&quot;&quot;);
+<span class="hunk">@@ -318,8 +302,9 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     ? calculateModuleMaturityLevels(data.modules, progress)
+     : [];
+ 
+<span class="add">+  const loadingModel = Boolean(src &amp;&amp; !data);</span>
+   return (
+<span class="del">-    &lt;div className=&quot;pkimm-assessment-container&quot;&gt;</span>
+<span class="add">+    &lt;div className=&quot;pkimm-assessment-container&quot; aria-busy={loadingModel}&gt;</span>
+       &lt;div
+         className=&quot;pkimm-burger-menu&quot;
+         onClick={() =&gt; setIsMenuOpen(!isMenuOpen)}
+<span class="hunk">@@ -330,6 +315,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+       &lt;/div&gt;
+       &lt;div className={`pkimm-tabs ${isMenuOpen ? &quot;active&quot; : &quot;&quot;}`}&gt;
+         &lt;button
+<span class="add">+          disabled={loadingModel}</span>
+           className={currentTab === &quot;overview&quot; ? &quot;active&quot; : &quot;&quot;}
+           onClick={() =&gt; handleTabClick(&quot;overview&quot;)}
+         &gt;
+<span class="hunk">@@ -345,6 +331,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+           &lt;/button&gt;
+         ))}
+         &lt;button
+<span class="add">+          disabled={loadingModel}</span>
+           className={currentTab === &quot;report&quot; ? &quot;active&quot; : &quot;&quot;}
+           onClick={() =&gt; handleTabClick(&quot;report&quot;)}
+         &gt;
+<span class="hunk">diff --git a/src/components/Category/Category.module.scss b/src/components/Category/Category.module.scss</span>
+index 015470d..0c3d3a9 100644
+<span class="hdr">--- a/src/components/Category/Category.module.scss</span>
+<span class="hdr">+++ b/src/components/Category/Category.module.scss</span>
+<span class="hunk">@@ -63,11 +63,25 @@</span>
+ }
+ 
+ .pkimm-level-card {
+<span class="add">+  position: relative;</span>
+   border: 1px solid #ddd;
+   padding: 0.5rem;
+   margin-bottom: 0.5rem;
+   cursor: pointer;
+ 
+<span class="add">+  label::after {</span>
+<span class="add">+    content: &quot;&quot;;</span>
+<span class="add">+    position: absolute;</span>
+<span class="add">+    inset: 0;</span>
+<span class="add">+    cursor: pointer;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  input,</span>
+<span class="add">+  a {</span>
+<span class="add">+    position: relative;</span>
+<span class="add">+    z-index: 1;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+   &amp;.selected {
+     background-color: var(--pkimm-primary-color-lighter);
+     border-color: #2c532e;
+<span class="hunk">diff --git a/src/components/Category/Category.tsx b/src/components/Category/Category.tsx</span>
+index a67e5ff..77ce87c 100644
+<span class="hdr">--- a/src/components/Category/Category.tsx</span>
+<span class="hdr">+++ b/src/components/Category/Category.tsx</span>
+<span class="hunk">@@ -1,9 +1,7 @@</span>
+<span class="del">-import React from &quot;react&quot;;</span>
+<span class="add">+import React, { useId } from &quot;react&quot;;</span>
+ import { CategoryData, ProgressData } from &quot;../../types/types&quot;;
+ import ReactMarkdown from &quot;react-markdown&quot;;
+<span class="del">-import styles from &quot;./Category.module.scss&quot;;</span>
+<span class="del">-</span>
+<span class="del">-console.log(&quot;Styles:&quot;, styles); // Add this line</span>
+<span class="add">+import &quot;./Category.module.scss&quot;;</span>
+ 
+ interface CategoryProps {
+   moduleId: string;
+<span class="hunk">@@ -20,29 +18,25 @@ export const Category: React.FC&lt;CategoryProps&gt; = ({</span>
+   onLevelChange,
+   onApplicabilityChange,
+ }) =&gt; {
+<span class="del">-  const selectedLevel =</span>
+<span class="del">-    progress[`${moduleId}.${category.id}`] === undefined</span>
+<span class="del">-      ? 0</span>
+<span class="del">-      : progress[`${moduleId}.${category.id}`].level;</span>
+<span class="del">-  const isApplicable =</span>
+<span class="del">-    progress[`${moduleId}.${category.id}`] === undefined</span>
+<span class="del">-      ? true</span>
+<span class="del">-      : progress[`${moduleId}.${category.id}`].applicability;</span>
+<span class="add">+  const categoryId = useId();</span>
+<span class="add">+  const answer = progress[`${moduleId}.${category.id}`];</span>
+<span class="add">+  const selectedLevel = answer?.level;</span>
+<span class="add">+  const isApplicable = answer?.applicability ?? true;</span>
+ 
+   return (
+<span class="del">-    // keep only the name of the style class</span>
+     &lt;div className=&quot;pkimm-category-card&quot;&gt;
+       &lt;div className=&quot;pkimm-category-header&quot;&gt;
+         &lt;div className=&quot;pkimm-category-text&quot;&gt;
+           &lt;label className=&quot;pkimm-toggle-switch&quot;&gt;
+             &lt;input
+               type=&quot;checkbox&quot;
+<span class="add">+              aria-label={`${category.name} is applicable`}</span>
+               checked={isApplicable}
+               onChange={() =&gt; onApplicabilityChange(moduleId, category.id)}
+             /&gt;
+             &lt;span className=&quot;pkimm-slider&quot;&gt;&lt;/span&gt;
+           &lt;/label&gt;
+<span class="del">-          &lt;strong&gt;</span>
+<span class="add">+          &lt;strong id={categoryId}&gt;</span>
+             {moduleId}.{category.id} {category.name}
+           &lt;/strong&gt;
+         &lt;/div&gt;
+<span class="hunk">@@ -52,16 +46,29 @@ export const Category: React.FC&lt;CategoryProps&gt; = ({</span>
+           &lt;div className=&quot;pkimm-category-description&quot;&gt;
+             &lt;ReactMarkdown&gt;{category.description}&lt;/ReactMarkdown&gt;
+           &lt;/div&gt;
+<span class="del">-          &lt;div className=&quot;pkimm-levels&quot;&gt;</span>
+<span class="del">-            {category.levels.map((level, index) =&gt; (</span>
+<span class="add">+          &lt;div</span>
+<span class="add">+            className=&quot;pkimm-levels&quot;</span>
+<span class="add">+            role=&quot;radiogroup&quot;</span>
+<span class="add">+            aria-labelledby={categoryId}</span>
+<span class="add">+          &gt;</span>
+<span class="add">+            {category.levels.map((level) =&gt; (</span>
+               &lt;div
+<span class="del">-                key={index}</span>
+<span class="add">+                key={level.number}</span>
+                 className={`pkimm-level-card ${selectedLevel === level.number ? &quot;selected&quot; : &quot;&quot;}`}
+<span class="del">-                onClick={() =&gt;</span>
+<span class="del">-                  onLevelChange(moduleId, category.id, level.number)</span>
+<span class="del">-                }</span>
+               &gt;
+<span class="del">-                &lt;strong&gt;{level.name}&lt;/strong&gt;:{&quot; &quot;}</span>
+<span class="add">+                &lt;input</span>
+<span class="add">+                  id={`${categoryId}-${level.number}`}</span>
+<span class="add">+                  type=&quot;radio&quot;</span>
+<span class="add">+                  name={categoryId}</span>
+<span class="add">+                  value={level.number}</span>
+<span class="add">+                  checked={selectedLevel === level.number}</span>
+<span class="add">+                  onChange={() =&gt;</span>
+<span class="add">+                    onLevelChange(moduleId, category.id, level.number)</span>
+<span class="add">+                  }</span>
+<span class="add">+                /&gt;</span>
+<span class="add">+                &lt;label htmlFor={`${categoryId}-${level.number}`}&gt;</span>
+<span class="add">+                  &lt;strong&gt;{level.name}&lt;/strong&gt;</span>
+<span class="add">+                &lt;/label&gt;</span>
+                 &lt;ReactMarkdown&gt;{level.description}&lt;/ReactMarkdown&gt;
+               &lt;/div&gt;
+             ))}
+<span class="hunk">diff --git a/src/components/Module/Module.module.scss b/src/components/Module/Module.module.scss</span>
+index a069167..cac3127 100644
+<span class="hdr">--- a/src/components/Module/Module.module.scss</span>
+<span class="hdr">+++ b/src/components/Module/Module.module.scss</span>
+<span class="hunk">@@ -5,3 +5,20 @@</span>
+   padding: 1rem;
+   margin-bottom: 1rem;
+ }
+<span class="add">+</span>
+<span class="add">+.pkimm-module-levels {</span>
+<span class="add">+  width: 100%;</span>
+<span class="add">+  margin-bottom: 1rem;</span>
+<span class="add">+  border-collapse: collapse;</span>
+<span class="add">+  text-align: left;</span>
+<span class="add">+</span>
+<span class="add">+  th,</span>
+<span class="add">+  td {</span>
+<span class="add">+    padding: 0.35rem 0.5rem;</span>
+<span class="add">+    border-bottom: 1px solid #ddd;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  tbody th {</span>
+<span class="add">+    font-weight: normal;</span>
+<span class="add">+  }</span>
+<span class="add">+}</span>
+<span class="hunk">diff --git a/src/components/Module/Module.tsx b/src/components/Module/Module.tsx</span>
+index 8189f3a..d0500af 100644
+<span class="hdr">--- a/src/components/Module/Module.tsx</span>
+<span class="hdr">+++ b/src/components/Module/Module.tsx</span>
+<span class="hunk">@@ -18,10 +18,39 @@ export const Module: React.FC&lt;ModuleProps&gt; = ({</span>
+   onApplicabilityChange,
+ }) =&gt; {
+   return (
+<span class="del">-    &lt;div className=&quot;pkimm-module&quot;&gt;</span>
+<span class="add">+    &lt;section className=&quot;pkimm-module&quot; aria-label={module.name}&gt;</span>
+       &lt;div className=&quot;pkimm-module-description&quot;&gt;
+         &lt;ReactMarkdown&gt;{module.description}&lt;/ReactMarkdown&gt;
+       &lt;/div&gt;
+<span class="add">+      &lt;table</span>
+<span class="add">+        className=&quot;pkimm-module-levels&quot;</span>
+<span class="add">+        aria-label={`${module.name} maturity levels`}</span>
+<span class="add">+      &gt;</span>
+<span class="add">+        &lt;thead&gt;</span>
+<span class="add">+          &lt;tr&gt;</span>
+<span class="add">+            &lt;th scope=&quot;col&quot;&gt;Category&lt;/th&gt;</span>
+<span class="add">+            &lt;th scope=&quot;col&quot;&gt;Selected maturity level&lt;/th&gt;</span>
+<span class="add">+          &lt;/tr&gt;</span>
+<span class="add">+        &lt;/thead&gt;</span>
+<span class="add">+        &lt;tbody&gt;</span>
+<span class="add">+          {module.categories.map((category) =&gt; {</span>
+<span class="add">+            const answer = progress[`${module.id}.${category.id}`];</span>
+<span class="add">+            const level = category.levels.find(</span>
+<span class="add">+              (entry) =&gt; entry.number === answer?.level,</span>
+<span class="add">+            );</span>
+<span class="add">+            return (</span>
+<span class="add">+              &lt;tr key={category.id}&gt;</span>
+<span class="add">+                &lt;th scope=&quot;row&quot;&gt;{category.name}&lt;/th&gt;</span>
+<span class="add">+                &lt;td&gt;</span>
+<span class="add">+                  {answer?.applicability === false</span>
+<span class="add">+                    ? &quot;Not applicable&quot;</span>
+<span class="add">+                    : level?.name}</span>
+<span class="add">+                &lt;/td&gt;</span>
+<span class="add">+              &lt;/tr&gt;</span>
+<span class="add">+            );</span>
+<span class="add">+          })}</span>
+<span class="add">+        &lt;/tbody&gt;</span>
+<span class="add">+      &lt;/table&gt;</span>
+       {module.categories.map((category) =&gt; (
+         &lt;Category
+           key={category.id}
+<span class="hunk">@@ -32,6 +61,6 @@ export const Module: React.FC&lt;ModuleProps&gt; = ({</span>
+           onApplicabilityChange={onApplicabilityChange}
+         /&gt;
+       ))}
+<span class="del">-    &lt;/div&gt;</span>
+<span class="add">+    &lt;/section&gt;</span>
+   );
+ };
+<span class="hunk">diff --git a/src/types/types.ts b/src/types/types.ts</span>
+index c7e2387..9e5f01c 100644
+<span class="hdr">--- a/src/types/types.ts</span>
+<span class="hdr">+++ b/src/types/types.ts</span>
+<span class="hunk">@@ -20,6 +20,7 @@ export interface ModuleData {</span>
+ }
+ 
+ export interface AssessmentData {
+<span class="add">+  version?: string;</span>
+   modules: ModuleData[];
+ }
+ 
+<span class="hunk">diff --git a/src/utils/assessmentProgress.ts b/src/utils/assessmentProgress.ts</span>
+new file mode 100644
+index 0000000..7d00390
+<span class="hdr">--- /dev/null</span>
+<span class="hdr">+++ b/src/utils/assessmentProgress.ts</span>
+<span class="hunk">@@ -0,0 +1,49 @@</span>
+<span class="add">+import LevelResult from &quot;../enums/LevelResult&quot;;</span>
+<span class="add">+import { AssessmentData, ProgressData } from &quot;../types/types&quot;;</span>
+<span class="add">+</span>
+<span class="add">+// Keys in model 1.1.0 mapped to the same category in model 1.0.0.</span>
+<span class="add">+// Read from the original save throughout, since several IDs were reused.</span>
+<span class="add">+const previousKeys: Record&lt;string, string&gt; = {</span>
+<span class="add">+  &quot;M.6&quot;: &quot;M.5&quot;, // Key management</span>
+<span class="add">+  &quot;M.7&quot;: &quot;M.6&quot;, // Certificate management</span>
+<span class="add">+  &quot;O.10&quot;: &quot;O.15&quot;, // Resilience</span>
+<span class="add">+  &quot;O.11&quot;: &quot;O.13&quot;, // Automation</span>
+<span class="add">+  &quot;O.12&quot;: &quot;O.7&quot;, // Interoperability</span>
+<span class="add">+  &quot;O.13&quot;: &quot;O.12&quot;, // Monitoring and auditing</span>
+<span class="add">+  &quot;R.14&quot;: &quot;R.10&quot;, // Sourcing</span>
+<span class="add">+  &quot;R.15&quot;: &quot;R.11&quot;, // Knowledge and training</span>
+<span class="add">+  &quot;R.16&quot;: &quot;R.14&quot;, // Awareness</span>
+<span class="add">+};</span>
+<span class="add">+</span>
+<span class="add">+export function restoreProgress(</span>
+<span class="add">+  model: AssessmentData | null,</span>
+<span class="add">+  saved: Record&lt;string, ProgressData&gt; = {},</span>
+<span class="add">+  savedVersion?: string,</span>
+<span class="add">+): Record&lt;string, ProgressData&gt; {</span>
+<span class="add">+  const progress: Record&lt;string, ProgressData&gt; = {};</span>
+<span class="add">+  // Both releases originally saved every category without a version.</span>
+<span class="add">+  // M.5 (Key management) occurs only in the previous release.</span>
+<span class="add">+  const migrate =</span>
+<span class="add">+    model?.version === &quot;1.1.0&quot; &amp;&amp;</span>
+<span class="add">+    (savedVersion === &quot;1.0.0&quot; || (!savedVersion &amp;&amp; &quot;M.5&quot; in saved));</span>
+<span class="add">+</span>
+<span class="add">+  for (const module of model?.modules ?? []) {</span>
+<span class="add">+    for (const category of module.categories) {</span>
+<span class="add">+      const key = `${module.id}.${category.id}`;</span>
+<span class="add">+      const previousKey = migrate ? (previousKeys[key] ?? key) : key;</span>
+<span class="add">+      const answer = saved[previousKey];</span>
+<span class="add">+      const level = answer?.level ?? 1;</span>
+<span class="add">+      const applicability = answer?.applicability ?? true;</span>
+<span class="add">+      progress[key] = {</span>
+<span class="add">+        level,</span>
+<span class="add">+        applicability,</span>
+<span class="add">+        result: LevelResult[applicability ? level : -1],</span>
+<span class="add">+        description:</span>
+<span class="add">+          category.levels.find((entry) =&gt; entry.number === level)</span>
+<span class="add">+            ?.description ?? &quot;&quot;,</span>
+<span class="add">+      };</span>
+<span class="add">+    }</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  return progress;</span>
+<span class="add">+}</span>
+</pre>
+  </li>
+  <li class="step pass">
+    <span class="n">4</span>
+    <h2>Replay & fresh rehearsal pass</h2>
+    <a class="img" href="after/shots/returning-user.jpg"><img src="after/shots/returning-user.jpg" alt="Kane's replay screenshot"></a>
+    <p>Completed the requested read-only review by reloading the page and opening the Governance, Management, and Resources tabs.
+Confirmed on the Report tab that the assessment name was “Returner-419b90fd” and the assessor name was “Saved work c66e88a8-e86.”
+Confirmed in Governance that “Strategy and Vision” was rated “3 - Advanced” and that “Cryptography” was listed.
+Confirmed in Management that “Infrastructure management” was rated “4 - Managed.”
+Confirmed in Resources that “Sourcing” was rated “2 - Basic.”</p>
+    <p class="fine">Holdout user (Profile B): <strong>pass</strong></p>
+    <a class="img" href="profile-b-after/shots/returning-user.jpg"><img src="profile-b-after/shots/returning-user.jpg" alt="Kane's Profile B holdout replay screenshot"></a>
+    <p class="fine">Fresh rehearsal (brand-new marker): <strong>pass</strong></p>
+  </li>
+</ol>
+
+<section class="panel"><h3>Full patch (repair.diff)</h3><pre class="diff"><span class="hunk">diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx</span>
+index 68d9fac..1f567f0 100644
+<span class="hdr">--- a/src/components/Assessment/Assessment.tsx</span>
+<span class="hdr">+++ b/src/components/Assessment/Assessment.tsx</span>
+<span class="hunk">@@ -4,6 +4,7 @@ import { SpiderChart } from &quot;../SpiderChart/SpiderChart&quot;;</span>
+ import { Overview } from &quot;../Overview/Overview&quot;;
+ import { Report } from &quot;../Report/Report&quot;;
+ import MaturityWidget from &quot;../MaturityWidget/MaturityWidget&quot;; // Import MaturityWidget
+<span class="add">+import { restoreProgress } from &quot;../../utils/assessmentProgress&quot;;</span>
+ import { yamlParser } from &quot;../../utils/yamlParser&quot;;
+ import { generateURL, exportToYAML } from &quot;../../utils/urlGenerator&quot;;
+ import { exportToPDF } from &quot;../../utils/pdfGenerator&quot;;
+<span class="hunk">@@ -57,40 +58,43 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     const useCaseDescription = urlHash.get(&quot;useCaseDescription&quot;);
+ 
+     const loadData = async () =&gt; {
+<span class="del">-      let initialData;</span>
+<span class="add">+      let initialData: AssessmentData | null = null;</span>
+       if (src) {
+         const response = await fetch(src);
+         const yamlText = await response.text();
+<span class="del">-        initialData = yamlParser(yamlText);</span>
+<span class="add">+        initialData = yamlParser(yamlText) as AssessmentData;</span>
+       }
+       setCurrentTab(&quot;overview&quot;);
+       if (encodedProgress) {
+         try {
+           const decodedProgress = JSON.parse(atob(encodedProgress));
+<span class="del">-          setProgress(decodedProgress);</span>
+<span class="add">+          setProgress(restoreProgress(initialData, decodedProgress));</span>
+           setCurrentTab(&quot;report&quot;);
+         } catch (error) {
+           console.error(&quot;Error decoding progress from URL:&quot;, error);
+<span class="del">-          if (initialData)</span>
+<span class="del">-            setProgress(initProgress(initialData as AssessmentData));</span>
+<span class="add">+          setProgress(restoreProgress(initialData));</span>
+         }
+       } else {
+         const storedData = localStorage.getItem(STORAGE_KEY);
+         if (storedData) {
+<span class="del">-          const { progress, assessmentName, assessorName, useCaseDescription } =</span>
+<span class="del">-            JSON.parse(storedData);</span>
+<span class="del">-          setProgress(progress);</span>
+<span class="add">+          const {</span>
+<span class="add">+            progress,</span>
+<span class="add">+            modelVersion,</span>
+<span class="add">+            assessmentName,</span>
+<span class="add">+            assessorName,</span>
+<span class="add">+            useCaseDescription,</span>
+<span class="add">+          } = JSON.parse(storedData);</span>
+<span class="add">+          setProgress(restoreProgress(initialData, progress, modelVersion));</span>
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+           setCurrentTab(&quot;report&quot;);
+         } else {
+<span class="del">-          if (initialData)</span>
+<span class="del">-            setProgress(initProgress(initialData as AssessmentData));</span>
+<span class="add">+          setProgress(restoreProgress(initialData));</span>
+         }
+       }
+ 
+<span class="del">-      if (initialData) setData(initialData as AssessmentData);</span>
+<span class="add">+      if (initialData) setData(initialData);</span>
+ 
+       if (assessmentName) setAssessmentName(atob(assessmentName));
+       if (assessorName) setAssessorName(atob(assessorName));
+<span class="hunk">@@ -117,12 +121,14 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+ 
+   useEffect(() =&gt; {
+     const handleStorageChange = (event: StorageEvent) =&gt; {
+<span class="del">-      if (event.key === STORAGE_KEY) {</span>
+<span class="add">+      if (event.key === STORAGE_KEY &amp;&amp; data) {</span>
+         const storedData = JSON.parse(event.newValue || &quot;{}&quot;);
+<span class="del">-        setProgress(storedData.progress);</span>
+<span class="del">-        setAssessmentName(storedData.assessmentName);</span>
+<span class="del">-        setAssessorName(storedData.assessorName);</span>
+<span class="del">-        setUseCaseDescription(storedData.useCaseDescription);</span>
+<span class="add">+        setProgress(</span>
+<span class="add">+          restoreProgress(data, storedData.progress, storedData.modelVersion),</span>
+<span class="add">+        );</span>
+<span class="add">+        setAssessmentName(storedData.assessmentName ?? &quot;&quot;);</span>
+<span class="add">+        setAssessorName(storedData.assessorName ?? &quot;&quot;);</span>
+<span class="add">+        setUseCaseDescription(storedData.useCaseDescription ?? &quot;&quot;);</span>
+       }
+     };
+ 
+<span class="hunk">@@ -131,11 +137,12 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     return () =&gt; {
+       window.removeEventListener(&quot;storage&quot;, handleStorageChange);
+     };
+<span class="del">-  }, []);</span>
+<span class="add">+  }, [data]);</span>
+ 
+   useEffect(() =&gt; {
+     if (data) {
+       const saveData = {
+<span class="add">+        modelVersion: data.version,</span>
+         progress,
+         assessmentName,
+         assessorName,
+<span class="hunk">@@ -145,29 +152,6 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     }
+   }, [progress, assessmentName, assessorName, useCaseDescription, data]);
+ 
+<span class="del">-  function initProgress(</span>
+<span class="del">-    parsedData: AssessmentData | null,</span>
+<span class="del">-  ): Record&lt;string, ProgressData&gt; {</span>
+<span class="del">-    return (</span>
+<span class="del">-      parsedData?.modules.reduce(</span>
+<span class="del">-        (acc, module) =&gt; {</span>
+<span class="del">-          module.categories.map((category) =&gt; {</span>
+<span class="del">-            const progressData = { ...defaultProgressData };</span>
+<span class="del">-            const levelOne = category.levels.find(</span>
+<span class="del">-              (level) =&gt; level.number === 1,</span>
+<span class="del">-            );</span>
+<span class="del">-            if (levelOne) {</span>
+<span class="del">-              progressData.description = levelOne.description;</span>
+<span class="del">-            }</span>
+<span class="del">-            acc[`${module.id}.${category.id}`] = progressData;</span>
+<span class="del">-          });</span>
+<span class="del">-          return acc;</span>
+<span class="del">-        },</span>
+<span class="del">-        {} as Record&lt;string, ProgressData&gt;,</span>
+<span class="del">-      ) || {}</span>
+<span class="del">-    );</span>
+<span class="del">-  }</span>
+<span class="del">-</span>
+   const handleLevelChange = (
+     moduleId: string,
+     categoryId: string,
+<span class="hunk">@@ -211,7 +195,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+   };
+ 
+   const handleReset = () =&gt; {
+<span class="del">-    setProgress(initProgress(data));</span>
+<span class="add">+    setProgress(restoreProgress(data));</span>
+     setAssessmentName(&quot;&quot;);
+     setAssessorName(&quot;&quot;);
+     setUseCaseDescription(&quot;&quot;);
+<span class="hunk">@@ -318,8 +302,9 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+     ? calculateModuleMaturityLevels(data.modules, progress)
+     : [];
+ 
+<span class="add">+  const loadingModel = Boolean(src &amp;&amp; !data);</span>
+   return (
+<span class="del">-    &lt;div className=&quot;pkimm-assessment-container&quot;&gt;</span>
+<span class="add">+    &lt;div className=&quot;pkimm-assessment-container&quot; aria-busy={loadingModel}&gt;</span>
+       &lt;div
+         className=&quot;pkimm-burger-menu&quot;
+         onClick={() =&gt; setIsMenuOpen(!isMenuOpen)}
+<span class="hunk">@@ -330,6 +315,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+       &lt;/div&gt;
+       &lt;div className={`pkimm-tabs ${isMenuOpen ? &quot;active&quot; : &quot;&quot;}`}&gt;
+         &lt;button
+<span class="add">+          disabled={loadingModel}</span>
+           className={currentTab === &quot;overview&quot; ? &quot;active&quot; : &quot;&quot;}
+           onClick={() =&gt; handleTabClick(&quot;overview&quot;)}
+         &gt;
+<span class="hunk">@@ -345,6 +331,7 @@ export const Assessment: React.FC&lt;AssessmentProps&gt; = ({ src, config }) =&gt; {</span>
+           &lt;/button&gt;
+         ))}
+         &lt;button
+<span class="add">+          disabled={loadingModel}</span>
+           className={currentTab === &quot;report&quot; ? &quot;active&quot; : &quot;&quot;}
+           onClick={() =&gt; handleTabClick(&quot;report&quot;)}
+         &gt;
+<span class="hunk">diff --git a/src/components/Category/Category.module.scss b/src/components/Category/Category.module.scss</span>
+index 015470d..0c3d3a9 100644
+<span class="hdr">--- a/src/components/Category/Category.module.scss</span>
+<span class="hdr">+++ b/src/components/Category/Category.module.scss</span>
+<span class="hunk">@@ -63,11 +63,25 @@</span>
+ }
+ 
+ .pkimm-level-card {
+<span class="add">+  position: relative;</span>
+   border: 1px solid #ddd;
+   padding: 0.5rem;
+   margin-bottom: 0.5rem;
+   cursor: pointer;
+ 
+<span class="add">+  label::after {</span>
+<span class="add">+    content: &quot;&quot;;</span>
+<span class="add">+    position: absolute;</span>
+<span class="add">+    inset: 0;</span>
+<span class="add">+    cursor: pointer;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  input,</span>
+<span class="add">+  a {</span>
+<span class="add">+    position: relative;</span>
+<span class="add">+    z-index: 1;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+   &amp;.selected {
+     background-color: var(--pkimm-primary-color-lighter);
+     border-color: #2c532e;
+<span class="hunk">diff --git a/src/components/Category/Category.tsx b/src/components/Category/Category.tsx</span>
+index a67e5ff..77ce87c 100644
+<span class="hdr">--- a/src/components/Category/Category.tsx</span>
+<span class="hdr">+++ b/src/components/Category/Category.tsx</span>
+<span class="hunk">@@ -1,9 +1,7 @@</span>
+<span class="del">-import React from &quot;react&quot;;</span>
+<span class="add">+import React, { useId } from &quot;react&quot;;</span>
+ import { CategoryData, ProgressData } from &quot;../../types/types&quot;;
+ import ReactMarkdown from &quot;react-markdown&quot;;
+<span class="del">-import styles from &quot;./Category.module.scss&quot;;</span>
+<span class="del">-</span>
+<span class="del">-console.log(&quot;Styles:&quot;, styles); // Add this line</span>
+<span class="add">+import &quot;./Category.module.scss&quot;;</span>
+ 
+ interface CategoryProps {
+   moduleId: string;
+<span class="hunk">@@ -20,29 +18,25 @@ export const Category: React.FC&lt;CategoryProps&gt; = ({</span>
+   onLevelChange,
+   onApplicabilityChange,
+ }) =&gt; {
+<span class="del">-  const selectedLevel =</span>
+<span class="del">-    progress[`${moduleId}.${category.id}`] === undefined</span>
+<span class="del">-      ? 0</span>
+<span class="del">-      : progress[`${moduleId}.${category.id}`].level;</span>
+<span class="del">-  const isApplicable =</span>
+<span class="del">-    progress[`${moduleId}.${category.id}`] === undefined</span>
+<span class="del">-      ? true</span>
+<span class="del">-      : progress[`${moduleId}.${category.id}`].applicability;</span>
+<span class="add">+  const categoryId = useId();</span>
+<span class="add">+  const answer = progress[`${moduleId}.${category.id}`];</span>
+<span class="add">+  const selectedLevel = answer?.level;</span>
+<span class="add">+  const isApplicable = answer?.applicability ?? true;</span>
+ 
+   return (
+<span class="del">-    // keep only the name of the style class</span>
+     &lt;div className=&quot;pkimm-category-card&quot;&gt;
+       &lt;div className=&quot;pkimm-category-header&quot;&gt;
+         &lt;div className=&quot;pkimm-category-text&quot;&gt;
+           &lt;label className=&quot;pkimm-toggle-switch&quot;&gt;
+             &lt;input
+               type=&quot;checkbox&quot;
+<span class="add">+              aria-label={`${category.name} is applicable`}</span>
+               checked={isApplicable}
+               onChange={() =&gt; onApplicabilityChange(moduleId, category.id)}
+             /&gt;
+             &lt;span className=&quot;pkimm-slider&quot;&gt;&lt;/span&gt;
+           &lt;/label&gt;
+<span class="del">-          &lt;strong&gt;</span>
+<span class="add">+          &lt;strong id={categoryId}&gt;</span>
+             {moduleId}.{category.id} {category.name}
+           &lt;/strong&gt;
+         &lt;/div&gt;
+<span class="hunk">@@ -52,16 +46,29 @@ export const Category: React.FC&lt;CategoryProps&gt; = ({</span>
+           &lt;div className=&quot;pkimm-category-description&quot;&gt;
+             &lt;ReactMarkdown&gt;{category.description}&lt;/ReactMarkdown&gt;
+           &lt;/div&gt;
+<span class="del">-          &lt;div className=&quot;pkimm-levels&quot;&gt;</span>
+<span class="del">-            {category.levels.map((level, index) =&gt; (</span>
+<span class="add">+          &lt;div</span>
+<span class="add">+            className=&quot;pkimm-levels&quot;</span>
+<span class="add">+            role=&quot;radiogroup&quot;</span>
+<span class="add">+            aria-labelledby={categoryId}</span>
+<span class="add">+          &gt;</span>
+<span class="add">+            {category.levels.map((level) =&gt; (</span>
+               &lt;div
+<span class="del">-                key={index}</span>
+<span class="add">+                key={level.number}</span>
+                 className={`pkimm-level-card ${selectedLevel === level.number ? &quot;selected&quot; : &quot;&quot;}`}
+<span class="del">-                onClick={() =&gt;</span>
+<span class="del">-                  onLevelChange(moduleId, category.id, level.number)</span>
+<span class="del">-                }</span>
+               &gt;
+<span class="del">-                &lt;strong&gt;{level.name}&lt;/strong&gt;:{&quot; &quot;}</span>
+<span class="add">+                &lt;input</span>
+<span class="add">+                  id={`${categoryId}-${level.number}`}</span>
+<span class="add">+                  type=&quot;radio&quot;</span>
+<span class="add">+                  name={categoryId}</span>
+<span class="add">+                  value={level.number}</span>
+<span class="add">+                  checked={selectedLevel === level.number}</span>
+<span class="add">+                  onChange={() =&gt;</span>
+<span class="add">+                    onLevelChange(moduleId, category.id, level.number)</span>
+<span class="add">+                  }</span>
+<span class="add">+                /&gt;</span>
+<span class="add">+                &lt;label htmlFor={`${categoryId}-${level.number}`}&gt;</span>
+<span class="add">+                  &lt;strong&gt;{level.name}&lt;/strong&gt;</span>
+<span class="add">+                &lt;/label&gt;</span>
+                 &lt;ReactMarkdown&gt;{level.description}&lt;/ReactMarkdown&gt;
+               &lt;/div&gt;
+             ))}
+<span class="hunk">diff --git a/src/components/Module/Module.module.scss b/src/components/Module/Module.module.scss</span>
+index a069167..cac3127 100644
+<span class="hdr">--- a/src/components/Module/Module.module.scss</span>
+<span class="hdr">+++ b/src/components/Module/Module.module.scss</span>
+<span class="hunk">@@ -5,3 +5,20 @@</span>
+   padding: 1rem;
+   margin-bottom: 1rem;
+ }
+<span class="add">+</span>
+<span class="add">+.pkimm-module-levels {</span>
+<span class="add">+  width: 100%;</span>
+<span class="add">+  margin-bottom: 1rem;</span>
+<span class="add">+  border-collapse: collapse;</span>
+<span class="add">+  text-align: left;</span>
+<span class="add">+</span>
+<span class="add">+  th,</span>
+<span class="add">+  td {</span>
+<span class="add">+    padding: 0.35rem 0.5rem;</span>
+<span class="add">+    border-bottom: 1px solid #ddd;</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  tbody th {</span>
+<span class="add">+    font-weight: normal;</span>
+<span class="add">+  }</span>
+<span class="add">+}</span>
+<span class="hunk">diff --git a/src/components/Module/Module.tsx b/src/components/Module/Module.tsx</span>
+index 8189f3a..d0500af 100644
+<span class="hdr">--- a/src/components/Module/Module.tsx</span>
+<span class="hdr">+++ b/src/components/Module/Module.tsx</span>
+<span class="hunk">@@ -18,10 +18,39 @@ export const Module: React.FC&lt;ModuleProps&gt; = ({</span>
+   onApplicabilityChange,
+ }) =&gt; {
+   return (
+<span class="del">-    &lt;div className=&quot;pkimm-module&quot;&gt;</span>
+<span class="add">+    &lt;section className=&quot;pkimm-module&quot; aria-label={module.name}&gt;</span>
+       &lt;div className=&quot;pkimm-module-description&quot;&gt;
+         &lt;ReactMarkdown&gt;{module.description}&lt;/ReactMarkdown&gt;
+       &lt;/div&gt;
+<span class="add">+      &lt;table</span>
+<span class="add">+        className=&quot;pkimm-module-levels&quot;</span>
+<span class="add">+        aria-label={`${module.name} maturity levels`}</span>
+<span class="add">+      &gt;</span>
+<span class="add">+        &lt;thead&gt;</span>
+<span class="add">+          &lt;tr&gt;</span>
+<span class="add">+            &lt;th scope=&quot;col&quot;&gt;Category&lt;/th&gt;</span>
+<span class="add">+            &lt;th scope=&quot;col&quot;&gt;Selected maturity level&lt;/th&gt;</span>
+<span class="add">+          &lt;/tr&gt;</span>
+<span class="add">+        &lt;/thead&gt;</span>
+<span class="add">+        &lt;tbody&gt;</span>
+<span class="add">+          {module.categories.map((category) =&gt; {</span>
+<span class="add">+            const answer = progress[`${module.id}.${category.id}`];</span>
+<span class="add">+            const level = category.levels.find(</span>
+<span class="add">+              (entry) =&gt; entry.number === answer?.level,</span>
+<span class="add">+            );</span>
+<span class="add">+            return (</span>
+<span class="add">+              &lt;tr key={category.id}&gt;</span>
+<span class="add">+                &lt;th scope=&quot;row&quot;&gt;{category.name}&lt;/th&gt;</span>
+<span class="add">+                &lt;td&gt;</span>
+<span class="add">+                  {answer?.applicability === false</span>
+<span class="add">+                    ? &quot;Not applicable&quot;</span>
+<span class="add">+                    : level?.name}</span>
+<span class="add">+                &lt;/td&gt;</span>
+<span class="add">+              &lt;/tr&gt;</span>
+<span class="add">+            );</span>
+<span class="add">+          })}</span>
+<span class="add">+        &lt;/tbody&gt;</span>
+<span class="add">+      &lt;/table&gt;</span>
+       {module.categories.map((category) =&gt; (
+         &lt;Category
+           key={category.id}
+<span class="hunk">@@ -32,6 +61,6 @@ export const Module: React.FC&lt;ModuleProps&gt; = ({</span>
+           onApplicabilityChange={onApplicabilityChange}
+         /&gt;
+       ))}
+<span class="del">-    &lt;/div&gt;</span>
+<span class="add">+    &lt;/section&gt;</span>
+   );
+ };
+<span class="hunk">diff --git a/src/types/types.ts b/src/types/types.ts</span>
+index c7e2387..9e5f01c 100644
+<span class="hdr">--- a/src/types/types.ts</span>
+<span class="hdr">+++ b/src/types/types.ts</span>
+<span class="hunk">@@ -20,6 +20,7 @@ export interface ModuleData {</span>
+ }
+ 
+ export interface AssessmentData {
+<span class="add">+  version?: string;</span>
+   modules: ModuleData[];
+ }
+ 
+<span class="hunk">diff --git a/src/utils/assessmentProgress.ts b/src/utils/assessmentProgress.ts</span>
+new file mode 100644
+index 0000000..7d00390
+<span class="hdr">--- /dev/null</span>
+<span class="hdr">+++ b/src/utils/assessmentProgress.ts</span>
+<span class="hunk">@@ -0,0 +1,49 @@</span>
+<span class="add">+import LevelResult from &quot;../enums/LevelResult&quot;;</span>
+<span class="add">+import { AssessmentData, ProgressData } from &quot;../types/types&quot;;</span>
+<span class="add">+</span>
+<span class="add">+// Keys in model 1.1.0 mapped to the same category in model 1.0.0.</span>
+<span class="add">+// Read from the original save throughout, since several IDs were reused.</span>
+<span class="add">+const previousKeys: Record&lt;string, string&gt; = {</span>
+<span class="add">+  &quot;M.6&quot;: &quot;M.5&quot;, // Key management</span>
+<span class="add">+  &quot;M.7&quot;: &quot;M.6&quot;, // Certificate management</span>
+<span class="add">+  &quot;O.10&quot;: &quot;O.15&quot;, // Resilience</span>
+<span class="add">+  &quot;O.11&quot;: &quot;O.13&quot;, // Automation</span>
+<span class="add">+  &quot;O.12&quot;: &quot;O.7&quot;, // Interoperability</span>
+<span class="add">+  &quot;O.13&quot;: &quot;O.12&quot;, // Monitoring and auditing</span>
+<span class="add">+  &quot;R.14&quot;: &quot;R.10&quot;, // Sourcing</span>
+<span class="add">+  &quot;R.15&quot;: &quot;R.11&quot;, // Knowledge and training</span>
+<span class="add">+  &quot;R.16&quot;: &quot;R.14&quot;, // Awareness</span>
+<span class="add">+};</span>
+<span class="add">+</span>
+<span class="add">+export function restoreProgress(</span>
+<span class="add">+  model: AssessmentData | null,</span>
+<span class="add">+  saved: Record&lt;string, ProgressData&gt; = {},</span>
+<span class="add">+  savedVersion?: string,</span>
+<span class="add">+): Record&lt;string, ProgressData&gt; {</span>
+<span class="add">+  const progress: Record&lt;string, ProgressData&gt; = {};</span>
+<span class="add">+  // Both releases originally saved every category without a version.</span>
+<span class="add">+  // M.5 (Key management) occurs only in the previous release.</span>
+<span class="add">+  const migrate =</span>
+<span class="add">+    model?.version === &quot;1.1.0&quot; &amp;&amp;</span>
+<span class="add">+    (savedVersion === &quot;1.0.0&quot; || (!savedVersion &amp;&amp; &quot;M.5&quot; in saved));</span>
+<span class="add">+</span>
+<span class="add">+  for (const module of model?.modules ?? []) {</span>
+<span class="add">+    for (const category of module.categories) {</span>
+<span class="add">+      const key = `${module.id}.${category.id}`;</span>
+<span class="add">+      const previousKey = migrate ? (previousKeys[key] ?? key) : key;</span>
+<span class="add">+      const answer = saved[previousKey];</span>
+<span class="add">+      const level = answer?.level ?? 1;</span>
+<span class="add">+      const applicability = answer?.applicability ?? true;</span>
+<span class="add">+      progress[key] = {</span>
+<span class="add">+        level,</span>
+<span class="add">+        applicability,</span>
+<span class="add">+        result: LevelResult[applicability ? level : -1],</span>
+<span class="add">+        description:</span>
+<span class="add">+          category.levels.find((entry) =&gt; entry.number === level)</span>
+<span class="add">+            ?.description ?? &quot;&quot;,</span>
+<span class="add">+      };</span>
+<span class="add">+    }</span>
+<span class="add">+  }</span>
+<span class="add">+</span>
+<span class="add">+  return progress;</span>
+<span class="add">+}</span>
+</pre></section>
+<section class="panel"><h3>Attempts</h3><table><thead><tr><th>Attempt</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr>
+    <td>#1</td>
+    <td><span class="pill fail">fail</span></td>
+    <td>Checkpoint assertion failed: &quot;&quot;Strategy and Vision&quot; is at level &quot;3 - Advanced&quot; and a category named &quot;Cryptography&quot; is listed.&quot;</td>
+  </tr><tr>
+    <td>#2</td>
+    <td><span class="pill pass">pass</span></td>
+    <td>Profile A replay, Profile B holdout replay, and fresh rehearsal all passed.</td>
+  </tr></tbody></table></section>
+
+<footer>Every verdict and screenshot comes from Kane CLI. The agent never grades its own fix.</footer>
+</main></body></html>

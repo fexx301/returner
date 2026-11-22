@@ -1,0 +1,51 @@
+{
+  "attempt": 2,
+  "code": 0,
+  "evidence": "…/returner/.returner/repair-utmIHI/.returner/run-xwX2D0",
+  "results": [
+    {
+      "name": "new user",
+      "status": "pass",
+      "reason": "Objective completed"
+    },
+    {
+      "name": "returning user",
+      "status": "pass",
+      "reason": "Objective completed"
+    }
+  ],
+  "holdout": {
+    "code": 0,
+    "results": [
+      {
+        "name": "new user",
+        "status": "pass"
+      },
+      {
+        "name": "returning user",
+        "status": "pass"
+      }
+    ]
+  },
+  "fresh": {
+    "code": 0,
+    "evidence": "…/returner/.returner/repair-utmIHI/.returner/run-8dCzrF",
+    "results": [
+      {
+        "name": "old baseline",
+        "status": "pass",
+        "reason": "Objective completed"
+      },
+      {
+        "name": "new user",
+        "status": "pass",
+        "reason": "Objective completed"
+      },
+      {
+        "name": "returning user",
+        "status": "pass",
+        "reason": "Objective completed"
+      }
+    ]
+  }
+}

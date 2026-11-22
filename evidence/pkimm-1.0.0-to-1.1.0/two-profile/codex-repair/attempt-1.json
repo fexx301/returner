@@ -1,0 +1,17 @@
+{
+  "attempt": 1,
+  "code": 1,
+  "evidence": "…/returner/.returner/repair-utmIHI/.returner/run-l1DH1u",
+  "results": [
+    {
+      "name": "new user",
+      "status": "pass",
+      "reason": "Objective completed"
+    },
+    {
+      "name": "returning user",
+      "status": "fail",
+      "reason": "Checkpoint assertion failed: \"\"Strategy and Vision\" is at level \"3 - Advanced\" and a category named \"Cryptography\" is listed.\""
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "baseline": "…/returner-holdout/.returner/run-XwqSoO",
+  "attempts": [
+    {
+      "attempt": 2,
+      "code": 0,
+      "evidence": "…/returner-holdout/.returner/run-Y65gev",
+      "results": [
+        {
+          "name": "new user",
+          "status": "pass",
+          "reason": "Objective completed"
+        },
+        {
+          "name": "returning user",
+          "status": "pass",
+          "reason": "Objective completed"
+        }
+      ]
+    }
+  ]
+}

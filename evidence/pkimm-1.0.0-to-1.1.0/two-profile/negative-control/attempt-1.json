@@ -1,0 +1,30 @@
+{
+  "attempt": 1,
+  "code": 0,
+  "evidence": "…/returner/.returner/repair-Gv2BBr/.returner/run-1GtRwA",
+  "results": [
+    {
+      "name": "new user",
+      "status": "pass",
+      "reason": "Objective completed"
+    },
+    {
+      "name": "returning user",
+      "status": "pass",
+      "reason": "Objective completed"
+    }
+  ],
+  "holdout": {
+    "code": 1,
+    "results": [
+      {
+        "name": "new user",
+        "status": "pass"
+      },
+      {
+        "name": "returning user",
+        "status": "fail"
+      }
+    ]
+  }
+}

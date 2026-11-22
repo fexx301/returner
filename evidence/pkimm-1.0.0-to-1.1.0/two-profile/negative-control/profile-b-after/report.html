@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23141517%27/%3E%3Cpath d=%27M9 17l5 5 9-12%27 stroke=%27%233fbf75%27 stroke-width=%274%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<title>Returner report · Returning users lose their work</title>
+<style>
+:root{--ground:#eceae4;--card:#fff;--ink:#141517;--muted:#5e5c57;--line:#d9d6ce;--pass:#1e8a4c;--fail:#c83f1a;--warn:#9a6a08}
+@media (prefers-color-scheme:dark){:root{--ground:#141517;--card:#1d1f22;--ink:#f1efe8;--muted:#a9a69e;--line:#2e3034;--pass:#3fbf75;--fail:#ff7a52;--warn:#e0b04a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px}
+.site{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line)}
+.siteinner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.mk{width:28px;height:28px;border-radius:8px;background:#141517;border:1px solid rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.sitenav{display:flex;gap:18px;font-size:14px;align-items:center}.sitenav a{color:var(--muted);text-decoration:none}.sitenav a:hover{color:var(--ink)}
+.sitenav a.go{color:var(--ground);background:var(--ink);padding:7px 12px;border-radius:8px;font-weight:600}
+a:focus-visible,summary:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--pass) 45%,transparent);border-radius:6px}
+.kicker{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.verdict{display:flex;gap:20px;align-items:center;margin:14px 0 6px}
+.verdict .dot{flex:none;width:18px;height:18px;border-radius:50%}
+.verdict.pass .dot{background:var(--pass)}.verdict.fail .dot{background:var(--fail)}.verdict.inconclusive .dot{background:var(--warn)}.verdict.running .dot{background:var(--muted)}
+.who{display:block;font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08;letter-spacing:-.025em;margin:0}
+.promise{font-size:19px;color:var(--muted);margin:8px 0 0}
+.meta{font:13px ui-monospace,Menlo,monospace;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:32px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card.hero{grid-column:1/-1;border-width:2px}.card.hero.fail{border-color:var(--fail)}.card.hero.pass{border-color:var(--pass)}
+.body{display:flex;flex-direction:column;gap:14px;min-width:0}.text{display:flex;flex-direction:column;gap:14px;min-width:0}
+figure{margin:0;min-width:0}figcaption{font-size:12px;color:var(--muted);margin-top:6px}
+.card.wide{grid-column:1/-1}
+.card.hero .body,.card.wide .body{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start;gap:22px}
+.card header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h2{font-size:20px;margin:0;letter-spacing:-.01em}
+.role{margin:2px 0 0;color:var(--muted);font-size:14px}
+.pill{flex:none;font:700 13px ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px;color:#fff}
+.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}.pill.inconclusive{background:var(--warn)}
+.shot{display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--ground);aspect-ratio:16/9}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left}
+.shot.none{display:grid;place-items:center;color:var(--muted);font-size:14px}
+.console{margin:0 0 14px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--fail) 35%,var(--line));background:color-mix(in srgb,var(--fail) 7%,transparent)}
+.console ul{margin:6px 0 0;padding-left:18px}.console code{font-size:13px;overflow-wrap:anywhere}
+.xray{margin-top:24px;background:#17181b;color:#e9e6df;border-radius:14px;padding:16px 20px;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.xray .who{color:#a9a69e}.xray .hl{color:#ffd180;margin:4px 0 10px;font-weight:600}.xray .row{display:flex;gap:12px;flex-wrap:wrap;padding:3px 0;border-top:1px solid rgba(255,255,255,.08)}
+.xray .row b{min-width:160px;color:#9fd5b0}.xray .none{color:#8a8780}
+.policy{margin-top:20px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pass);border-radius:12px;padding:14px 18px;font-size:14px}
+.policy.fail{border-left-color:var(--fail)}.policy.errored{border-left-color:var(--warn)}
+.summary{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;color:var(--muted);font-size:14px}
+.objective{font-size:14px;overflow-wrap:anywhere}
+ol{margin:8px 0 0;padding-left:20px;font-size:14px;color:var(--muted)}li{overflow-wrap:anywhere;margin:2px 0}
+.replay{margin-top:28px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:18px 20px}
+.replay code{display:block;font:13px/1.5 ui-monospace,Menlo,monospace;overflow-wrap:anywhere;color:var(--muted);margin-top:6px}
+footer{margin-top:36px;color:var(--muted);font-size:13px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:28px 16px 48px}.card.hero .body,.card.wide .body{grid-template-columns:1fr}}
+</style></head>
+<body><header class="site"><div class="siteinner"><a class="logo" href="https://fexx301.github.io/returner/"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a><nav class="sitenav" aria-label="Site"><a href="https://fexx301.github.io/returner/">All results</a><a class="go" href="https://fexx301.github.io/returner/try/">Try it live</a></nav></div></header>
+<main class="wrap">
+<p class="kicker">Returner · upgrade rehearsal with Kane CLI</p>
+<div class="verdict fail"><span class="dot" aria-hidden="true"></span><h1>Returning users lose their work</h1></div>
+<p class="promise">Promise: “My saved assessment survives the model update, and I see the new model”</p>
+<p class="meta">Both builds served at http://127.0.0.1:55272</p>
+
+<section class="xray" aria-label="Browser state keys observed via Chrome DevTools"><span class="who">Browser state X-ray · key names only (via Chrome DevTools)</span><div class="hl">Storage keys diverged: v2 new user wrote localStorage: assessmentData</div><div class="row"><b>New user</b><span>localStorage: assessmentData</span></div><div class="row"><b>Returning user</b><span>localStorage: assessmentData</span></div></section>
+<div class="grid">
+<section class="card hero  fail">
+  <header><div><h2>Returning user</h2><p class="role">Yesterday&#39;s profile on the new build</p></div><span class="pill fail">fail</span></header>
+  <div class="body"><figure><a class="shot" href="shots/returning-user.jpg"><img src="shots/returning-user.jpg" alt="Kane's final screenshot for the Returning user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
+  <div class="console"><span class="who">Browser console errors from Kane's evidence pack</span><ul><li><code>Failed to load resource: the server responded with a status of 404 (Not Found)</code></li></ul></div>
+  <p class="summary"><span class="who">Kane's summary</span>The assessment identity was retained, but its saved maturity selection for Sourcing was not reflected in the Resources view after the model update.
+Investigate migration and restore logic for saved category maturity levels, especially R.14 Sourcing, and verify that the selected level remains attached to the saved assessment after loading the new model.
+evidence: objective_contradiction: Final verification failed: &quot;&quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.&quot;</p>
+  <details><summary>Kane objective and steps</summary><p class="objective">Reload the page. On the Report tab, verify the Assessment Name is exactly &quot;Returner-8e5f4bd1&quot; and the Assessor Name is exactly &quot;Saved work a551ae0a-0fc&quot;. Open the Governance tab: verify &quot;Strategy and Vision&quot; is at level &quot;5 - Optimized&quot; and a category named &quot;Cryptography&quot; is listed. Open the Management tab: verify &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;. Open the Resources tab: verify &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;. This is a read-only check: do not type, select or change anything. Release promise: My saved assessment survives the model update, and I see the new model</p><ol><li>navigate: Navigate to http://127.0.0.1:55272</li><li>click: Clicking Open the Report tab</li><li>click: PRIMARY: Open the Report tab; role=button; text=&quot;Report&quot; | HINTS: container=top </li><li>analyze: ANALYZE(textual_visual, &#39;The Assessor Name is exactly &quot;Saved work a551ae0a-0fc&quot;.</li><li>assert: The Assessment Name is exactly &quot;Returner-8e5f4bd1&quot; and the Assessor Name is exac</li><li>click: PRIMARY: Open the Governance tab; role=button; text=&quot;Governance&quot; | HINTS: contai</li><li>analyze: A category named &quot;Cryptography&quot; is listed.</li><li>assert: &quot;Strategy and Vision&quot; is at level &quot;5 - Optimized&quot; and a category named &quot;Cryptogr</li><li>click: PRIMARY: Open the Management tab; role=button; text=&quot;Management&quot; | HINTS: contai</li><li>analyze: &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;.</li><li>assert: &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;.</li><li>click: PRIMARY: Open the Resources tab; role=button; text=&quot;Resources&quot; | HINTS: containe</li><li>analyze: &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.</li><li>assert: &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.</li></ol><p class="meta">64.5 Kane credits · 184 s · <a href="https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M81S6GAHPEQDK2JZMBXMZG62/dashboard/share/US_HYTDCASWM8QYWVS0C825U0EU5XHZH81NIOW6RF3CQESHOSRIAJBIFHSWC8BHHP4W?type=summary&amp;agentView=true&amp;fqdn=summary-page">Open in TestMu Test Manager</a></p></details>
+  </div></div>
+</section>
+<section class="card  wide pass">
+  <header><div><h2>New user</h2><p class="role">Empty profile on the new build</p></div><span class="pill pass">pass</span></header>
+  <div class="body"><figure><a class="shot" href="shots/new-user.jpg"><img src="shots/new-user.jpg" alt="Kane's final screenshot for the New user check"></a><figcaption>Kane's final screen · click to enlarge</figcaption></figure><div class="text">
+  <div class="console"><span class="who">Browser console errors from Kane's evidence pack</span><ul><li><code>Failed to load resource: the server responded with a status of 404 (Not Found)</code></li></ul></div>
+  <p class="summary"><span class="who">Kane's summary</span>Completed the requested PKI maturity assessment updates and revisited the Report, Governance, Management, and Resources sections after reloading the page.
+Entered Assessment Name as “New-Returner-8e5f4bd1” and Assessor Name as “Fresh Saved work a551ae0a-0fc.”
+Set Strategy and Vision to “5 - Optimized” and Sourcing to “4 - Managed.”
+Confirmed that Infrastructure management remained at its default level of “1 - Initial,” without changing it.
+Confirmed after the reload that the entered names and selected maturity levels were retained.</p>
+  <details><summary>Kane objective and steps</summary><p class="objective">Open the Report tab. Type &quot;New-Returner-8e5f4bd1&quot; into the Assessment Name field and &quot;Fresh Saved work a551ae0a-0fc&quot; into the Assessor Name field. Open the Governance tab and select level &quot;5 - Optimized&quot; for &quot;Strategy and Vision&quot;. Open the Management tab and confirm &quot;Infrastructure management&quot; is already at its default level &quot;1 - Initial&quot; without changing it. Open the Resources tab and select level &quot;4 - Managed&quot; for &quot;Sourcing&quot;. Reload the page. On the Report tab, verify Assessment Name is exactly &quot;New-Returner-8e5f4bd1&quot; and Assessor Name is exactly &quot;Fresh Saved work a551ae0a-0fc&quot;. Open the Governance tab and verify &quot;Strategy and Vision&quot; is at level &quot;5 - Optimized&quot;. Open the Management tab and verify &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;. Open the Resources tab and verify &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.</p><ol><li>navigate: Navigate to http://127.0.0.1:55272</li><li>click: Clicking the Report tab in the top navigation bar</li><li>wait: queued plan (2 steps): type &quot;Assessment Name:&quot;; type &quot;Assessor Name:&quot;</li><li>type: Type &quot;New-Returner-8e5f4bd1&quot; into &quot;Assessment Name:&quot;</li><li>scroll: Scroll &quot;Assessor Name:&quot; into view</li><li>type: Type &quot;Fresh Saved work a551ae0a-0fc&quot; into &quot;Assessor Name:&quot;</li><li>click: Clicking the Governance tab in the top navigation bar</li><li>click: Selecting level 5 - Optimized for Strategy and Vision</li><li>click: Clicking the Management tab in the top navigation bar</li><li>analyze: &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;.</li><li>assert: &quot;Infrastructure management&quot; is already at its default level &quot;1 - Initial&quot;.</li><li>click: Clicking the Resources tab in the top navigation bar</li><li>click: Clicking level 4 - Managed for Sourcing resources</li><li>click: Clicking Open the Report tab</li><li>wait: PRIMARY: wait 300 ms after reloading the page</li><li>analyze: ANALYZE(textual_visual, &#39;Assessor Name is exactly &quot;Fresh Saved work a551ae0a-0fc</li><li>assert: Assessment Name is exactly &quot;New-Returner-8e5f4bd1&quot; and Assessor Name is exactly </li><li>click: Clicking the Governance tab in the top navigation bar</li><li>analyze: &quot;Strategy and Vision&quot; is at level &quot;5 - Optimized&quot;.</li><li>assert: &quot;Strategy and Vision&quot; is at level &quot;5 - Optimized&quot;.</li><li>click: Clicking Management tab in the top navigation bar</li><li>analyze: ANALYZE(devtool_storage, &#39;&quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;.</li><li>assert: &quot;Infrastructure management&quot; is at level &quot;1 - Initial&quot;.</li><li>click: Clicking Resources in the top navigation bar</li><li>analyze: &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.</li><li>assert: &quot;Sourcing&quot; is at level &quot;4 - Managed&quot;.</li></ol><p class="meta">70.6 Kane credits · 208 s · <a href="https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M81RY3KN37E69K04RHHYRF8E/dashboard/share/US_5H1CQCYQRPOIF7BIP5H6YSLW4OG1QBHF1PPDLFQ3N0OWGRQDUYJ03KDBOQ4BRW11?type=summary&amp;agentView=true&amp;fqdn=summary-page">Open in TestMu Test Manager</a></p></details>
+  </div></div>
+</section>
+</div>
+
+<section class="replay"><strong>Replay after repair</strong><code>&#39;node&#39; &#39;../../../../../../..…/returner/src/returner.mjs&#39; &#39;--replay&#39; &#39;.returner/run-Fi8BBK&#39; &#39;--new&#39; &#39;../../../../../../..…/returner/.returner/repair-Gv2BBr/candidate/site&#39;</code></section>
+<footer>Every screenshot and verdict comes from Kane CLI's own run evidence. Screenshots show Kane's final step for each check.</footer>
+</main></body></html>

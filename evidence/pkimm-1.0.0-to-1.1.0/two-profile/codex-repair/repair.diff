@@ -1,0 +1,431 @@
+diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx
+index 68d9fac..1f567f0 100644
+--- a/src/components/Assessment/Assessment.tsx
++++ b/src/components/Assessment/Assessment.tsx
+@@ -4,6 +4,7 @@ import { SpiderChart } from "../SpiderChart/SpiderChart";
+ import { Overview } from "../Overview/Overview";
+ import { Report } from "../Report/Report";
+ import MaturityWidget from "../MaturityWidget/MaturityWidget"; // Import MaturityWidget
++import { restoreProgress } from "../../utils/assessmentProgress";
+ import { yamlParser } from "../../utils/yamlParser";
+ import { generateURL, exportToYAML } from "../../utils/urlGenerator";
+ import { exportToPDF } from "../../utils/pdfGenerator";
+@@ -57,40 +58,43 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     const useCaseDescription = urlHash.get("useCaseDescription");
+ 
+     const loadData = async () => {
+-      let initialData;
++      let initialData: AssessmentData | null = null;
+       if (src) {
+         const response = await fetch(src);
+         const yamlText = await response.text();
+-        initialData = yamlParser(yamlText);
++        initialData = yamlParser(yamlText) as AssessmentData;
+       }
+       setCurrentTab("overview");
+       if (encodedProgress) {
+         try {
+           const decodedProgress = JSON.parse(atob(encodedProgress));
+-          setProgress(decodedProgress);
++          setProgress(restoreProgress(initialData, decodedProgress));
+           setCurrentTab("report");
+         } catch (error) {
+           console.error("Error decoding progress from URL:", error);
+-          if (initialData)
+-            setProgress(initProgress(initialData as AssessmentData));
++          setProgress(restoreProgress(initialData));
+         }
+       } else {
+         const storedData = localStorage.getItem(STORAGE_KEY);
+         if (storedData) {
+-          const { progress, assessmentName, assessorName, useCaseDescription } =
+-            JSON.parse(storedData);
+-          setProgress(progress);
++          const {
++            progress,
++            modelVersion,
++            assessmentName,
++            assessorName,
++            useCaseDescription,
++          } = JSON.parse(storedData);
++          setProgress(restoreProgress(initialData, progress, modelVersion));
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
+           setCurrentTab("report");
+         } else {
+-          if (initialData)
+-            setProgress(initProgress(initialData as AssessmentData));
++          setProgress(restoreProgress(initialData));
+         }
+       }
+ 
+-      if (initialData) setData(initialData as AssessmentData);
++      if (initialData) setData(initialData);
+ 
+       if (assessmentName) setAssessmentName(atob(assessmentName));
+       if (assessorName) setAssessorName(atob(assessorName));
+@@ -117,12 +121,14 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+ 
+   useEffect(() => {
+     const handleStorageChange = (event: StorageEvent) => {
+-      if (event.key === STORAGE_KEY) {
++      if (event.key === STORAGE_KEY && data) {
+         const storedData = JSON.parse(event.newValue || "{}");
+-        setProgress(storedData.progress);
+-        setAssessmentName(storedData.assessmentName);
+-        setAssessorName(storedData.assessorName);
+-        setUseCaseDescription(storedData.useCaseDescription);
++        setProgress(
++          restoreProgress(data, storedData.progress, storedData.modelVersion),
++        );
++        setAssessmentName(storedData.assessmentName ?? "");
++        setAssessorName(storedData.assessorName ?? "");
++        setUseCaseDescription(storedData.useCaseDescription ?? "");
+       }
+     };
+ 
+@@ -131,11 +137,12 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     return () => {
+       window.removeEventListener("storage", handleStorageChange);
+     };
+-  }, []);
++  }, [data]);
+ 
+   useEffect(() => {
+     if (data) {
+       const saveData = {
++        modelVersion: data.version,
+         progress,
+         assessmentName,
+         assessorName,
+@@ -145,29 +152,6 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     }
+   }, [progress, assessmentName, assessorName, useCaseDescription, data]);
+ 
+-  function initProgress(
+-    parsedData: AssessmentData | null,
+-  ): Record<string, ProgressData> {
+-    return (
+-      parsedData?.modules.reduce(
+-        (acc, module) => {
+-          module.categories.map((category) => {
+-            const progressData = { ...defaultProgressData };
+-            const levelOne = category.levels.find(
+-              (level) => level.number === 1,
+-            );
+-            if (levelOne) {
+-              progressData.description = levelOne.description;
+-            }
+-            acc[`${module.id}.${category.id}`] = progressData;
+-          });
+-          return acc;
+-        },
+-        {} as Record<string, ProgressData>,
+-      ) || {}
+-    );
+-  }
+-
+   const handleLevelChange = (
+     moduleId: string,
+     categoryId: string,
+@@ -211,7 +195,7 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+   };
+ 
+   const handleReset = () => {
+-    setProgress(initProgress(data));
++    setProgress(restoreProgress(data));
+     setAssessmentName("");
+     setAssessorName("");
+     setUseCaseDescription("");
+@@ -318,8 +302,9 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+     ? calculateModuleMaturityLevels(data.modules, progress)
+     : [];
+ 
++  const loadingModel = Boolean(src && !data);
+   return (
+-    <div className="pkimm-assessment-container">
++    <div className="pkimm-assessment-container" aria-busy={loadingModel}>
+       <div
+         className="pkimm-burger-menu"
+         onClick={() => setIsMenuOpen(!isMenuOpen)}
+@@ -330,6 +315,7 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+       </div>
+       <div className={`pkimm-tabs ${isMenuOpen ? "active" : ""}`}>
+         <button
++          disabled={loadingModel}
+           className={currentTab === "overview" ? "active" : ""}
+           onClick={() => handleTabClick("overview")}
+         >
+@@ -345,6 +331,7 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+           </button>
+         ))}
+         <button
++          disabled={loadingModel}
+           className={currentTab === "report" ? "active" : ""}
+           onClick={() => handleTabClick("report")}
+         >
+diff --git a/src/components/Category/Category.module.scss b/src/components/Category/Category.module.scss
+index 015470d..0c3d3a9 100644
+--- a/src/components/Category/Category.module.scss
++++ b/src/components/Category/Category.module.scss
+@@ -63,11 +63,25 @@
+ }
+ 
+ .pkimm-level-card {
++  position: relative;
+   border: 1px solid #ddd;
+   padding: 0.5rem;
+   margin-bottom: 0.5rem;
+   cursor: pointer;
+ 
++  label::after {
++    content: "";
++    position: absolute;
++    inset: 0;
++    cursor: pointer;
++  }
++
++  input,
++  a {
++    position: relative;
++    z-index: 1;
++  }
++
+   &.selected {
+     background-color: var(--pkimm-primary-color-lighter);
+     border-color: #2c532e;
+diff --git a/src/components/Category/Category.tsx b/src/components/Category/Category.tsx
+index a67e5ff..77ce87c 100644
+--- a/src/components/Category/Category.tsx
++++ b/src/components/Category/Category.tsx
+@@ -1,9 +1,7 @@
+-import React from "react";
++import React, { useId } from "react";
+ import { CategoryData, ProgressData } from "../../types/types";
+ import ReactMarkdown from "react-markdown";
+-import styles from "./Category.module.scss";
+-
+-console.log("Styles:", styles); // Add this line
++import "./Category.module.scss";
+ 
+ interface CategoryProps {
+   moduleId: string;
+@@ -20,29 +18,25 @@ export const Category: React.FC<CategoryProps> = ({
+   onLevelChange,
+   onApplicabilityChange,
+ }) => {
+-  const selectedLevel =
+-    progress[`${moduleId}.${category.id}`] === undefined
+-      ? 0
+-      : progress[`${moduleId}.${category.id}`].level;
+-  const isApplicable =
+-    progress[`${moduleId}.${category.id}`] === undefined
+-      ? true
+-      : progress[`${moduleId}.${category.id}`].applicability;
++  const categoryId = useId();
++  const answer = progress[`${moduleId}.${category.id}`];
++  const selectedLevel = answer?.level;
++  const isApplicable = answer?.applicability ?? true;
+ 
+   return (
+-    // keep only the name of the style class
+     <div className="pkimm-category-card">
+       <div className="pkimm-category-header">
+         <div className="pkimm-category-text">
+           <label className="pkimm-toggle-switch">
+             <input
+               type="checkbox"
++              aria-label={`${category.name} is applicable`}
+               checked={isApplicable}
+               onChange={() => onApplicabilityChange(moduleId, category.id)}
+             />
+             <span className="pkimm-slider"></span>
+           </label>
+-          <strong>
++          <strong id={categoryId}>
+             {moduleId}.{category.id} {category.name}
+           </strong>
+         </div>
+@@ -52,16 +46,29 @@ export const Category: React.FC<CategoryProps> = ({
+           <div className="pkimm-category-description">
+             <ReactMarkdown>{category.description}</ReactMarkdown>
+           </div>
+-          <div className="pkimm-levels">
+-            {category.levels.map((level, index) => (
++          <div
++            className="pkimm-levels"
++            role="radiogroup"
++            aria-labelledby={categoryId}
++          >
++            {category.levels.map((level) => (
+               <div
+-                key={index}
++                key={level.number}
+                 className={`pkimm-level-card ${selectedLevel === level.number ? "selected" : ""}`}
+-                onClick={() =>
+-                  onLevelChange(moduleId, category.id, level.number)
+-                }
+               >
+-                <strong>{level.name}</strong>:{" "}
++                <input
++                  id={`${categoryId}-${level.number}`}
++                  type="radio"
++                  name={categoryId}
++                  value={level.number}
++                  checked={selectedLevel === level.number}
++                  onChange={() =>
++                    onLevelChange(moduleId, category.id, level.number)
++                  }
++                />
++                <label htmlFor={`${categoryId}-${level.number}`}>
++                  <strong>{level.name}</strong>
++                </label>
+                 <ReactMarkdown>{level.description}</ReactMarkdown>
+               </div>
+             ))}
+diff --git a/src/components/Module/Module.module.scss b/src/components/Module/Module.module.scss
+index a069167..cac3127 100644
+--- a/src/components/Module/Module.module.scss
++++ b/src/components/Module/Module.module.scss
+@@ -5,3 +5,20 @@
+   padding: 1rem;
+   margin-bottom: 1rem;
+ }
++
++.pkimm-module-levels {
++  width: 100%;
++  margin-bottom: 1rem;
++  border-collapse: collapse;
++  text-align: left;
++
++  th,
++  td {
++    padding: 0.35rem 0.5rem;
++    border-bottom: 1px solid #ddd;
++  }
++
++  tbody th {
++    font-weight: normal;
++  }
++}
+diff --git a/src/components/Module/Module.tsx b/src/components/Module/Module.tsx
+index 8189f3a..d0500af 100644
+--- a/src/components/Module/Module.tsx
++++ b/src/components/Module/Module.tsx
+@@ -18,10 +18,39 @@ export const Module: React.FC<ModuleProps> = ({
+   onApplicabilityChange,
+ }) => {
+   return (
+-    <div className="pkimm-module">
++    <section className="pkimm-module" aria-label={module.name}>
+       <div className="pkimm-module-description">
+         <ReactMarkdown>{module.description}</ReactMarkdown>
+       </div>
++      <table
++        className="pkimm-module-levels"
++        aria-label={`${module.name} maturity levels`}
++      >
++        <thead>
++          <tr>
++            <th scope="col">Category</th>
++            <th scope="col">Selected maturity level</th>
++          </tr>
++        </thead>
++        <tbody>
++          {module.categories.map((category) => {
++            const answer = progress[`${module.id}.${category.id}`];
++            const level = category.levels.find(
++              (entry) => entry.number === answer?.level,
++            );
++            return (
++              <tr key={category.id}>
++                <th scope="row">{category.name}</th>
++                <td>
++                  {answer?.applicability === false
++                    ? "Not applicable"
++                    : level?.name}
++                </td>
++              </tr>
++            );
++          })}
++        </tbody>
++      </table>
+       {module.categories.map((category) => (
+         <Category
+           key={category.id}
+@@ -32,6 +61,6 @@ export const Module: React.FC<ModuleProps> = ({
+           onApplicabilityChange={onApplicabilityChange}
+         />
+       ))}
+-    </div>
++    </section>
+   );
+ };
+diff --git a/src/types/types.ts b/src/types/types.ts
+index c7e2387..9e5f01c 100644
+--- a/src/types/types.ts
++++ b/src/types/types.ts
+@@ -20,6 +20,7 @@ export interface ModuleData {
+ }
+ 
+ export interface AssessmentData {
++  version?: string;
+   modules: ModuleData[];
+ }
+ 
+diff --git a/src/utils/assessmentProgress.ts b/src/utils/assessmentProgress.ts
+new file mode 100644
+index 0000000..7d00390
+--- /dev/null
++++ b/src/utils/assessmentProgress.ts
+@@ -0,0 +1,49 @@
++import LevelResult from "../enums/LevelResult";
++import { AssessmentData, ProgressData } from "../types/types";
++
++// Keys in model 1.1.0 mapped to the same category in model 1.0.0.
++// Read from the original save throughout, since several IDs were reused.
++const previousKeys: Record<string, string> = {
++  "M.6": "M.5", // Key management
++  "M.7": "M.6", // Certificate management
++  "O.10": "O.15", // Resilience
++  "O.11": "O.13", // Automation
++  "O.12": "O.7", // Interoperability
++  "O.13": "O.12", // Monitoring and auditing
++  "R.14": "R.10", // Sourcing
++  "R.15": "R.11", // Knowledge and training
++  "R.16": "R.14", // Awareness
++};
++
++export function restoreProgress(
++  model: AssessmentData | null,
++  saved: Record<string, ProgressData> = {},
++  savedVersion?: string,
++): Record<string, ProgressData> {
++  const progress: Record<string, ProgressData> = {};
++  // Both releases originally saved every category without a version.
++  // M.5 (Key management) occurs only in the previous release.
++  const migrate =
++    model?.version === "1.1.0" &&
++    (savedVersion === "1.0.0" || (!savedVersion && "M.5" in saved));
++
++  for (const module of model?.modules ?? []) {
++    for (const category of module.categories) {
++      const key = `${module.id}.${category.id}`;
++      const previousKey = migrate ? (previousKeys[key] ?? key) : key;
++      const answer = saved[previousKey];
++      const level = answer?.level ?? 1;
++      const applicability = answer?.applicability ?? true;
++      progress[key] = {
++        level,
++        applicability,
++        result: LevelResult[applicability ? level : -1],
++        description:
++          category.levels.find((entry) => entry.number === level)
++            ?.description ?? "",
++      };
++    }
++  }
++
++  return progress;
++}
