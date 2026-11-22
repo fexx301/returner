@@ -45,6 +45,7 @@ Then open a real regression, [PKI Consortium #148: before](https://fexx301.githu
 | ↳ repaired by **Claude Code**, replayed from the same v1 profile | Pass | **Pass**: both names, all three answers and the new Cryptography category | [patch](evidence/pkimm-1.0.0-to-1.1.0/repair.diff) · [report](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/after/report.html) |
 | ↳ one uninterrupted recorded run with **Codex** (20 min 6 s, fixed on attempt 1) | Pass | Fail → **Pass** | [patch](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/repair.diff) · [run](evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/) |
 | **Real regression caught before release:** Rackula v0.6.16 → v0.7.0 development build ([issue #935](https://github.com/RackulaLives/Rackula/issues/935)) | Pass | **Fail**: the saved rack is gone and the app throws on load → **Pass** after Codex's repair | [before](https://fexx301.github.io/returner/evidence/rackula-0.6.16-to-0.7.0-dev/before/report.html) · [patch](evidence/rackula-0.6.16-to-0.7.0-dev/repair.diff) · [after](https://fexx301.github.io/returner/evidence/rackula-0.6.16-to-0.7.0-dev/after/report.html) |
+| **Running server app** (our fixture): Quillpad v1 → v2, draft cookie format changed, proxied at one origin | Pass | **Fail**: `500 Internal Server Error` → **Pass** after Codex's repair, confirmed by a fresh rehearsal | [before](https://fexx301.github.io/returner/evidence/quillpad-server-v1-to-v2/before/report.html) · [patch](evidence/quillpad-server-v1-to-v2/repair.diff) · [after](https://fexx301.github.io/returner/evidence/quillpad-server-v1-to-v2/after/report.html) |
 | **GitHub Actions** on `ubuntu-latest` | Fieldnotes repaired: pass | PKIMM 1.1.0: regression caught | [workflow run](https://github.com/fexx301/returner/actions/runs/44353094616) |
 | **Clean upgrade:** DeckMark v2.5.3 → v2.5.4, unmodified upstream builds | Pass | Pass: original note opened, edited and reloaded | [report](https://fexx301.github.io/returner/evidence/deckmark-2.5.3-to-2.5.4/report.html) |
 | **Fixture:** Fieldnotes, storage key deliberately renamed in v2 | Pass | Fail → **Pass** after Codex repair | [before](https://fexx301.github.io/returner/evidence/fieldnotes-before/report.html) · [after](https://fexx301.github.io/returner/evidence/fieldnotes-after/report.html) · [one command](evidence/one-command-repair.json) |
@@ -69,10 +70,12 @@ git clone https://github.com/fexx301/returner && cd returner
 npm install -g @testmuai/kane-cli && kane-cli login
 ```
 
-**Rehearse your own release** (two static builds, each with a root `index.html`):
+**Rehearse your own release** (two static builds, each with a root `index.html`, or two running apps by URL):
 
 ```sh
 node src/returner.mjs --old ./v1 --new ./v2 --promise "My draft survives the release"
+# Or two running servers, proxied through Returner's one localhost origin:
+node src/returner.mjs --old http://127.0.0.1:4001 --new http://127.0.0.1:4002 --promise "My draft survives the release"
 ```
 
 Or skip the clone and run it straight from GitHub:
@@ -97,6 +100,7 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
 | `npm run demo` | Fieldnotes: the new user passes and the returning user fails (exit 1) |
 | `npm run demo:repair` | Fieldnotes: Codex repairs it, and the replay passes |
 | `examples/pkimm/prepare.sh && examples/pkimm/run.sh codex` | The real PKI Consortium regression, fetched at pinned upstream revisions, repaired and replayed |
+| `examples/server/run.sh codex` | Quillpad: a running server app whose v2 answers 500 to returning users; Returner starts each candidate (`--start`) and gives the agent the server's stack trace |
 | `examples/rackula/prepare.sh && examples/rackula/run.sh codex` | Rackula's v0.6.x autosave regression, built from pinned commits, repaired and replayed |
 
 **Add it to CI:**
@@ -127,11 +131,11 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 
 ## Limitations
 
-- **Static browser builds on localhost.** Server-rendered apps and sign-in flows aren't covered yet.
-- **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage and IndexedDB. Cookies written during a Kane check are not yet reliably kept: Kane ends Chrome before Chrome writes new cookies to disk (found on Nov 22).
+- **Saved work must live in the browser.** Static builds and running apps (proxied at one localhost origin) are covered when the returning user's state is in cookies, localStorage or IndexedDB. State in a server's database isn't snapshotted, and third-party sign-in flows aren't covered. Use a production server (`next start`, `vite preview`), not a dev server with hot reload: WebSockets aren't proxied.
+- **Returner opens and closes Chrome itself.** Kane attaches over DevTools, and Returner closes Chrome cleanly so cookies saved during a check reach disk. Kane's own shutdown lost them (found on Nov 22, before the Quillpad run). It looks for Chrome at `CHROME_PATH`, the macOS app or `google-chrome` on the PATH.
 - **Kane credits:** the recorded runs used about 5–95 credits per Kane run. Longer objectives cost more.
 - **Kane verdicts can be inconclusive.** Returner reports exit 2 instead of guessing. The first PKIMM attempt in the Actions run was inconclusive, and the rerun reproduced the regression.
-- **Recorded runs predate later loop hardening.** Marker redaction and fresh-rehearsal confirmation were added on Nov 20 (`npm run demo:repair` uses them from Nov 21), and automatic console-error extraction was added on Nov 22. The recorded repairs ran before those additions; their patches contain no marker strings (check the diffs) and their reports were backfilled from the saved Kane packs.
+- **Recorded runs predate later loop hardening.** Marker redaction and fresh-rehearsal confirmation were added on Nov 20 (`npm run demo:repair` uses them from Nov 21), and automatic console-error extraction and Returner-owned Chrome were added on Nov 22 (every earlier recorded run let Kane open its own Chrome; their apps saved to localStorage, which that path kept). The recorded repairs ran before those additions; their patches contain no marker strings (check the diffs) and their reports were backfilled from the saved Kane packs.
 - **Fresh rehearsals vary the marker, not the whole task.** The PKIMM objectives always save the same three answer levels, so a patch that hard-wired those exact levels, rather than the marker, would not be caught by the fresh rehearsal.
 - **The repairs are specific.** The PKIMM repairs map the categories for this one model change. Upstream's v2.0.0 later shipped a general migration.
 - **Service workers:** a navigation served entirely from a service worker can come back inconclusive, because Returner also checks that its server received a document request.
