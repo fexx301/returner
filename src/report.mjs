@@ -23,6 +23,12 @@ const ROLES = {
 // The returning user decides the release, so it leads; the supporting checks follow in run order.
 const ORDER = ["returning user", "old baseline", "new user", "saved edit"];
 
+const meta = (r) => {
+  const parts = [r.credits && `${Number(r.credits).toFixed(1)} Kane credits`, r.duration && `${Math.round(r.duration)} s`,
+    /^https:\/\//.test(r.testUrl || "") && `<a href="${escape(r.testUrl)}">Open in TestMu Test Manager</a>`].filter(Boolean);
+  return parts.length ? `<p class="meta">${parts.join(" · ")}</p>` : "";
+};
+
 export async function writeReport(directory, report) {
   await writeFile(join(directory, "report.json"), JSON.stringify(report, null, 2));
   const results = ORDER.map((name) => report.results.find((r) => r.name === name)).filter(Boolean);
@@ -48,8 +54,8 @@ export async function writeReport(directory, report) {
     return `<section class="card ${r.name === "returning user" ? "hero" : ""} ${wide ? "wide" : ""} ${escape(r.status)}">
   <header><div><h2>${escape(LABELS[r.name] || r.name)}</h2><p class="role">${escape(ROLES[r.name] || "")}</p></div><span class="pill ${escape(r.status)}">${escape(r.status)}</span></header>
   <div class="body">${shot}<div class="text">
-  <p class="summary"><span class="who">Kane's summary</span>${escape(r.summary || r.reason || "Kane did not return a complete result.")}</p>
-  <details><summary>Kane objective and steps</summary><p class="objective">${escape(r.objective)}</p><ol>${steps}</ol>${r.credits ? `<p class="meta">${Number(r.credits).toFixed(1)} Kane credits</p>` : ""}</details>
+  ${r.consoleErrors?.length ? `<div class="console"><span class="who">Browser console errors from Kane's evidence pack</span><ul>${r.consoleErrors.map((e) => `<li><code>${escape(e)}</code></li>`).join("")}</ul></div>\n  ` : ""}<p class="summary"><span class="who">Kane's summary</span>${escape(r.summary || r.reason || "Kane did not return a complete result.")}</p>
+  <details><summary>Kane objective and steps</summary><p class="objective">${escape(r.objective)}</p><ol>${steps}</ol>${meta(r)}</details>
   </div></div>
 </section>`;
   }).join("\n");
@@ -93,6 +99,8 @@ h2{font-size:20px;margin:0;letter-spacing:-.01em}
 .shot{display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--ground);aspect-ratio:16/9}
 .shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left}
 .shot.none{display:grid;place-items:center;color:var(--muted);font-size:14px}
+.console{margin:0 0 14px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--fail) 35%,var(--line));background:color-mix(in srgb,var(--fail) 7%,transparent)}
+.console ul{margin:6px 0 0;padding-left:18px}.console code{font-size:13px;overflow-wrap:anywhere}
 .summary{margin:0;white-space:pre-line;overflow-wrap:anywhere}
 details{border-top:1px solid var(--line);padding-top:10px}
 summary{cursor:pointer;color:var(--muted);font-size:14px}

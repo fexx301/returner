@@ -7,7 +7,7 @@ import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
 import { serve } from "./server.mjs";
 import { writeReport } from "./report.mjs";
-import { attachShot } from "./shots.mjs";
+import { attachShot, consoleErrors } from "./shots.mjs";
 
 const usage =
   'returner --old ./v1 --new ./v2 --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2';
@@ -122,11 +122,16 @@ async function main() {
       reasonCode: end?.reason_code,
       summary: end?.summary,
       credits: end?.credits_consumed,
+      duration: end?.duration,
+      testUrl: end?.test_url,
       runId: end?.run_id,
       objective: task,
       steps,
     };
-    if (result.session) result.shot = attachShot(result.session, run, name);
+    if (result.session) {
+      result.shot = attachShot(result.session, run, name);
+      result.consoleErrors = consoleErrors(result.session);
+    }
     results.push(result);
     await writeReport(run, { promise: state.promise, url, results });
     console.log(

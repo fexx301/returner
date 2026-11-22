@@ -201,7 +201,8 @@
           "remark": "wait: Waiting task completion verified after reload"
         }
       ],
-      "shot": "shots/old-baseline.jpg"
+      "shot": "shots/old-baseline.jpg",
+      "consoleErrors": []
     },
     {
       "name": "new user",
@@ -482,7 +483,8 @@
           "remark": "wait: Waiting after all persistence checks passed"
         }
       ],
-      "shot": "shots/new-user.jpg"
+      "shot": "shots/new-user.jpg",
+      "consoleErrors": []
     },
     {
       "name": "returning user",
@@ -558,7 +560,10 @@
           "remark": "wait: Waiting while the unloaded self-assessment component is checked"
         }
       ],
-      "shot": "shots/returning-user.jpg"
+      "shot": "shots/returning-user.jpg",
+      "consoleErrors": [
+        "Cannot read properties of undefined (reading 'result')"
+      ]
     }
   ]
 }

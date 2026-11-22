@@ -11,16 +11,37 @@ import { writeReport } from "./report.mjs";
 const SESSIONS = join(homedir(), ".testmuai", "kaneai", "sessions");
 const slug = (name) => name.replace(/\s+/g, "-");
 
+// A Kane session's sealed evidence pack (a zip) and the paths inside it.
+function pack(session) {
+  const evidence = join(SESSIONS, session, "evidence");
+  const file = join(evidence, readdirSync(evidence).find((f) => f.endsWith(".evidence")));
+  return { file, entries: spawnSync("unzip", ["-Z1", file], { encoding: "utf8" }).stdout.split("\n") };
+}
+
+// The browser console errors Kane recorded during a check: often the exact crash behind a failure,
+// even when Kane's prose summary guesses another cause. Unique, at most 5, each trimmed.
+export function consoleErrors(session) {
+  try {
+    const { file, entries } = pack(session);
+    const texts = entries.filter((p) => /logs\/\d+-console\.ndjson$/.test(p))
+      .flatMap((p) => spawnSync("unzip", ["-p", file, p], { encoding: "utf8", maxBuffer: 64 << 20 }).stdout.split("\n"))
+      .map((line) => { try { return JSON.parse(line); } catch {} })
+      .filter((e) => e?.level === "error" && e.text).map((e) => String(e.text).slice(0, 400));
+    return [...new Set(texts)].slice(0, 5);
+  } catch {
+    return []; // console logs are a convenience, like screenshots
+  }
+}
+
 // Copies the last step screenshot of a Kane session into dir/shots; returns its relative path or undefined.
 export function attachShot(session, dir, name) {
   try {
-    const evidence = join(SESSIONS, session, "evidence");
-    const pack = join(evidence, readdirSync(evidence).find((f) => f.endsWith(".evidence")));
+    const { file, entries } = pack(session);
     const step = (p) => parseInt(p.match(/steps\/(\d+)/)?.[1] ?? "0", 10); // folders look like 9-0-5 or 4-0-e1169d09-1
-    const shots = spawnSync("unzip", ["-Z1", pack], { encoding: "utf8" }).stdout.split("\n").filter((p) => p.endsWith("/screenshot.jpg"))
+    const shots = entries.filter((p) => p.endsWith("/screenshot.jpg"))
       .sort((a, b) => step(a) - step(b) || a.localeCompare(b));
     if (!shots.length) return;
-    const image = spawnSync("unzip", ["-p", pack, shots.at(-1)], { maxBuffer: 64 << 20 }).stdout;
+    const image = spawnSync("unzip", ["-p", file, shots.at(-1)], { maxBuffer: 64 << 20 }).stdout;
     if (!image?.length) return;
     mkdirSync(join(dir, "shots"), { recursive: true });
     writeFileSync(join(dir, "shots", `${slug(name)}.jpg`), image);
@@ -56,7 +77,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       if (!session) { console.log(`${result.name}: no matching Kane session`); continue; }
       taken.add(session);
       result.shot = attachShot(session, dir, result.name);
-      console.log(`${result.name}: ${result.shot || "no screenshot"} (${session.slice(0, 8)})`);
+      result.consoleErrors = consoleErrors(session);
+      console.log(`${result.name}: ${result.shot || "no screenshot"}, ${result.consoleErrors.length} console errors (${session.slice(0, 8)})`);
     }
     await writeReport(dir, report);
   }

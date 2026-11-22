@@ -90,3 +90,19 @@ test("bad flags and attempt counts exit 2 before any Kane run", async (t) => {
     assert.equal(node("repair.mjs", ["--old", ".", "--source", ".", "--promise", "p", "--attempts", attempts]).status, 2, attempts);
   await assert.rejects(readFile(join(root, "kane-ran")), "no Kane run was started");
 });
+
+// Kane's sealed evidence pack is a zip; its console log's errors reach the report and the repair prompt.
+test("console errors are read from Kane's evidence pack, unique and errors only", async (t) => {
+  const home = await mkdtemp(join(tmpdir(), "returner-pack-"));
+  t.after(() => rm(home, { recursive: true, force: true }));
+  const dir = join(home, ".testmuai", "kaneai", "sessions", "s1", "evidence");
+  await mkdir(join(dir, "tests", "t", "logs"), { recursive: true });
+  const line = (level, text) => JSON.stringify({ level, text });
+  await writeFile(join(dir, "tests", "t", "logs", "0-console.ndjson"),
+    [JSON.stringify({ marker: "step" }), line("error", "boom"), line("warning", "meh"), line("error", "boom"), "not json"].join("\n"));
+  assert.equal(spawnSync("zip", ["-qr", "p.evidence", "tests"], { cwd: dir }).status, 0);
+  const shots = new URL("../src/shots.mjs", import.meta.url).href;
+  const r = spawnSync(process.execPath, ["--input-type=module", "-e", `import { consoleErrors } from ${JSON.stringify(shots)}; console.log(JSON.stringify(consoleErrors("s1")), JSON.stringify(consoleErrors("missing")))`],
+    { env: { ...process.env, HOME: home }, encoding: "utf8" });
+  assert.equal(r.stdout.trim(), '["boom"] []', r.stderr);
+});

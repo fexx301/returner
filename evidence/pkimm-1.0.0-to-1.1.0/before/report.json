@@ -181,7 +181,8 @@
           "remark": "wait: Waiting after all persistence checkpoints pass"
         }
       ],
-      "shot": "shots/old-baseline.jpg"
+      "shot": "shots/old-baseline.jpg",
+      "consoleErrors": []
     },
     {
       "name": "new user",
@@ -462,7 +463,8 @@
           "remark": "wait: Waiting 500 ms after all persistence checkpoints pass"
         }
       ],
-      "shot": "shots/new-user.jpg"
+      "shot": "shots/new-user.jpg",
+      "consoleErrors": []
     },
     {
       "name": "returning user",
@@ -538,7 +540,10 @@
           "remark": "wait: Waiting because the self-assessment application failed to render"
         }
       ],
-      "shot": "shots/returning-user.jpg"
+      "shot": "shots/returning-user.jpg",
+      "consoleErrors": [
+        "Cannot read properties of undefined (reading 'result')"
+      ]
     }
   ]
 }

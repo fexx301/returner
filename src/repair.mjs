@@ -62,7 +62,8 @@ async function rehearse(args, cwd) {
 const failing = (results) => results.filter((r) => r.status !== "pass");
 const describe = (r) =>
   [`Kane objective: ${r?.objective}`, `Kane verdict: ${r?.status} — ${r?.reason || "no reason"}`, `Kane summary: ${r?.summary || ""}`,
-   "Kane steps:", ...(r?.steps || []).filter((s) => s.status !== "running").map((s) => `- ${s.status}: ${s.remark}`)].join("\n");
+   "Kane steps:", ...(r?.steps || []).filter((s) => s.status !== "running").map((s) => `- ${s.status}: ${s.remark}`),
+   ...(r?.consoleErrors?.length ? ["Browser console errors Kane recorded:", ...r.consoleErrors.map((e) => `- ${e}`)] : [])].join("\n");
 
 async function main() {
   // Checked before any Kane run, so a typo never spends the baseline's credits.

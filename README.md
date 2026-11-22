@@ -57,7 +57,7 @@ Every browser observation comes from Kane. Report links open the rendered `repor
 2. **Ship today.** The new build is served at the same address, so the browser's storage still belongs to the same origin.
 3. **New user (control).** A fresh profile performs the same task.
 4. **Returning user (the check).** A copy of the snapshot opens the new build. Kane must find the original marker, and it fails rather than recreating anything that's missing.
-5. **Repair and replay.** On a failure, `repair.mjs` hands Kane's verdict to the coding agent, rebuilds and replays step 4 from the same snapshot.
+5. **Repair and replay.** On a failure, `repair.mjs` hands the coding agent Kane's verdict, its steps and the browser console errors from Kane's evidence pack (on Rackula, the exact crash that Kane's summary missed). It then rebuilds and replays step 4 from the same snapshot.
 6. **No faked fixes.** Returner never puts the run's marker in the agent's prompt: it is redacted from Kane's findings, earlier attempts and build output. A passing replay must also survive a fresh rehearsal with brand-new saved work, so a fix that hardcodes one user's saved data is rejected and sent back to the agent. `npm test` includes a cheating agent that reads the hidden marker from disk and is still rejected, through both `repair.mjs` and `npm run demo:repair`. The fresh rehearsal changes the marker, not the rest of the task (see Limitations).
 
 ## Quick start
