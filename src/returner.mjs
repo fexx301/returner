@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
 import { isUrl, serve } from "./server.mjs";
+import { openChrome } from "./chrome.mjs";
 import { writeReport } from "./report.mjs";
 import { attachShot, consoleErrors } from "./shots.mjs";
 
@@ -58,8 +59,10 @@ async function main() {
   const url = "http://127.0.0.1:" + server.port;
   const results = [];
   let activeChild;
+  let activeChrome;
   const stop = (signal) => {
     activeChild?.kill(signal);
+    activeChrome?.kill();
     server.close();
     process.exit(128 + (signal === "SIGINT" ? 2 : 15));
   };
@@ -73,18 +76,18 @@ async function main() {
     console.log("Running " + name);
     const before = server.documents();
     await mkdir(profile, { recursive: true, mode: 0o700 });
+    const chrome = (activeChrome = await openChrome(profile));
     const child = spawn(
       "kane-cli",
       [
         "run",
         "--agent",
-        "--headless",
         "--timeout",
         "300",
         "--max-steps",
         "35",
-        "--chrome-profile",
-        profile,
+        "--cdp-endpoint",
+        chrome.endpoint,
         "--url",
         url,
         task,
@@ -119,7 +122,8 @@ async function main() {
       if (e.remark && e.status)
         steps.push({ step: e.step, status: e.status, remark: e.remark });
     });
-    const code = await completion;
+    const code = await completion.finally(() => chrome.close());
+    activeChrome = null;
     const loaded = server.documents() > before;
     let status = "inconclusive";
     if (loaded && code === 0 && end?.status === "passed") status = "pass";

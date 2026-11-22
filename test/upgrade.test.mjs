@@ -4,6 +4,7 @@ import { mkdtemp, writeFile, readFile, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+const fakeChrome = fileURLToPath(new URL("./fake-chrome.mjs", import.meta.url));
 import { spawnSync } from "node:child_process";
 
 // A local stand-in exercises the CLI's origin, snapshot and exit-code contract.
@@ -21,7 +22,7 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
 (async () => {
   const fs=require('node:fs');
   const field=flag=>process.argv[process.argv.indexOf(flag)+1];
-  const url=field('--url'), path=field('--chrome-profile')+'/draft';
+  const url=field('--url'), path=(await (await fetch(field('--cdp-endpoint')+'/json/version')).json()).userDataDir+'/draft';
   const build=await (await fetch(url,{headers:{'sec-fetch-dest':'document'}})).text();
   if(process.env.RETURNER_TEST_INTERRUPT) process.exit(2);
   const previous=fs.existsSync(path)?fs.readFileSync(path,'utf8'):null;
@@ -38,7 +39,7 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
   function run(args, env = {}) {
     return spawnSync(process.execPath, [cli, ...args], {
       cwd: root,
-      env: { ...process.env, PATH: root + ":" + process.env.PATH, ...env },
+      env: { ...process.env, PATH: root + ":" + process.env.PATH, CHROME_PATH: fakeChrome, ...env },
       encoding: "utf8",
       timeout: 30000,
     });
@@ -63,7 +64,7 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
   );
   await writeFile(join(root, "broken", "index.html"), "fixed");
   const second = spawnSync("/bin/sh", ["-c", failedReport.replay], {
-    cwd: root, env: {...process.env, PATH: root + ":" + process.env.PATH},
+    cwd: root, env: {...process.env, PATH: root + ":" + process.env.PATH, CHROME_PATH: fakeChrome},
     encoding: "utf8", timeout: 30000,
   });
   assert.equal(second.status, 0, second.stderr);
@@ -82,7 +83,7 @@ test("bad flags and attempt counts exit 2 before any Kane run", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "returner-usage-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   await writeFile(join(root, "kane-cli"), `#!/bin/sh\ntouch "${root}/kane-ran"\nexit 1\n`, { mode: 0o755 });
-  const env = { ...process.env, PATH: root + ":" + process.env.PATH };
+  const env = { ...process.env, PATH: root + ":" + process.env.PATH, CHROME_PATH: fakeChrome };
   const node = (file, args) => spawnSync(process.execPath, [fileURLToPath(new URL(`../src/${file}`, import.meta.url)), ...args], { cwd: root, env, encoding: "utf8", timeout: 30000 });
   assert.equal(node("returner.mjs", ["--unknown-flag"]).status, 2);
   assert.equal(node("repair.mjs", ["--unknown-flag"]).status, 2);

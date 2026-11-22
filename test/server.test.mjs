@@ -5,6 +5,7 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+const fakeChrome = fileURLToPath(new URL("./fake-chrome.mjs", import.meta.url));
 import { spawn, spawnSync } from "node:child_process";
 
 // Proxy mode with the Quillpad fixture: a server-rendered app whose draft lives in a cookie.
@@ -13,7 +14,7 @@ const kane = `#!/usr/bin/env node
 (async () => {
   const fs=require('node:fs');
   const field=flag=>process.argv[process.argv.indexOf(flag)+1];
-  const url=field('--url'), task=process.argv.at(-1), jarFile=field('--chrome-profile')+'/cookies';
+  const url=field('--url'), task=process.argv.at(-1), jarFile=(await (await fetch(field('--cdp-endpoint')+'/json/version')).json()).userDataDir+'/cookies';
   const [title, body] = [...task.matchAll(/"([^"]+)"/g)].map(m=>m[1]);
   let jar=fs.existsSync(jarFile)?fs.readFileSync(jarFile,'utf8'):'';
   const get=async()=>{const r=await fetch(url+'/',{headers:{cookie:jar,'sec-fetch-dest':'document'}});return {status:r.status,text:await r.text()};};
@@ -43,7 +44,7 @@ async function root(t) {
   return dir;
 }
 const run = (dir, script, args) => spawnSync(process.execPath, [fileURLToPath(new URL(`../src/${script}`, import.meta.url)), ...args],
-  { cwd: dir, env: { ...process.env, PATH: dir + ":" + process.env.PATH }, encoding: "utf8", timeout: 120000 });
+  { cwd: dir, env: { ...process.env, PATH: dir + ":" + process.env.PATH, CHROME_PATH: fakeChrome }, encoding: "utf8", timeout: 120000 });
 
 test("proxy mode: a running app's cookies cross the release at one origin, and a URL replays", async (t) => {
   const dir = await root(t);

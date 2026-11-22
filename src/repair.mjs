@@ -125,7 +125,7 @@ async function main() {
     } finally {
       cleanups.delete(stopApp);
       try { process.kill(-app.pid); } catch {}
-      await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
+      await Promise.race([exited, new Promise((r) => setTimeout(r, 5000).unref())]);
       if (app.exitCode === null) try { process.kill(-app.pid, "SIGKILL"); } catch {}
     }
   };

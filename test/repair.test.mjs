@@ -4,6 +4,7 @@ import { mkdtemp, writeFile, readFile, mkdir, rm, readdir } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+const fakeChrome = fileURLToPath(new URL("./fake-chrome.mjs", import.meta.url));
 import { spawnSync } from "node:child_process";
 
 // Stand-in Kane: seeding saves the objective's quoted marker in the profile; a returning user passes only
@@ -12,7 +13,7 @@ const kane = `#!/usr/bin/env node
 (async () => {
   const fs=require('node:fs');
   const field=flag=>process.argv[process.argv.indexOf(flag)+1];
-  const task=process.argv.at(-1), path=field('--chrome-profile')+'/marker';
+  const task=process.argv.at(-1), path=(await (await fetch(field('--cdp-endpoint')+'/json/version')).json()).userDataDir+'/marker';
   const page=await (await fetch(field('--url'),{headers:{'sec-fetch-dest':'document'}})).text();
   let failed=false;
   if (task.startsWith('Create a draft')) fs.writeFileSync(path, task.match(/"([^"]+)"/)[1]);
@@ -36,7 +37,7 @@ async function setup(agentScript) {
   await writeFile(join(root, "claude"), agentScript(root), { mode: 0o755 });
   const repair = fileURLToPath(new URL("../src/repair.mjs", import.meta.url));
   const r = spawnSync(process.execPath, [repair, "--old", "old", "--source", "source", "--serve", "site", "--promise", "draft survives", "--agent", "claude", "--attempts", "2"], {
-    cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH, GIT_CONFIG_GLOBAL: join(root, "gitconfig") }, encoding: "utf8", timeout: 120000,
+    cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH, CHROME_PATH: fakeChrome, GIT_CONFIG_GLOBAL: join(root, "gitconfig") }, encoding: "utf8", timeout: 120000,
   });
   const work = r.stdout.match(/^Repair workspace: (.+)$/m)[1];
   const runs = await readdir(join(work, ".returner"));
@@ -89,7 +90,7 @@ async function demoRepair(codexScript) {
   await writeFile(join(root, "kane-cli"), kane, { mode: 0o755 });
   await writeFile(join(root, "codex"), codexScript(root), { mode: 0o755 });
   const entry = fileURLToPath(new URL("../src/demo-repair.mjs", import.meta.url));
-  const r = spawnSync(process.execPath, [entry], { cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH }, encoding: "utf8", timeout: 120000 });
+  const r = spawnSync(process.execPath, [entry], { cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH, CHROME_PATH: fakeChrome }, encoding: "utf8", timeout: 120000 });
   return { root, r };
 }
 
