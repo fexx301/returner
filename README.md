@@ -69,12 +69,10 @@ git clone https://github.com/fexx301/returner && cd returner
 npm install -g @testmuai/kane-cli && kane-cli login
 ```
 
-**Rehearse your own release** (two static builds with a root `index.html`, or two running apps by URL):
+**Rehearse your own release** (two static builds, each with a root `index.html`):
 
 ```sh
 node src/returner.mjs --old ./v1 --new ./v2 --promise "My draft survives the release"
-# Or proxy two running servers through Returner's single localhost origin:
-node src/returner.mjs --old http://127.0.0.1:4001 --new http://127.0.0.1:4002 --promise "My draft survives the release"
 ```
 
 Or skip the clone and run it straight from GitHub:
@@ -100,7 +98,6 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
 | `npm run demo:repair` | Fieldnotes: Codex repairs it, and the replay passes |
 | `examples/pkimm/prepare.sh && examples/pkimm/run.sh codex` | The real PKI Consortium regression, fetched at pinned upstream revisions, repaired and replayed |
 | `examples/rackula/prepare.sh && examples/rackula/run.sh codex` | Rackula's v0.6.x autosave regression, built from pinned commits, repaired and replayed |
-| `examples/server/run.sh codex` | Quillpad: a server-rendered Node app proxied at one origin (`--start`), repaired from its 500 stack trace |
 
 **Add it to CI:**
 
@@ -130,8 +127,8 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 
 ## Limitations
 
-- **Localhost origin only; no multi-tenant backend state snapshots.** `--old` and `--new` accept static builds or running app URLs (proxied through one localhost origin so cookies and browser storage carry over; `repair.mjs --start` starts and stops the candidate server per check). Database migrations and third-party OAuth sign-in flows aren't managed by Returner.
-- **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage, IndexedDB and cookies.
+- **Static browser builds on localhost.** Server-rendered apps and sign-in flows aren't covered yet.
+- **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage and IndexedDB. Cookies written during a Kane check are not yet reliably kept: Kane ends Chrome before Chrome writes new cookies to disk (found on Nov 22).
 - **Kane credits:** the recorded runs used about 5–95 credits per Kane run. Longer objectives cost more.
 - **Kane verdicts can be inconclusive.** Returner reports exit 2 instead of guessing. The first PKIMM attempt in the Actions run was inconclusive, and the rerun reproduced the regression.
 - **Recorded runs predate later loop hardening.** Marker redaction and fresh-rehearsal confirmation were added on Nov 20 (`npm run demo:repair` uses them from Nov 21), and automatic console-error extraction was added on Nov 22. The recorded repairs ran before those additions; their patches contain no marker strings (check the diffs) and their reports were backfilled from the saved Kane packs.
