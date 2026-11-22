@@ -5,6 +5,7 @@ import { parseArgs } from "node:util";
 import { spawn } from "node:child_process";
 import { closeSync, openSync } from "node:fs";
 import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isUrl } from "./server.mjs";
@@ -24,6 +25,10 @@ try {
       promise: { type: "string" },
       seed: { type: "string" },
       check: { type: "string" },
+      "holdout-seed": { type: "string" },
+      "holdout-check": { type: "string" },
+      "holdout-secret": { type: "string", multiple: true, default: [] },
+      "holdout-field": { type: "string", multiple: true, default: [] },
       agent: { type: "string", default: "codex" },
       attempts: { type: "string", default: "3" },
       note: { type: "string", default: "" },
@@ -83,7 +88,12 @@ const describe = (r) =>
 
 async function main() {
   // Checked before any Kane run, so a typo never spends the baseline's credits.
-  if (a.error || !a.old || !a.source || !a.promise || !AGENTS[a.agent] || !/^[1-9]\d*$/.test(a.attempts) || Boolean(a.start) !== isUrl(a.serve)) {
+  const hasHoldout = Boolean(a["holdout-seed"] || a["holdout-check"]);
+  if (
+    a.error || !a.old || !a.source || !a.promise || !AGENTS[a.agent] ||
+    !/^[1-9]\d*$/.test(a.attempts) || Boolean(a.start) !== isUrl(a.serve) ||
+    Boolean(a["holdout-seed"]) !== Boolean(a["holdout-check"])
+  ) {
     console.error([a.error, usage].filter(Boolean).join("\n"));
     return 2;
   }
@@ -139,11 +149,41 @@ async function main() {
   if (last.startFailed) return console.error("The candidate app did not start:\n" + last.server), 2;
   const baseline = last.run;
   const beforeReport = last.report;
+  const beforeResults = last.results;
   const beforeServer = last.server || "";
   const verdict = (name) => last.results.find((r) => r.name === name)?.status;
   if (last.code !== 1 || verdict("new user") !== "pass" || ![verdict("returning user"), verdict("saved edit")].includes("fail")) {
     console.error("Repair needs a reproduced regression: new user pass, returning user (or its saved edit) fail.");
     return last.code === 0 ? 0 : 2;
+  }
+
+  // Optional holdout user (Profile B): seeded on --old in a separate directory OUTSIDE the repair workspace,
+  // so its snapshot and expected values never sit beside the agent's candidate copy.
+  let holdoutWork;
+  let holdoutBaseline;
+  const holdoutSecrets = [];
+  const holdoutOnlySecrets = [];
+  if (hasHoldout) {
+    holdoutWork = await mkdtemp(join(tmpdir(), "returner-holdout-"));
+    console.log("Holdout workspace:", holdoutWork);
+    const seedB = await rehearse(
+      ["--old", old, "--seed-only", "--promise", a.promise, "--seed", a["holdout-seed"], "--check", a["holdout-check"]],
+      holdoutWork,
+    );
+    if (seedB.code !== 0 || !seedB.run) {
+      console.error("Could not seed the holdout profile (Profile B); stopping without a verdict.");
+      return 2;
+    }
+    holdoutBaseline = seedB.run;
+    const stateB = JSON.parse(await readFile(join(holdoutBaseline, "baseline.json"), "utf8").catch(() => "{}"));
+    const profileAText = `${a.seed || ""}\n${a.check || ""}`;
+    for (const v of [stateB.title, stateB.body]) if (v) { holdoutSecrets.push(v); holdoutOnlySecrets.push(v); }
+    for (const v of a["holdout-secret"] || []) if (v) {
+      holdoutSecrets.push(v);
+      if (!profileAText.includes(v)) holdoutOnlySecrets.push(v);
+    }
+    holdoutSecrets.sort((x, y) => y.length - x.length);
+    holdoutOnlySecrets.sort((x, y) => y.length - x.length);
   }
 
   // The agent never sees a run's random marker, so it cannot hardcode the saved title or body to fake a pass.
@@ -152,18 +192,50 @@ async function main() {
     const state = JSON.parse(await readFile(join(run, "baseline.json"), "utf8").catch(() => "{}"));
     for (const [value, label] of [[state.title, "<saved title>"], [state.body, "<saved body>"]]) if (value) secrets.push([value, label]);
   };
-  const redact = (text) => secrets.reduce((t, [value, label]) => t.split(value).join(label), String(text));
+  const redact = (text) => {
+    let out = secrets.reduce((t, [value, label]) => t.split(value).join(label), String(text));
+    if (holdoutWork) out = out.split(holdoutWork).join("<holdout>");
+    for (const v of holdoutOnlySecrets) out = out.replaceAll(v, "<holdout saved value>");
+    return out;
+  };
+  // Sanitize a holdout (Profile B) failure so the agent learns which field was corrupted without receiving
+  // Profile B's expected values or objective to hard-code.
+  const redactHoldout = (text) =>
+    holdoutSecrets.reduce((t, v) => t.replaceAll(v, "<holdout saved value>"), String(text || ""));
+  const describeHoldoutFailure = (results) => {
+    const bad = failing(results);
+    const raw = bad.map((r) => [r.reason, r.summary, ...(r.steps || []).map((s) => s.remark)].filter(Boolean).join(" ")).join(" ");
+    const fields = (a["holdout-field"] || []).filter((f) => raw.toLowerCase().includes(f.toLowerCase()));
+    const lines = [
+      "A second returning user (Profile B, whose saved answers are withheld) failed on the candidate release.",
+      ...(fields.length ? [`Corrupted or failing field(s) mentioned: ${fields.join(", ")}`] : []),
+      ...bad.map((r) =>
+        [
+          `Check "${r.name}" (holdout user): ${r.status} — ${redactHoldout(r.reason || "no reason")}`,
+          r.summary ? `Summary (expected values withheld): ${redactHoldout(r.summary)}` : "",
+          ...(r.consoleErrors?.length ? ["Browser console errors:", ...r.consoleErrors.map((e) => `- ${redactHoldout(e)}`)] : []),
+        ].filter(Boolean).join("\n"),
+      ),
+    ];
+    return lines.join("\n");
+  };
   await learn(baseline);
   const fullRehearsal = () => live(() => rehearse(["--old", old, "--new", site, "--promise", a.promise, ...options], work));
   const attempts = [];
   const attemptLog = [];
+  const holdoutAudit = [];
   let lastPrompt = "";
   let afterRun;
   let afterReport;
+  let holdoutAfterRun;
+  let holdoutAfterReport;
   let freshRun;
   let freshReport;
   const finish = async (code, diff = "") => {
     const repairVerdict = code === 0 ? "pass" : code === 1 ? "fail" : "inconclusive";
+    if (holdoutWork && holdoutAudit.length) {
+      await writeFile(join(holdoutWork, "holdout-attempts.json"), JSON.stringify({ baseline: holdoutBaseline, attempts: holdoutAudit }, null, 2));
+    }
     await writeRepairReport(work, {
       verdict: repairVerdict,
       promise: a.promise,
@@ -172,6 +244,7 @@ async function main() {
       beforeReport,
       afterDir: afterRun,
       afterReport,
+      holdoutReport: holdoutAfterReport,
       freshDir: freshRun,
       freshReport,
       diff,
@@ -203,7 +276,7 @@ async function main() {
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
-    prompt = redact(prompt); // covers Kane's findings, earlier attempts and build output alike
+    prompt = redact(prompt); // covers Kane's findings, earlier attempts, build output, and holdout-only values alike
     lastPrompt = prompt;
     await writeFile(join(work, `prompt-${i}.txt`), prompt); // exactly what the agent received, marker already redacted
     console.log(`Attempt ${i}/${a.attempts}: passing Kane's returning-user result to ${a.agent}…`);
@@ -240,8 +313,36 @@ async function main() {
       attempts.push(`Attempt ${i}: Kane still failed.\n${failing(last.results).map(describe).join("\n\n")}`);
       continue;
     }
+    // Two-profile verification: replay a second untouched user (Profile B) whose answers were withheld from the agent.
+    if (holdoutBaseline) {
+      console.log("Profile A replay passed. Verifying against the holdout user (Profile B)…");
+      const holdout = await live(() => rehearse(["--replay", holdoutBaseline, "--new", site], holdoutWork));
+      if (holdout.startFailed) {
+        attemptLog.push({ attempt: i, status: "inconclusive", note: "Candidate app did not start for holdout verification." });
+        console.error("The candidate app did not start for holdout verification:\n" + holdout.server);
+        return finish(2);
+      }
+      holdoutAfterRun = holdout.run;
+      holdoutAfterReport = holdout.report;
+      holdoutAudit.push({ attempt: i, code: holdout.code, evidence: holdout.run, results: holdout.results.map(({ name, status, reason }) => ({ name, status, reason })) });
+      // Keep Profile B's path and expected values out of work/attempt-N.json (which sits beside the agent's candidate).
+      outcome.holdout = { code: holdout.code, results: holdout.results.map(({ name, status }) => ({ name, status })) };
+      await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
+      if (holdout.code === 2) {
+        attemptLog.push({ attempt: i, status: "inconclusive", note: "Holdout user (Profile B) replay was inconclusive." });
+        console.error("Holdout replay (Profile B) was inconclusive; stopping without a verdict.");
+        return finish(2);
+      }
+      if (holdout.code !== 0) {
+        last = { code: 1, run: baseline, results: beforeResults, server: beforeServer };
+        attemptLog.push({ attempt: i, status: "fail", note: "Profile A passed, but holdout user (Profile B) failed; patch rejected." });
+        console.log(`Attempt ${i} passed Profile A, but failed the holdout user (Profile B); rejecting it.`);
+        attempts.push(`Attempt ${i}: Profile A passed, but the candidate corrupted or lost another returning user's saved answers.\n${describeHoldoutFailure(holdout.results)}`);
+        continue;
+      }
+    }
     // A passing replay must also hold for saved work the agent has never seen: rehearse again with a new marker.
-    console.log("Replay passed. Confirming with a fresh rehearsal and a new marker…");
+    console.log(`${holdoutBaseline ? "Both profiles passed." : "Replay passed."} Confirming with a fresh rehearsal and a new marker…`);
     const fresh = await fullRehearsal();
     if (fresh.startFailed) {
       attemptLog.push({ attempt: i, status: "inconclusive", note: "Candidate app did not start for fresh confirmation." });
@@ -256,8 +357,8 @@ async function main() {
       await git("add", "-A");
       const diff = (await git("diff", "--cached")).out;
       await writeFile(join(work, "repair.diff"), diff);
-      attemptLog.push({ attempt: i, status: "pass", note: "Untouched replay passed and fresh rehearsal with a new marker confirmed it." });
-      console.log(`Kane passed the returning user after attempt ${i}, and a fresh rehearsal with a new marker confirmed it. Patch: ${join(work, "repair.diff")}`);
+      attemptLog.push({ attempt: i, status: "pass", note: holdoutBaseline ? "Profile A replay, holdout user (Profile B) replay, and fresh rehearsal all passed." : "Untouched replay passed and fresh rehearsal with a new marker confirmed it." });
+      console.log(`Kane passed ${holdoutBaseline ? "both returning users (Profile A and holdout Profile B)" : "the returning user"} after attempt ${i}, and a fresh rehearsal with a new marker confirmed it. Patch: ${join(work, "repair.diff")}`);
       return finish(0, diff);
     }
     if (fresh.code === 2) {

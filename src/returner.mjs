@@ -12,7 +12,7 @@ import { writeReport } from "./report.mjs";
 import { attachShot, consoleErrors, packPath } from "./shots.mjs";
 
 const usage =
-  'returner --old ./v1 --new ./v2 --promise "my draft survives" [--policy policies/release-gate.yaml]\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
+  'returner --old ./v1 --new ./v2 --promise "my draft survives" [--policy policies/release-gate.yaml]\nreturner --old ./v1 --seed-only --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
 let args;
 try {
   ({ values: args } = parseArgs({
@@ -23,6 +23,7 @@ try {
       seed: { type: "string" },
       check: { type: "string" },
       replay: { type: "string" },
+      "seed-only": { type: "boolean" },
       policy: { type: "string", multiple: true, default: [] },
       help: { type: "boolean" },
     },
@@ -36,7 +37,7 @@ if (args.help) {
   console.log(usage);
   process.exit(0);
 }
-if (!args.new || (!args.replay && (!args.old || !args.promise))) {
+if (args["seed-only"] ? (!args.old || !args.promise || args.replay) : (!args.new || (!args.replay && (!args.old || !args.promise)))) {
   console.error(usage);
   process.exit(2);
 }
@@ -207,6 +208,7 @@ async function main() {
         join(run, "baseline.json"),
         JSON.stringify(state, null, 2),
       );
+      if (args["seed-only"]) return 0;
     }
     await server.use(args.new);
     const fresh = await probe(

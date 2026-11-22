@@ -43,6 +43,9 @@ export async function writeRepairReport(workDir, data) {
     beforeReport,
     afterDir,
     afterReport,
+    holdoutBaselineDir,
+    holdoutDir,
+    holdoutReport,
     freshDir,
     freshReport,
     diff = "",
@@ -53,12 +56,16 @@ export async function writeRepairReport(workDir, data) {
 
   const failCheck = pick(beforeReport, "returning user") || pick(beforeReport, "saved edit");
   const passCheck = pick(afterReport, "returning user");
+  const holdoutCheck = pick(holdoutReport, "returning user");
   const freshCheck = pick(freshReport, "returning user");
   const beforeRel = relLink(workDir, beforeDir);
   const afterRel = relLink(workDir, afterDir);
+  const holdoutBaseRel = relLink(workDir, holdoutBaselineDir);
+  const holdoutRel = relLink(workDir, holdoutDir);
   const freshRel = relLink(workDir, freshDir);
   const beforeShot = failCheck?.shot && beforeRel ? `${beforeRel}/${failCheck.shot}` : null;
   const afterShot = passCheck?.shot && afterRel ? `${afterRel}/${passCheck.shot}` : null;
+  const holdoutShot = holdoutCheck?.shot && holdoutRel ? `${holdoutRel}/${holdoutCheck.shot}` : null;
   const files = changedFiles(diff);
   const storage = describeStorage(beforeReport?.results || []);
 
@@ -70,6 +77,7 @@ export async function writeRepairReport(workDir, data) {
 
   const badges = [
     verdict === "pass" && `<span class="badge pass">Untouched replay passed</span>`,
+    holdoutCheck && `<span class="badge ${holdoutCheck.status === "pass" ? "pass" : holdoutCheck.status === "fail" ? "fail" : ""}">Holdout user (Profile B): ${esc(holdoutCheck.status)}</span>`,
     freshReport && freshCheck?.status === "pass" && `<span class="badge pass">Fresh rehearsal confirmed</span>`,
     agent && `<span class="badge">Agent: ${esc(agent)}</span>`,
     attempts.length && `<span class="badge">${attempts.length} attempt${attempts.length === 1 ? "" : "s"}</span>`,
@@ -89,8 +97,11 @@ export async function writeRepairReport(workDir, data) {
   const links = [
     beforeRel && `<a href="${esc(beforeRel)}/report.html">Before report</a>`,
     afterRel && `<a href="${esc(afterRel)}/report.html">After replay report</a>`,
+    holdoutBaseRel && `<a href="${esc(holdoutBaseRel)}/report.html">Profile B baseline</a>`,
+    holdoutRel && `<a href="${esc(holdoutRel)}/report.html">Profile B replay report</a>`,
     freshRel && `<a href="${esc(freshRel)}/report.html">Fresh confirmation report</a>`,
     existsSync(join(workDir, "repair.diff")) && `<a href="repair.diff">repair.diff</a>`,
+    existsSync(join(workDir, "incomplete-342.patch")) && `<a href="incomplete-342.patch">incomplete-342.patch</a>`,
     existsSync(join(workDir, "prompt-1.txt")) && `<a href="prompt-1.txt">prompt-1.txt</a>`,
   ].filter(Boolean).join("");
 
@@ -116,6 +127,7 @@ h1{font-size:clamp(28px,4.4vw,46px);line-height:1.06;letter-spacing:-.025em;marg
 .badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
 .badge{font:600 12px ui-monospace,Menlo,monospace;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted)}
 .badge.pass{border-color:var(--pass);color:var(--pass)}
+.badge.fail{border-color:var(--fail);color:var(--fail)}
 .links{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 0;font-size:14px}.links a{color:var(--muted)}.links a:hover{color:var(--ink)}
 .steps{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -177,6 +189,8 @@ ${links ? `<nav class="links" aria-label="Artifacts">${links}</nav>` : ""}
     <h2>${verdict === "pass" ? "Replay & fresh rehearsal pass" : "Replay verdict"}</h2>
     ${afterShot ? `<a class="img" href="${esc(afterShot)}"><img src="${esc(afterShot)}" alt="Kane's replay screenshot"></a>` : ""}
     <p>${esc(passCheck?.summary || passCheck?.reason || "Replay did not pass.")}</p>
+    ${holdoutCheck ? `<p class="fine">Holdout user (Profile B): <strong>${esc(holdoutCheck.status)}</strong>${holdoutCheck.status !== "pass" && holdoutCheck.reason ? ` — ${esc(holdoutCheck.reason)}` : ""}</p>` : ""}
+    ${holdoutShot ? `<a class="img" href="${esc(holdoutShot)}"><img src="${esc(holdoutShot)}" alt="Kane's Profile B holdout replay screenshot"></a>` : ""}
     ${freshCheck ? `<p class="fine">Fresh rehearsal (brand-new marker): <strong>${esc(freshCheck.status)}</strong></p>` : ""}
   </li>
 </ol>

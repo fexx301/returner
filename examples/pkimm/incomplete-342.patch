@@ -1,0 +1,39 @@
+diff --git a/src/components/Assessment/Assessment.tsx b/src/components/Assessment/Assessment.tsx
+--- a/src/components/Assessment/Assessment.tsx
++++ b/src/components/Assessment/Assessment.tsx
+@@ -79,7 +79,34 @@ export const Assessment: React.FC<AssessmentProps> = ({ src, config }) => {
+         if (storedData) {
+           const { progress, assessmentName, assessorName, useCaseDescription } =
+             JSON.parse(storedData);
+-          setProgress(progress);
++          if (initialData && !progress?.["G.5"]) {
++            // DELIBERATE TEST CASE (incomplete patch): stops the v1.1.0 crash
++            // by restoring fixed 3 / 4 / 2 levels for every v1.0.0 user instead
++            // of migrating each user's actual saved answers.
++            const migrated = initProgress(initialData as AssessmentData);
++            const setFixed = (key: string, level: number) => {
++              const [modId, catId] = key.split(".");
++              const cat = (initialData as AssessmentData).modules
++                .find((m) => m.id === modId)
++                ?.categories.find((c) => c.id === catId);
++              if (migrated[key] && cat) {
++                migrated[key] = {
++                  ...migrated[key],
++                  level,
++                  result: LevelResult[level],
++                  description:
++                    cat.levels.find((l) => l.number === level)?.description ||
++                    migrated[key].description,
++                };
++              }
++            };
++            setFixed("G.1", 3);
++            setFixed("M.8", 4);
++            setFixed("R.14", 2);
++            setProgress(migrated);
++          } else {
++            setProgress(progress);
++          }
+           setAssessmentName(assessmentName);
+           setAssessorName(assessorName);
+           setUseCaseDescription(useCaseDescription);
