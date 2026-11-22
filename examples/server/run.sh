@@ -7,7 +7,7 @@ set -eu
 cd "$(dirname "$0")/../.."
 PORT=4101 node examples/server/v1/server.mjs &
 OLD=$!
-trap 'kill $OLD' EXIT INT TERM
+trap 'kill "$OLD" 2>/dev/null || true' EXIT INT TERM
 until curl -s -o /dev/null http://127.0.0.1:4101/; do sleep 0.2; done
 node src/repair.mjs --agent "${1:-codex}" --attempts 3 \
   --old http://127.0.0.1:4101 --source examples/server/v2-broken \

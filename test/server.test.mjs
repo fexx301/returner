@@ -59,6 +59,34 @@ test("proxy mode: a running app's cookies cross the release at one origin, and a
   const replay = run(dir, "returner.mjs", ["--replay", baseline, "--new", v1]); // v1 reads its own cookie: stands in for a fix
   assert.equal(replay.status, 0, replay.stdout + replay.stderr);
   assert.equal(run(dir, "returner.mjs", ["--old", "http://127.0.0.1:9", "--new", v2, "--promise", "p"]).status, 2, "an app that is not running is inconclusive");
+  assert.equal(run(dir, "returner.mjs", ["--old", v1 + "/app", "--new", v2, "--promise", "p"]).status, 2, "non-root proxy URLs are rejected explicitly");
+});
+
+test("repair --start: failed startup keeps Kane's original failure for the next attempt, and an occupied port is rejected", async (t) => {
+  const dir = await root(t);
+  await cp(fixture("v2-broken"), join(dir, "source"), { recursive: true });
+  const v1 = await app(t, fixture("v1"), await freePort());
+  const port = await freePort();
+  // Attempt 1 writes broken syntax so the app fails to start; attempt 2 fixes it and must still see Kane's original failure.
+  await writeFile(join(dir, "claude"), `#!/bin/sh
+cat >> "${dir}/prompts.log"; echo "=====" >> "${dir}/prompts.log"
+if [ "$(grep -c "=====" "${dir}/prompts.log")" -eq 1 ]; then
+  printf 'this is not valid js (((' > server.mjs
+else
+  cp "${fixture("v1")}/server.mjs" server.mjs
+fi
+`, { mode: 0o755 });
+  const r = run(dir, "repair.mjs", ["--old", v1, "--source", "source", "--start", `PORT=${port} node server.mjs`, "--serve", `http://127.0.0.1:${port}`,
+    "--promise", "draft survives", "--agent", "claude", "--attempts", "2"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const secondPrompt = (await readFile(join(dir, "prompts.log"), "utf8")).split("=====")[1];
+  assert.match(secondPrompt, /Check "returning user"/, "attempt 2 still sees Kane's original returning-user failure");
+  assert.match(secondPrompt, /the app did not start/, "attempt 2 also sees the startup crash from attempt 1");
+  // If --serve is already answering before --start runs, repair must refuse rather than test the wrong server.
+  const occupied = run(dir, "repair.mjs", ["--old", v1, "--source", "source", "--start", "true", "--serve", v1,
+    "--promise", "draft survives", "--agent", "claude", "--attempts", "1"]);
+  assert.equal(occupied.status, 2);
+  assert.match(occupied.stderr, /already answering/);
 });
 
 test("repair --start: the agent sees the server's crash, and its fix is started, replayed and confirmed", async (t) => {

@@ -31,6 +31,9 @@ inputs:
   kane-cli-version:
     description: kane-cli version to install.
     default: "0.10.6"
+  artifact-name:
+    description: Name of the uploaded report artifact. Override in matrix jobs or when running Returner twice in one job.
+    required: false
 outputs:
   verdict:
     description: pass, fail (regression for returning users) or inconclusive.
@@ -88,7 +91,7 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: returner-report-${{ github.job }}
+        name: ${{ inputs.artifact-name || format('returner-report-{0}', github.job) }}
         path: returner-report
     - name: Require the expected verdict
       shell: bash

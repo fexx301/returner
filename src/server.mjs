@@ -57,14 +57,21 @@ export async function serve(port) {
       const pathname = decodeURIComponent(
         new URL(req.url, "http://localhost").pathname,
       );
+      if (pathname.split("/").some((p) => p.startsWith("."))) throw Error();
       let file = resolve(root, "." + pathname);
-      if ((await stat(file)).isDirectory()) file = resolve(file, "index.html");
+      try {
+        if ((await stat(file)).isDirectory()) file = resolve(file, "index.html");
+      } catch (error) {
+        // Client-side routed SPAs need index.html on reload of extensionless routes.
+        const htmlNav =
+          !extname(pathname) &&
+          (req.headers["sec-fetch-dest"] === "document" ||
+            req.headers.accept?.includes("text/html"));
+        if (error.code === "ENOENT" && htmlNav) file = resolve(root, "index.html");
+        else throw error;
+      }
       file = await realpath(file);
-      if (
-        !file.startsWith(root + sep) ||
-        pathname.split("/").some((p) => p.startsWith("."))
-      )
-        throw Error();
+      if (!file.startsWith(root + sep)) throw Error();
       const data = await readFile(file);
       const ext = extname(file);
       if (
@@ -92,7 +99,10 @@ export async function serve(port) {
     async use(target) {
       documents = 0;
       if (isUrl(target)) {
-        upstream = new URL(target);
+        const parsed = new URL(target);
+        if (parsed.pathname !== "/" || parsed.search || parsed.hash)
+          throw Error(`Proxy targets must be an origin URL without a path (got ${target}; use ${parsed.origin}).`);
+        upstream = parsed;
         // Fails the run (exit 2) when the app isn't up; any HTTP answer, even an error page, means it is.
         await fetch(upstream.origin, { redirect: "manual" }).catch(() => { throw Error(`Nothing is answering at ${upstream.origin}. Start the app first.`); });
         return;
@@ -102,6 +112,9 @@ export async function serve(port) {
       await stat(resolve(root, "index.html"));
     },
     documents: () => documents,
-    close: () => server.close(),
+    close: () => {
+      server.closeAllConnections?.();
+      server.close();
+    },
   };
 }

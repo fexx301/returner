@@ -38,14 +38,16 @@ export function attachShot(session, dir, name) {
   try {
     const { file, entries } = pack(session);
     const step = (p) => parseInt(p.match(/steps\/(\d+)/)?.[1] ?? "0", 10); // folders look like 9-0-5 or 4-0-e1169d09-1
-    const shots = entries.filter((p) => p.endsWith("/screenshot.jpg"))
+    const shots = entries.filter((p) => /\/screenshot\.(jpg|jpeg|png)$/i.test(p))
       .sort((a, b) => step(a) - step(b) || a.localeCompare(b));
     if (!shots.length) return;
-    const image = spawnSync("unzip", ["-p", file, shots.at(-1)], { maxBuffer: 64 << 20 }).stdout;
+    const pick = shots.at(-1);
+    const ext = pick.slice(pick.lastIndexOf(".")).toLowerCase();
+    const image = spawnSync("unzip", ["-p", file, pick], { maxBuffer: 64 << 20 }).stdout;
     if (!image?.length) return;
     mkdirSync(join(dir, "shots"), { recursive: true });
-    writeFileSync(join(dir, "shots", `${slug(name)}.jpg`), image);
-    return `shots/${slug(name)}.jpg`;
+    writeFileSync(join(dir, "shots", `${slug(name)}${ext}`), image);
+    return `shots/${slug(name)}${ext}`;
   } catch {
     return undefined; // screenshots are a convenience; a missing pack never fails a run
   }

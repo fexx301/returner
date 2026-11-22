@@ -7,6 +7,11 @@
     "returner": "./src/returner.mjs",
     "returner-repair": "./src/repair.mjs"
   },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22"
   },

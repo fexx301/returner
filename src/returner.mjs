@@ -57,6 +57,14 @@ async function main() {
   const server = await serve(state.port || 0);
   const url = "http://127.0.0.1:" + server.port;
   const results = [];
+  let activeChild;
+  const stop = (signal) => {
+    activeChild?.kill(signal);
+    server.close();
+    process.exit(128 + (signal === "SIGINT" ? 2 : 15));
+  };
+  process.on("SIGINT", stop);
+  process.on("SIGTERM", stop);
   function objective(template, title, body) {
     return template.replaceAll("{title}", title).replaceAll("{body}", body);
   }
@@ -81,11 +89,21 @@ async function main() {
         url,
         task,
       ],
-      { stdio: ["ignore", "pipe", "inherit"] },
+      {
+        stdio: ["ignore", "pipe", "inherit"],
+        env: { KANE_CLI_USER_AGENT: "returner", ...process.env },
+      },
     );
+    activeChild = child;
     const completion = new Promise((ok, fail) => {
-      child.on("error", fail);
-      child.on("close", ok);
+      child.on("error", (err) => {
+        activeChild = null;
+        fail(err);
+      });
+      child.on("close", (code) => {
+        activeChild = null;
+        ok(code);
+      });
     });
     let end;
     const steps = [];
@@ -216,6 +234,8 @@ async function main() {
     console.error(error.message);
     process.exitCode = 2;
   } finally {
+    process.off("SIGINT", stop);
+    process.off("SIGTERM", stop);
     server.close();
   }
 }

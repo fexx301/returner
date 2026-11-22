@@ -40,14 +40,24 @@ const usage =
   'returner-repair --old ./v1-build --source ./v2-source [--build "npm run build"] [--serve dist] --promise "…" [--seed …] [--check …] [--agent codex|claude] [--attempts 3]\n' +
   'Running apps: --old http://127.0.0.1:4001 --start "PORT=4002 node server.mjs" --serve http://127.0.0.1:4002 (the candidate is started for every check)';
 
+const cleanups = new Set();
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => {
+    for (const fn of cleanups) try { fn(signal); } catch {}
+    process.exit(128 + (signal === "SIGINT" ? 2 : 15));
+  });
+}
+
 function execute(program, args, cwd, { prompt, capture, shell } = {}) {
   return new Promise((done, reject) => {
     const child = spawn(program, args, { cwd, shell, stdio: [prompt ? "pipe" : "ignore", capture ? "pipe" : "inherit", capture ? "pipe" : "inherit"] });
+    const stop = (signal) => child.kill(signal);
+    cleanups.add(stop);
     let out = "";
     for (const s of capture ? [child.stdout, child.stderr] : [])
       s.on("data", (d) => { out += d; (s === child.stdout ? process.stdout : process.stderr).write(d); });
-    child.on("error", reject);
-    child.on("close", (code) => done({ code: code ?? 2, out }));
+    child.on("error", (e) => { cleanups.delete(stop); reject(e); });
+    child.on("close", (code) => { cleanups.delete(stop); done({ code: code ?? 2, out }); });
     if (prompt) {
       child.stdin.on("error", (e) => { if (e.code !== "EPIPE") reject(e); });
       child.stdin.end(prompt);
@@ -96,10 +106,14 @@ async function main() {
   const log = join(work, "server.log");
   const live = async (rehearsal) => {
     if (!a.start) return rehearsal();
+    if (await fetch(a.serve, { redirect: "manual" }).then(() => true, () => false))
+      return { startFailed: true, server: `${a.serve} is already answering before --start ran. Stop whatever is using it first.`, results: [] };
     const from = (await stat(log).catch(() => ({ size: 0 }))).size;
     const fd = openSync(log, "a");
     const app = spawn(a.start, { cwd: candidate, shell: true, detached: true, stdio: ["ignore", fd, fd] });
     closeSync(fd);
+    const stopApp = (signal) => process.kill(-app.pid, signal);
+    cleanups.add(stopApp);
     const exited = new Promise((done) => app.on("exit", done));
     const tail = async () => (await readFile(log)).subarray(from).toString("utf8").slice(-3000);
     try {
@@ -109,8 +123,10 @@ async function main() {
       }
       return { ...(await rehearsal()), server: await tail() };
     } finally {
+      cleanups.delete(stopApp);
       try { process.kill(-app.pid); } catch {}
       await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
+      if (app.exitCode === null) try { process.kill(-app.pid, "SIGKILL"); } catch {}
     }
   };
   console.log("Repair workspace:", work);
@@ -158,11 +174,12 @@ async function main() {
       continue;
     }
     console.log("Replaying independently from the original baseline…");
-    last = await live(() => rehearse(["--replay", baseline, "--new", site], work));
-    if (last.startFailed) {
-      attempts.push(`Attempt ${i}: the app did not start:\n${last.server}`);
+    const replay = await live(() => rehearse(["--replay", baseline, "--new", site], work));
+    if (replay.startFailed) {
+      attempts.push(`Attempt ${i}: the app did not start:\n${replay.server}`);
       continue;
     }
+    last = replay;
     const outcome = { attempt: i, code: last.code, evidence: last.run, results: last.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
@@ -173,6 +190,7 @@ async function main() {
     // A passing replay must also hold for saved work the agent has never seen: rehearse again with a new marker.
     console.log("Replay passed. Confirming with a fresh rehearsal and a new marker…");
     const fresh = await fullRehearsal();
+    if (fresh.startFailed) return console.error("The candidate app did not start for fresh confirmation:\n" + fresh.server), 2;
     outcome.fresh = { code: fresh.code, evidence: fresh.run, results: fresh.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (fresh.code === 0) {

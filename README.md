@@ -57,7 +57,7 @@ Every browser observation comes from Kane. Report links open the rendered `repor
 2. **Ship today.** The new build is served at the same address, so the browser's storage still belongs to the same origin.
 3. **New user (control).** A fresh profile performs the same task.
 4. **Returning user (the check).** A copy of the snapshot opens the new build. Kane must find the original marker, and it fails rather than recreating anything that's missing.
-5. **Repair and replay.** On a failure, `repair.mjs` hands the coding agent Kane's verdict, its steps and the browser console errors from Kane's evidence pack (on Rackula, the exact crash that Kane's summary missed). It then rebuilds and replays step 4 from the same snapshot.
+5. **Repair and replay.** On a failure, `repair.mjs` hands the coding agent Kane's verdict, its steps and the browser console errors from Kane's evidence pack (such as Rackula's startup crash, which Kane's summary missed). It then rebuilds and replays step 4 from the same snapshot.
 6. **No faked fixes.** Returner never puts the run's marker in the agent's prompt: it is redacted from Kane's findings, earlier attempts and build output. A passing replay must also survive a fresh rehearsal with brand-new saved work, so a fix that hardcodes one user's saved data is rejected and sent back to the agent. `npm test` includes a cheating agent that reads the hidden marker from disk and is still rejected, through both `repair.mjs` and `npm run demo:repair`. The fresh rehearsal changes the marker, not the rest of the task (see Limitations).
 
 ## Quick start
@@ -69,10 +69,12 @@ git clone https://github.com/fexx301/returner && cd returner
 npm install -g @testmuai/kane-cli && kane-cli login
 ```
 
-**Rehearse your own release** (two static builds, each with a root `index.html`):
+**Rehearse your own release** (two static builds with a root `index.html`, or two running apps by URL):
 
 ```sh
 node src/returner.mjs --old ./v1 --new ./v2 --promise "My draft survives the release"
+# Or proxy two running servers through Returner's single localhost origin:
+node src/returner.mjs --old http://127.0.0.1:4001 --new http://127.0.0.1:4002 --promise "My draft survives the release"
 ```
 
 Or skip the clone and run it straight from GitHub:
@@ -98,6 +100,7 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
 | `npm run demo:repair` | Fieldnotes: Codex repairs it, and the replay passes |
 | `examples/pkimm/prepare.sh && examples/pkimm/run.sh codex` | The real PKI Consortium regression, fetched at pinned upstream revisions, repaired and replayed |
 | `examples/rackula/prepare.sh && examples/rackula/run.sh codex` | Rackula's v0.6.x autosave regression, built from pinned commits, repaired and replayed |
+| `examples/server/run.sh codex` | Quillpad: a server-rendered Node app proxied at one origin (`--start`), repaired from its 500 stack trace |
 
 **Add it to CI:**
 
@@ -127,11 +130,11 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 
 ## Limitations
 
-- **Static browser builds on localhost.** Server-rendered apps and sign-in flows aren't covered yet.
+- **Localhost origin only; no multi-tenant backend state snapshots.** `--old` and `--new` accept static builds or running app URLs (proxied through one localhost origin so cookies and browser storage carry over; `repair.mjs --start` starts and stops the candidate server per check). Database migrations and third-party OAuth sign-in flows aren't managed by Returner.
 - **It tests browser-side state:** whatever the Chrome profile carries, such as localStorage, IndexedDB and cookies.
 - **Kane credits:** the recorded runs used about 5–95 credits per Kane run. Longer objectives cost more.
 - **Kane verdicts can be inconclusive.** Returner reports exit 2 instead of guessing. The first PKIMM attempt in the Actions run was inconclusive, and the rerun reproduced the regression.
-- **Recorded runs predate the anti-cheat steps.** The marker redaction and fresh-rehearsal confirmation were added on Nov 20, and `npm run demo:repair` uses them from Nov 21. The recorded repairs ran before that, but their patches contain no marker strings (check the diffs).
+- **Recorded runs predate later loop hardening.** Marker redaction and fresh-rehearsal confirmation were added on Nov 20 (`npm run demo:repair` uses them from Nov 21), and automatic console-error extraction was added on Nov 22. The recorded repairs ran before those additions; their patches contain no marker strings (check the diffs) and their reports were backfilled from the saved Kane packs.
 - **Fresh rehearsals vary the marker, not the whole task.** The PKIMM objectives always save the same three answer levels, so a patch that hard-wired those exact levels, rather than the marker, would not be caught by the fresh rehearsal.
 - **The repairs are specific.** The PKIMM repairs map the categories for this one model change. Upstream's v2.0.0 later shipped a general migration.
 - **Service workers:** a navigation served entirely from a service worker can come back inconclusive, because Returner also checks that its server received a document request.

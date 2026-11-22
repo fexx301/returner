@@ -91,18 +91,42 @@ test("bad flags and attempt counts exit 2 before any Kane run", async (t) => {
   await assert.rejects(readFile(join(root, "kane-ran")), "no Kane run was started");
 });
 
-// Kane's sealed evidence pack is a zip; its console log's errors reach the report and the repair prompt.
-test("console errors are read from Kane's evidence pack, unique and errors only", async (t) => {
+// Kane's sealed evidence pack is a zip; its console log's errors and screenshots (.jpg or .png) are extracted.
+test("console errors and png screenshots are read from Kane's evidence pack", async (t) => {
   const home = await mkdtemp(join(tmpdir(), "returner-pack-"));
   t.after(() => rm(home, { recursive: true, force: true }));
   const dir = join(home, ".testmuai", "kaneai", "sessions", "s1", "evidence");
   await mkdir(join(dir, "tests", "t", "logs"), { recursive: true });
+  await mkdir(join(dir, "tests", "t", "steps", "2-0-a"), { recursive: true });
   const line = (level, text) => JSON.stringify({ level, text });
   await writeFile(join(dir, "tests", "t", "logs", "0-console.ndjson"),
     [JSON.stringify({ marker: "step" }), line("error", "boom"), line("warning", "meh"), line("error", "boom"), "not json"].join("\n"));
+  await writeFile(join(dir, "tests", "t", "steps", "2-0-a", "screenshot.png"), "PNGDATA");
   assert.equal(spawnSync("zip", ["-qr", "p.evidence", "tests"], { cwd: dir }).status, 0);
   const shots = new URL("../src/shots.mjs", import.meta.url).href;
-  const r = spawnSync(process.execPath, ["--input-type=module", "-e", `import { consoleErrors } from ${JSON.stringify(shots)}; console.log(JSON.stringify(consoleErrors("s1")), JSON.stringify(consoleErrors("missing")))`],
+  const r = spawnSync(process.execPath, ["--input-type=module", "-e",
+    `import { attachShot, consoleErrors } from ${JSON.stringify(shots)}; console.log(JSON.stringify({ errors: consoleErrors("s1"), missing: consoleErrors("missing"), shot: attachShot("s1", ${JSON.stringify(home)}, "returning user") }))`],
     { env: { ...process.env, HOME: home }, encoding: "utf8" });
-  assert.equal(r.stdout.trim(), '["boom"] []', r.stderr);
+  assert.deepEqual(JSON.parse(r.stdout.trim()), { errors: ["boom"], missing: [], shot: "shots/returning-user.png" }, r.stderr);
+  assert.equal(await readFile(join(home, "shots", "returning-user.png"), "utf8"), "PNGDATA");
+});
+
+// Client-side routed SPAs must survive reloads while missing assets and dotfiles stay 404.
+test("server falls back to index.html for extensionless HTML routes, not missing assets or dotfiles", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "returner-spa-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(join(root, "index.html"), "<main>spa</main>");
+  await writeFile(join(root, ".env"), "SECRET=1");
+  const { serve } = await import("../src/server.mjs");
+  const server = await serve(0);
+  t.after(() => server.close());
+  await server.use(root);
+  const base = "http://127.0.0.1:" + server.port;
+  const nav = await fetch(base + "/notes/123", { headers: { "sec-fetch-dest": "document" } });
+  assert.equal(nav.status, 200);
+  assert.equal(await nav.text(), "<main>spa</main>");
+  assert.equal(server.documents(), 1);
+  assert.equal((await fetch(base + "/missing.js", { headers: { accept: "text/html" } })).status, 404);
+  assert.equal((await fetch(base + "/notes/123", { headers: { accept: "application/json" } })).status, 404);
+  assert.equal((await fetch(base + "/.env", { headers: { "sec-fetch-dest": "document" } })).status, 404);
 });

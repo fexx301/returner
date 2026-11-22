@@ -25,7 +25,8 @@ const kane = `#!/usr/bin/env node
 async function setup(agentScript) {
   // The project sits under a folder named node_modules, and the user's git signs commits with a failing signer:
   // neither may break the candidate copy or its baseline commit.
-  const root = join(await mkdtemp(join(tmpdir(), "returner-repair-")), "node_modules", "app");
+  const base = await mkdtemp(join(tmpdir(), "returner-repair-"));
+  const root = join(base, "node_modules", "app");
   await mkdir(join(root, "old"), { recursive: true });
   await writeFile(join(root, "gitconfig"), "[commit]\n  gpgsign = true\n[gpg]\n  program = false\n");
   await writeFile(join(root, "old", "index.html"), "old");
@@ -43,16 +44,16 @@ async function setup(agentScript) {
   for (const run of runs) {
     try { marker = JSON.parse(await readFile(join(work, ".returner", run, "baseline.json"), "utf8")).title; break; } catch {}
   }
-  return { root, r, work, marker, prompts: await readFile(join(root, "prompts.log"), "utf8") };
+  return { base, root, r, work, marker, prompts: await readFile(join(root, "prompts.log"), "utf8") };
 }
 
 test("an honest repair passes the replay and a fresh rehearsal; the agent never sees the marker", async (t) => {
-  const { root, r, work, marker, prompts } = await setup((root) => `#!/bin/sh
+  const { base, root, r, work, marker, prompts } = await setup((root) => `#!/bin/sh
 cat >> "${root}/prompts.log"; echo "=====" >> "${root}/prompts.log"
 [ "$(grep -c "=====" "${root}/prompts.log")" -ge 2 ] && printf fixed > site/index.html && printf added > site/new-helper.js
 exit 0
 `);
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => rm(base, { recursive: true, force: true }));
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /after attempt 2, and a fresh rehearsal with a new marker confirmed it/);
   assert.match(prompts, /saved draft missing/, "the agent sees Kane's reason");
@@ -70,12 +71,12 @@ exit 0
 
 test("a fix that hardcodes the saved marker passes the replay but is rejected by the fresh rehearsal", async (t) => {
   // This agent cheats: it reads the hidden baseline from disk and writes its marker into the page.
-  const { root, r, prompts } = await setup((root) => `#!/bin/sh
+  const { base, r, prompts } = await setup((root) => `#!/bin/sh
 cat >> "${root}/prompts.log"; echo "=====" >> "${root}/prompts.log"
 for f in ../.returner/run-*/baseline.json; do node -e "process.stdout.write(require('$PWD/'+process.argv[1]).title)" "$f" > site/index.html && break; done
 exit 0
 `);
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => rm(base, { recursive: true, force: true }));
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.match(r.stdout, /passed the replay but failed the fresh rehearsal; rejecting it/);
   assert.match(r.stderr, /did not pass the returning user within the attempt limit/);

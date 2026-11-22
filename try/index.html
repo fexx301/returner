@@ -68,10 +68,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 button:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}
 .verdict{border-radius:14px;padding:16px 18px;border:2px solid var(--line);background:var(--card);display:none}
 .verdict.show{display:block}
-.verdict.pass{border-color:var(--pass)}.verdict.fail{border-color:var(--fail)}
+.verdict.pass{border-color:var(--pass)}.verdict.fail{border-color:var(--fail)}.verdict.info{border-color:var(--ink)}
 .verdict .head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .pill{font:700 12px ui-monospace,Menlo,monospace;letter-spacing:.08em;padding:5px 10px;border-radius:999px;color:#fff}
-.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}
+.pill.pass{background:var(--pass)}.pill.fail{background:var(--fail)}.pill.info{background:var(--ink);color:var(--ground)}
 .verdict strong{font-size:18px}
 .verdict p{margin:0;color:var(--muted);font-size:14px}
 .inspect{font:13px/1.6 ui-monospace,Menlo,monospace;background:var(--code);color:var(--codeink);border-radius:12px;padding:12px 14px;overflow-x:auto}
@@ -208,16 +208,17 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
   function verdict(kind, head, body) {
     const v = $("verdict");
     v.className = "verdict show " + kind;
-    $("vpill").className = "pill " + kind; $("vpill").textContent = kind === "pass" ? "PASS" : "FAIL";
+    $("vpill").className = "pill " + kind; $("vpill").textContent = kind === "pass" ? "PASS" : kind === "fail" ? "FAIL" : "NEXT";
     $("vhead").textContent = head; $("vbody").textContent = body;
   }
   function clearVerdict() { $("verdict").className = "verdict"; }
 
   function render() {
     const s = STEPS[step], k = KANE[step];
+    const origin = location.host ? location.host + location.pathname.replace(/\/try\/.*$/, "/") : "fexx301.github.io/returner/";
     $("kicker").textContent = s.kicker; $("title").textContent = s.title; $("copy").innerHTML = s.copy;
     $("ver").textContent = s.ver[0]; $("ver").className = "ver " + s.ver[1];
-    $("addr").textContent = "fexx301.github.io/returner/" + s.path;
+    $("addr").textContent = origin + s.path;
     $("kimg").src = k.shot; $("kimg").alt = "Kane's screenshot for step " + step; $("kshot").href = k.shot; $("kreport").href = k.report;
     $("ktag").textContent = k.tag[0]; $("ktag").style.background = `var(--${k.tag[1]})`; $("ktext").textContent = k.text;
     $("fill").hidden = step !== 1;
@@ -262,7 +263,8 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
     const id = Math.random().toString(16).slice(2, 8);
     const t = doc.querySelector("#title"), b = doc.querySelector("#body");
     if (t && b) { t.value = "Trip notes " + id; b.value = "Pack the charger. Book the 9:40 train. Draft " + id + "."; t.focus(); }
-    verdict("pass", "Filled in. Now press Save draft in the app.", "The page typed for you; saving is the app's own button, exactly as a user would do it.");
+    $("next").disabled = true;
+    verdict("info", "Filled in. Now press Save draft in the app.", "The page typed for you; saving is the app's own button, exactly as a user would do it.");
   });
   function reset() {
     try { storage?.removeItem(V1); storage?.removeItem(V2); } catch {}
