@@ -1,0 +1,48 @@
+{
+  "attempt": 1,
+  "code": 0,
+  "evidence": "…/returner/.returner/repair-A6V4MM/.returner/run-M38X7U",
+  "results": [
+    {
+      "name": "new user",
+      "status": "pass",
+      "reason": "Objective completed"
+    },
+    {
+      "name": "returning user",
+      "status": "pass",
+      "reason": "Objective completed"
+    },
+    {
+      "name": "saved edit",
+      "status": "pass",
+      "reason": "Objective completed"
+    }
+  ],
+  "fresh": {
+    "code": 0,
+    "evidence": "…/returner/.returner/repair-A6V4MM/.returner/run-EpRnxE",
+    "results": [
+      {
+        "name": "old baseline",
+        "status": "pass",
+        "reason": "Objective completed"
+      },
+      {
+        "name": "new user",
+        "status": "pass",
+        "reason": "Objective completed"
+      },
+      {
+        "name": "returning user",
+        "status": "pass",
+        "reason": "Objective completed"
+      },
+      {
+        "name": "saved edit",
+        "status": "pass",
+        "reason": "Objective completed"
+      }
+    ]
+  }
+}

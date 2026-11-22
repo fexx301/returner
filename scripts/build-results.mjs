@@ -33,6 +33,10 @@ const loops = [
     change: "Assessment model 1.0.0 → 1.1.0", agent: "Codex", before: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/before", after: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/after", diff: "evidence/pkimm-1.0.0-to-1.1.0/codex-recorded-run/repair.diff" },
   { id: "rackula", title: "Rackula rack designer", tag: "Real regression · caught by its maintainers before release", issue: ["RackulaLives/Rackula#935", "https://github.com/RackulaLives/Rackula/issues/935"],
     change: "v0.6.16 → v0.7.0 development build", agent: "Codex", before: "evidence/rackula-0.6.16-to-0.7.0-dev/before", after: "evidence/rackula-0.6.16-to-0.7.0-dev/after", diff: "evidence/rackula-0.6.16-to-0.7.0-dev/repair.diff" },
+  { id: "quillpad", title: "Quillpad: a running server app", tag: "Our fixture · server-rendered, proxied at one origin", change: "v1 → v2, draft cookie format changed", agent: "Codex",
+    note: "Our own fixture, not an upstream bug: the first case where Returner proxies a running server instead of serving a static build. The agent also received the app server's stack trace. One uninterrupted run, and a fresh rehearsal with a new marker confirmed the patch.",
+    server: "evidence/quillpad-server-v1-to-v2/server.log",
+    before: "evidence/quillpad-server-v1-to-v2/before", after: "evidence/quillpad-server-v1-to-v2/after", diff: "evidence/quillpad-server-v1-to-v2/repair.diff" },
   { id: "fieldnotes", title: "Fieldnotes", tag: "Our fixture · storage key deliberately renamed", change: "v1 → v2", agent: "Codex", before: "evidence/fieldnotes-before", after: "evidence/fieldnotes-after",
     fixture: ["examples/draft/v2-broken/draft.js", "examples/draft/v2/draft.js"] },
 ];
@@ -45,6 +49,15 @@ function strip(l) {
   // Kane's own console capture, when the evidence folder carries one, is the clearest failure line.
   const consoleFile = join(root, l.before, "console-errors.ndjson");
   const consoleLine = existsSync(consoleFile) ? JSON.parse(readFileSync(consoleFile, "utf8").split("\n")[0]).text : null;
+  // Running apps: the server's own first error line, as the agent received it.
+  // Error name and the first app frame; the message itself quotes binary garbage from the bad cookie.
+  const serverLine = (() => {
+    if (!l.server) return null;
+    const log = readFileSync(join(root, l.server), "utf8").split("\n");
+    const at = log.findIndex((x) => /\w+Error/.test(x));
+    const frame = log.slice(at + 1).map((x) => x.match(/^\s+at (\S+) \(.*\/([^/]+:\d+):\d+\)$/)).find(Boolean);
+    return `${log[at].match(/\w+Error/)[0]} thrown in ${frame ? `${frame[1]} (${frame[2]})` : "the app"}, answered as 500`;
+  })();
   const shot = (dir, r) => r?.shot ? `<a class="img" href="${dir}/${r.shot}"><img src="${dir}/${r.shot}" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a>` : "";
   return `<section class="loop" id="${l.id}">
   <header class="lh"><div><p class="tag">${esc(l.tag)}</p><h2>${esc(l.title)}</h2>
@@ -52,8 +65,8 @@ function strip(l) {
   <p class="links"><a href="${l.before}/report.html">Before report</a><a href="${l.after}/report.html">After report</a>${l.diff ? `<a href="https://github.com/fexx301/returner/blob/main/${l.diff}">Full patch</a>` : `<a href="https://github.com/fexx301/returner/tree/main/examples/draft">Fixture source</a>`}</p></header>
   ${l.note ? `<p class="note">${esc(l.note)}</p>` : ""}
   <ol class="steps">
-    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3>${shot(l.before, fail)}<p>${esc(clip(consoleLine ? `Console: ${consoleLine}` : failLine(fail), 150))}</p></li>
-    <li class="step"><span class="n">2</span><h3>Kane's finding goes to the agent</h3><blockquote>${esc(clip(fail?.summary || fail?.reason, 170))}</blockquote>${String(fail?.summary || "").length > 170 ? `<details class="more"><summary>Kane's full finding</summary><p>${esc(fail?.summary)}</p></details>` : ""}<p class="fine">Plus the unchanged objective and the release promise. The agent edits a disposable copy only.</p></li>
+    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3>${shot(l.before, fail)}<p>${esc(clip(serverLine ? `Server: ${serverLine}` : consoleLine ? `Console: ${consoleLine}` : failLine(fail), 150))}</p></li>
+    <li class="step"><span class="n">2</span><h3>Kane's finding goes to the agent</h3><blockquote>${esc(clip(fail?.summary || fail?.reason, 170))}</blockquote>${String(fail?.summary || "").length > 170 ? `<details class="more"><summary>Kane's full finding</summary><p>${esc(fail?.summary)}</p></details>` : ""}<p class="fine">Plus ${l.server ? "the app server's stack trace, " : ""}the unchanged objective and the release promise. The agent edits a disposable copy only.</p></li>
     <li class="step"><span class="n">3</span><h3>${l.diff ? `${esc(l.agent)}'s patch` : "The fix (as committed in the fixture)"}</h3><p class="files">${p.files.map(esc).join("<br>")}</p><pre>${p.lines.map(esc).join("\n")}${p.more ? `\n… ${p.more} more added lines` : ""}</pre></li>
     <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3>${shot(l.after, pass)}<p>${esc(clip(pass?.summary, 170))}</p></li>
   </ol>
@@ -142,7 +155,7 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
 <div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>4</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
-<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
+<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
 ${loops.map(strip).join("\n")}
 <section class="loop" id="deckmark"><header class="lh"><div><p class="tag">Clean upgrade · unmodified upstream builds</p><h2>DeckMark v2.5.3 → v2.5.4</h2><p class="sub">An open-source Markdown editor: the returning user's note survives</p></div><p class="links"><a href="evidence/deckmark-2.5.3-to-2.5.4/report.html">Report</a></p></header>
 <div class="clean" style="margin-top:18px"><a class="img" href="evidence/deckmark-2.5.3-to-2.5.4/${deck?.shot}"><img src="evidence/deckmark-2.5.3-to-2.5.4/${deck?.shot}" alt="Kane's final screenshot"></a><p>${esc(clip(deck?.summary, 260))}</p></div></section>

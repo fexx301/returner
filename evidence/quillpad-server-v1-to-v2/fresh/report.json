@@ -1,0 +1,398 @@
+{
+  "promise": "My draft survives the release",
+  "url": "http://127.0.0.1:63791",
+  "results": [
+    {
+      "name": "old baseline",
+      "session": "6a367d28-5607-4525-af86-c1d6b201cced",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the title \"Returner-960bf809\" and body \"Saved work fd57c3ea-9e8\".\nSaved the draft and reloaded the page.\nConfirmed that both the title and body remained visible after the reload.",
+      "credits": 20.096615,
+      "duration": 64.3,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816FFMRVGT2YT84JMK7TGPZ/dashboard/share/US_F6WOLJ05WXBK0C9FTQPL0URYTVI7SMV2MCAYF1NAHH9GU7SL0LPJMFMK9C9YUMQ1?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"Returner-960bf809\" and body is \"Saved work fd57c3ea-9e8\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:63791"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Title\"; type \"Body\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"Returner-960bf809\" into \"Title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing Saved work fd57c3ea-9e8 into the draft body field"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "wait: PRIMARY: Reload the page"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Saved work fd57c3ea-9e8\" remains visi"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: Both exact strings \"Returner-960bf809\" and \"Saved work fd57c3ea-9e8\" remain visi"
+        }
+      ],
+      "shot": "shots/old-baseline.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "new user",
+      "session": "a8311ed8-eedb-44b6-a299-d11ac5f7eb1a",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the requested title “New-Returner-960bf809” and body “Fresh Saved work fd57c3ea-9e8”.\nSaved the draft and reloaded the page.\nConfirmed that both the title and body were still visible after reloading.",
+      "credits": 20.4383925,
+      "duration": 43.6,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816JKVMEWBJQRFGWRPWNGM5/dashboard/share/US_FZFIEDU658QQ5Q9LNKLC4I2MQR7GZZ4O8CVB4BQD6PLAY9T7RT5U75OSYDFF5NTC?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"New-Returner-960bf809\" and body is \"Fresh Saved work fd57c3ea-9e8\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:63791"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Title\"; type \"Body\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"New-Returner-960bf809\" into \"Title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing “Fresh Saved work fd57c3ea-9e8” into the body field"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Fresh Saved work fd57c3ea-9e8\" remain"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "assert: Both exact strings \"New-Returner-960bf809\" and \"Fresh Saved work fd57c3ea-9e8\" r"
+        }
+      ],
+      "shot": "shots/new-user.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "returning user",
+      "session": "fef83e51-b128-422e-a16b-d62f6381eb5d",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Opened the existing draft titled “Returner-960bf809”.\nConfirmed that the draft title and body text “Saved work fd57c3ea-9e8” were present.\nThe requested draft was successfully opened and remained available.",
+      "credits": 36.3834175,
+      "duration": 86.4,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816MNCE9WN5QPK3JDPCV494/dashboard/share/US_HBPX60PUEHHJJRS69I3GIE1VL5QLTIQCBYX47ZJMQBZTQEFD1AI65354J6JD4UQC?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Open the existing draft titled \"Returner-960bf809\". Verify that exact title and body \"Saved work fd57c3ea-9e8\" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append \" EDITED\" to the body, save, reload, and verify the full edited body \"Saved work fd57c3ea-9e8 EDITED\". Release promise: My draft survives the release",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:63791"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Open the existing draft titled \"Returner-960bf809\"; role=textbox; text="
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: The body \"Saved work fd57c3ea-9e8\" is missing."
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "type: Typing Edited into Body textbox"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking Save draft button in the draft editor form"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "wait: PRIMARY: Reload the page"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the full edited body is \"Saved work fd57c3ea-9e8 EDITED"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "assert: the full edited body is \"Saved work fd57c3ea-9e8 EDITED\""
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait for the reloaded Quillpad editor to load"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "wait: Waiting confirm the reloaded draft retains the full edited body"
+        }
+      ],
+      "shot": "shots/returning-user.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "saved edit",
+      "session": "7d02a9c1-55cf-4587-a150-cc7fb23f415f",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Read the existing draft without typing or saving any changes.\nConfirmed the draft title was “Returner-960bf809” and the body was “Saved work fd57c3ea-9e8 EDITED”.",
+      "credits": 15.325035,
+      "duration": 22.2,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816R2ESGST11TJ7PF7XJ6AB/dashboard/share/US_M03UHX6CEVW1ZYBT42EI6WFKBTMQ30WEKI1RYNCKDA17ELZ2QVPG0A0LO4EQNAQG?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Read the existing draft without typing or saving. Verify that its title equals \"Returner-960bf809\" and that the body field exactly equals \"Saved work fd57c3ea-9e8 EDITED\". Fail if either value differs.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:63791"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Read the existing draft title and body without editing or saving"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the body field exactly equals \"Saved work fd57c3ea-9e8 "
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the existing draft title equals \"Returner-960bf809\" and the body field exactly e"
+        }
+      ],
+      "shot": "shots/saved-edit.jpg",
+      "consoleErrors": []
+    }
+  ],
+  "verdict": "pass"
+}

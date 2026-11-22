@@ -1,0 +1,267 @@
+{
+  "promise": "My draft survives the release",
+  "url": "http://127.0.0.1:62980",
+  "results": [
+    {
+      "name": "old baseline",
+      "session": "b79fffd2-e791-442d-9cc3-f64b940437f9",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the title \"Returner-2c92570a\" and body \"Saved work da2179c2-e71\".\nSaved the draft and reloaded the page.\nConfirmed that both the title and body text remained visible after the reload.",
+      "credits": 19.13289,
+      "duration": 41.9,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M8160TY5KCQKAXJ9SJSRBB28/dashboard/share/US_5BXYZVHXZ279X8VK4AQJGZ92FVDZVT420QR6VYA3F88TJCLQGPF7LON72X7F36CG?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"Returner-2c92570a\" and body is \"Saved work da2179c2-e71\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (3 steps): type \"Title\"; type \"Body\"; click \"Save draft\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"Returner-2c92570a\" into \"Title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing draft body text"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Saved work da2179c2-e71\" remains visi"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "assert: Both exact strings \"Returner-2c92570a\" and \"Saved work da2179c2-e71\" remain visi"
+        }
+      ],
+      "shot": "shots/old-baseline.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "new user",
+      "session": "394e82c2-a8a8-4507-954f-e0565d6a354c",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the title \"New-Returner-2c92570a\" and body \"Fresh Saved work da2179c2-e71\".\nSaved the draft and reloaded the page.\nConfirmed that both the title and body remained visible after the reload.",
+      "credits": 19.724654999999995,
+      "duration": 47,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M8162VB9ARQN44HD8P2W2CB7/dashboard/share/US_NB39P241WPUUOVSV2KOV8SQ735TUQUQ2ABSV1VF7WOB8WLLHTKP3ACZQ9LK14ULE?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"New-Returner-2c92570a\" and body is \"Fresh Saved work da2179c2-e71\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Title\"; type \"Body\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"New-Returner-2c92570a\" into \"Title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing the draft body text in the editor"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft button"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Reload the page"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait for the reloaded Quillpad page to appear"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Fresh Saved work da2179c2-e71\" remain"
+        },
+        {
+          "step": 11,
+          "status": "running",
+          "remark": "Step 10"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "assert: Both exact strings \"New-Returner-2c92570a\" and \"Fresh Saved work da2179c2-e71\" r"
+        }
+      ],
+      "shot": "shots/new-user.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "returning user",
+      "session": "04ae5b5f-9b41-40ae-83d5-eeb1898d0ba5",
+      "status": "fail",
+      "code": 1,
+      "loaded": true,
+      "reason": "I checked and refreshed the page; it only shows Internal Server Error, with no drafts available.",
+      "reasonCode": "assertion_error.confirmed_product_bug",
+      "summary": "The service behind the draft application failed while loading the home page, so no drafts could be displayed or checked.\nRestore the draft application's server response, then rerun the check to verify that the existing draft can be opened, edited, saved, and reloaded.\nevidence: network_failure: GET http://127.0.0.1:62980/ -> 500 body: Internal Server Error\nevidence: console_error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "credits": 15.6036825,
+      "duration": 37.8,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M81650FYDGVS0SW7WZRWFDP2/dashboard/share/US_SUISX29ZJSTCZAHFXXP81NUAHRJSY0DYZETW6RV13IB2RKWLGQ1ZRE5C77X16N96?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Open the existing draft titled \"Returner-2c92570a\". Verify that exact title and body \"Saved work da2179c2-e71\" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append \" EDITED\" to the body, save, reload, and verify the full edited body \"Saved work da2179c2-e71 EDITED\". Release promise: My draft survives the release",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait 1000 ms for the draft application to recover from the internal ser"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "failed",
+          "remark": "wait: Waiting after confirming the draft application remains unavailable"
+        }
+      ],
+      "shot": "shots/returning-user.jpg",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ]
+    }
+  ],
+  "verdict": "fail",
+  "replay": "'node' '../../src/returner.mjs' '--replay' '.returner/run-R77UEM' '--new' 'http://127.0.0.1:4102'"
+}

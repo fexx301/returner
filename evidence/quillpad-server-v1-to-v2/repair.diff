@@ -1,0 +1,24 @@
+diff --git a/server.mjs b/server.mjs
+index dc3f0a0..41b81a8 100644
+--- a/server.mjs
++++ b/server.mjs
+@@ -1,11 +1,16 @@
+-// Quillpad v2: drafts now carry a "last saved" time, stored as base64url JSON. The bug only returning users
+-// hit: v1's cookie is URL-encoded JSON, so decoding it as base64url throws and the page answers 500.
++// Quillpad v2 saves timestamped drafts as base64url JSON.
+ import { createServer } from "node:http";
+ 
+ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+ const read = (req) => Object.fromEntries((req.headers.cookie || "").split(/;\s*/).filter(Boolean).map((c) => [c.slice(0, c.indexOf("=")), c.slice(c.indexOf("=") + 1)]));
+ const body = (req) => new Promise((done) => { let s = ""; req.on("data", (d) => (s += d)); req.on("end", () => done(new URLSearchParams(s))); });
+-const decode = (cookie) => JSON.parse(Buffer.from(cookie, "base64url").toString("utf8"));
++function decode(cookie) {
++  // v1 used encodeURIComponent on a JSON object, so its opening brace is %7B.
++  const json = cookie.startsWith("%7B")
++    ? decodeURIComponent(cookie)
++    : Buffer.from(cookie, "base64url").toString("utf8");
++  return JSON.parse(json);
++}
+ const encode = (draft) => Buffer.from(JSON.stringify(draft)).toString("base64url");
+ 
+ createServer(async (req, res) => {

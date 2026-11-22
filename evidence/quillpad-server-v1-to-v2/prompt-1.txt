@@ -1,0 +1,54 @@
+Repair the web application in the current directory.
+
+Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: My draft survives the release
+
+Check "returning user":
+Kane objective: Open the existing draft titled "<saved title>". Verify that exact title and body "<saved body>" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append " EDITED" to the body, save, reload, and verify the full edited body "<saved body> EDITED". Release promise: My draft survives the release
+Kane verdict: fail — I checked and refreshed the page; it only shows Internal Server Error, with no drafts available.
+Kane summary: The service behind the draft application failed while loading the home page, so no drafts could be displayed or checked.
+Restore the draft application's server response, then rerun the check to verify that the existing draft can be opened, edited, saved, and reloaded.
+evidence: network_failure: GET http://127.0.0.1:62980/ -> 500 body: Internal Server Error
+evidence: console_error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+Kane steps:
+- done: navigate: Navigate to http://127.0.0.1:62980
+- done: wait: PRIMARY: wait 1000 ms for the draft application to recover from the internal ser
+- failed: wait: Waiting after confirming the draft application remains unavailable
+Browser console errors Kane recorded:
+- Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+
+The app server's output during that run (the end of it):
+GET / SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET /favicon.ico SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET / SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET /favicon.ico SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+
+
+This is a server-rendered Node app: server.mjs, no build and no dependencies. Returner starts it with PORT=4102 node server.mjs. The previous release's server.mjs is the reference file.
+
+Reference material from the previous release is in .returner-reference/: server.mjs. Read it; do not edit it.
+
+Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner replays the returning user from the untouched browser state with the same Kane objective.

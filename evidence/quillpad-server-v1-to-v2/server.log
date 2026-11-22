@@ -1,0 +1,28 @@
+GET / SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET /favicon.ico SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET / SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+GET /favicon.ico SyntaxError: Unexpected token '�', "���+e{m�"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at decode (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:8:33)
+    at Server.<anonymous> (file:///…/returner/.returner/repair-A6V4MM/candidate/server.mjs:20:28)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)

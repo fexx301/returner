@@ -79,7 +79,7 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
 <div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>4</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
-<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
+<nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
 <section class="loop" id="pkimm">
   <header class="lh"><div><p class="tag">Real regression · shipped in a release</p><h2>PKI Consortium self-assessment</h2>
   <p class="sub">Assessment model 1.0.0 → 1.1.0 · <a href="https://github.com/pkic/self-assessment/issues/148">pkic/self-assessment#148</a> · repaired by Claude Code</p></div>
@@ -145,6 +145,26 @@ Update the check to open the Racks view, wait for the rack list or canvas to loa
     (!data.racks?.length &amp;&amp; !!data.rack) ||
     needsPositionMigration(data.version, allDevices);</pre></li>
     <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3><a class="img" href="evidence/rackula-0.6.16-to-0.7.0-dev/after/shots/returning-user.jpg"><img src="evidence/rackula-0.6.16-to-0.7.0-dev/after/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Verified that the existing rack named “Returner-ef5cab08” is displayed on the canvas. The requested rack was present successfully.</p></li>
+  </ol>
+</section>
+<section class="loop" id="quillpad">
+  <header class="lh"><div><p class="tag">Our fixture · server-rendered, proxied at one origin</p><h2>Quillpad: a running server app</h2>
+  <p class="sub">v1 → v2, draft cookie format changed · repaired by Codex</p></div>
+  <p class="links"><a href="evidence/quillpad-server-v1-to-v2/before/report.html">Before report</a><a href="evidence/quillpad-server-v1-to-v2/after/report.html">After report</a><a href="https://github.com/fexx301/returner/blob/main/evidence/quillpad-server-v1-to-v2/repair.diff">Full patch</a></p></header>
+  <p class="note">Our own fixture, not an upstream bug: the first case where Returner proxies a running server instead of serving a static build. The agent also received the app server&#39;s stack trace. One uninterrupted run, and a fresh rehearsal with a new marker confirmed the patch.</p>
+  <ol class="steps">
+    <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3><a class="img" href="evidence/quillpad-server-v1-to-v2/before/shots/returning-user.jpg"><img src="evidence/quillpad-server-v1-to-v2/before/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Server: SyntaxError thrown in decode (server.mjs:8), answered as 500</p></li>
+    <li class="step"><span class="n">2</span><h3>Kane's finding goes to the agent</h3><blockquote>The service behind the draft application failed while loading the home page, so no drafts could be displayed or checked. Restore the draft application&#39;s server response,…</blockquote><details class="more"><summary>Kane's full finding</summary><p>The service behind the draft application failed while loading the home page, so no drafts could be displayed or checked.
+Restore the draft application&#39;s server response, then rerun the check to verify that the existing draft can be opened, edited, saved, and reloaded.
+evidence: network_failure: GET http://127.0.0.1:62980/ -&gt; 500 body: Internal Server Error
+evidence: console_error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)</p></details><p class="fine">Plus the app server's stack trace, the unchanged objective and the release promise. The agent edits a disposable copy only.</p></li>
+    <li class="step"><span class="n">3</span><h3>Codex's patch</h3><p class="files">server.mjs</p><pre>function decode(cookie) {
+  const json = cookie.startsWith(&quot;%7B&quot;)
+    ? decodeURIComponent(cookie)
+    : Buffer.from(cookie, &quot;base64url&quot;).toString(&quot;utf8&quot;);
+  return JSON.parse(json);
+}</pre></li>
+    <li class="step pass"><span class="n">4</span><h3>Replay from the same saved profile passes</h3><a class="img" href="evidence/quillpad-server-v1-to-v2/after/shots/returning-user.jpg"><img src="evidence/quillpad-server-v1-to-v2/after/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>The requested existing draft “Returner-2c92570a” was opened. Its title and body, “Saved work da2179c2-e71,” were visible, confirming that the draft already existed. The …</p></li>
   </ol>
 </section>
 <section class="loop" id="fieldnotes">

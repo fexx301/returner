@@ -1,0 +1,314 @@
+{
+  "promise": "My draft survives the release",
+  "url": "http://127.0.0.1:62980",
+  "results": [
+    {
+      "name": "new user",
+      "session": "4ee17a38-24e3-4c7d-a77e-18ffc824b862",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Created a draft with the requested title and body.\nSaved the draft and reloaded the page.\nConfirmed that both the title and body were still visible after reloading.",
+      "credits": 11.143725499999999,
+      "duration": 38.4,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M8168MF4KZYK98APX3KJ1S7W/dashboard/share/US_TTZI6XURIUAZUJMEX74DKOSLCR4SKJFKBRN9KRGRSHNKE9T6WEI67NIBPT422SFB?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Create a draft whose title is \"New-Returner-2c92570a\" and body is \"Fresh Saved work da2179c2-e71\". Save it, reload and verify both exact strings remain visible.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: queued plan (2 steps): type \"Title\"; type \"Body\""
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Type \"New-Returner-2c92570a\" into \"Title\""
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "type: Typing the draft body text in the Title form"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "press_key: PRIMARY: Reload the page"
+        },
+        {
+          "step": 9,
+          "status": "running",
+          "remark": "Step 8"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'The exact string \"Fresh Saved work da2179c2-e71\" is vis"
+        },
+        {
+          "step": 10,
+          "status": "running",
+          "remark": "Step 9"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "assert: Both exact strings \"New-Returner-2c92570a\" and \"Fresh Saved work da2179c2-e71\" r"
+        }
+      ],
+      "shot": "shots/new-user.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "returning user",
+      "session": "43675663-066d-4889-85a8-fc03f58b4fd3",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "The requested existing draft “Returner-2c92570a” was opened.\nIts title and body, “Saved work da2179c2-e71,” were visible, confirming that the draft already existed.\nThe draft was found successfully without creating or entering missing content.",
+      "credits": 33.664405,
+      "duration": 89.4,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816AH1DQC3TW9WMC5C9F8FF/dashboard/share/US_3BXQ33HK4HQNTDMEX2JO74S49F4MIDPXDRLR9GADHUUUZEFBZ82NH9MN5OHN71OM?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Open the existing draft titled \"Returner-2c92570a\". Verify that exact title and body \"Saved work da2179c2-e71\" are visible. If missing, fail immediately without creating or typing the missing contents. If present, append \" EDITED\" to the body, save, reload, and verify the full edited body \"Saved work da2179c2-e71 EDITED\". Release promise: My draft survives the release",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: Open the existing draft titled \"Returner-2c92570a\"; role=textbox; text="
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: The body \"Saved work da2179c2-e71\" is missing."
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: That exact title \"Returner-2c92570a\" and body \"Saved work da2179c2-e71\" are visi"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "type: Typing EDITED into the body field and saving the changes"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "click: Clicking Save draft to append EDITED and save draft"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "navigate: PRIMARY: Reload the page"
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait for the reloaded page body field to appear"
+        },
+        {
+          "step": 6,
+          "status": "running",
+          "remark": "Step 5"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the full edited body is \"Saved work da2179c2-e71 EDITED"
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "assert: the full edited body is \"Saved work da2179c2-e71 EDITED\""
+        },
+        {
+          "step": 7,
+          "status": "running",
+          "remark": "Step 6"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Save draft in the editor below the body field"
+        },
+        {
+          "step": 8,
+          "status": "running",
+          "remark": "Step 7"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "wait: Waiting verify the full edited body \"Saved work da2179c2-e71 EDITED\" after reload"
+        }
+      ],
+      "shot": "shots/returning-user.jpg",
+      "consoleErrors": []
+    },
+    {
+      "name": "saved edit",
+      "session": "9ca218c5-ffdd-4d9a-ac43-d7fcbf4f3b5d",
+      "status": "pass",
+      "code": 0,
+      "loaded": true,
+      "reason": "Objective completed",
+      "reasonCode": "success.complete",
+      "summary": "Read the existing draft as requested without typing or saving any changes.\nConfirmed the draft title was “Returner-2c92570a” and its body was “Saved work da2179c2-e71 EDITED”.\nThe draft remained unchanged.",
+      "credits": 15.304437499999999,
+      "duration": 24.4,
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7PT81Z7661CPY79C1HYAG94/test-cases/01M816E0KRZSAFSDAP5RW35Q2P/dashboard/share/US_YTQP1JI1HKF50M8Q7D8GE05XBOL1EX0NEY7T2AF5WU7RTZA50XJY360LMGANQDR7?type=summary&agentView=true&fqdn=summary-page",
+      "runId": "run-0",
+      "objective": "Read the existing draft without typing or saving. Verify that its title equals \"Returner-2c92570a\" and that the body field exactly equals \"Saved work da2179c2-e71 EDITED\". Fail if either value differs.",
+      "steps": [
+        {
+          "step": 2,
+          "status": "running",
+          "remark": "Step 1"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://127.0.0.1:62980"
+        },
+        {
+          "step": 3,
+          "status": "running",
+          "remark": "Step 2"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: read the existing draft title and body fields"
+        },
+        {
+          "step": 4,
+          "status": "running",
+          "remark": "Step 3"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the body field exactly equals \"Saved work da2179c2-e71 "
+        },
+        {
+          "step": 5,
+          "status": "running",
+          "remark": "Step 4"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the existing draft's title equals \"Returner-2c92570a\" and the body field exactly"
+        }
+      ],
+      "shot": "shots/saved-edit.jpg",
+      "consoleErrors": []
+    }
+  ],
+  "verdict": "pass"
+}
