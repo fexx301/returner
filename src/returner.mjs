@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { mkdtemp, mkdir, cp, readFile, writeFile } from "node:fs/promises";
-import { join, relative, resolve } from "node:path";
+import { basename, join, relative, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
@@ -9,16 +9,23 @@ import { serve } from "./server.mjs";
 import { writeReport } from "./report.mjs";
 import { attachShot } from "./shots.mjs";
 
-const { values: args } = parseArgs({
-  options: Object.fromEntries(
-    ["old", "new", "promise", "seed", "check", "replay", "help"].map((key) => [
-      key,
-      { type: key === "help" ? "boolean" : "string" },
-    ]),
-  ),
-});
 const usage =
   'returner --old ./v1 --new ./v2 --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2';
+let args;
+try {
+  ({ values: args } = parseArgs({
+    options: Object.fromEntries(
+      ["old", "new", "promise", "seed", "check", "replay", "help"].map((key) => [
+        key,
+        { type: key === "help" ? "boolean" : "string" },
+      ]),
+    ),
+  }));
+} catch (error) {
+  // A usage mistake is never a regression verdict: exit 2, not 1.
+  console.error(error.message + "\n" + usage);
+  process.exit(2);
+}
 if (args.help) {
   console.log(usage);
   process.exit(0);
@@ -161,7 +168,7 @@ async function main() {
           "SingletonSocket",
           "SingletonLock",
           "DevToolsActivePort",
-        ].includes(p.split("/").pop()),
+        ].includes(basename(p)),
     });
     const returning = await probe(
       "returning user",
@@ -173,13 +180,14 @@ async function main() {
     // For the built-in draft contract, independently read back the edited
     // value from disk in a new Chrome process. A green action trace alone
     // can disagree with the final field value.
-    if (returning === "pass" && state.check === findDraft) {
+    // Skipped when the control was inconclusive: the run already exits 2, so the extra Kane run would only spend credits.
+    if (returning === "pass" && fresh !== "inconclusive" && state.check === findDraft) {
       const persisted = await probe(
         "saved edit",
         working,
         objective('Read the existing draft without typing or saving. Verify that its title equals "{title}" and that the body field exactly equals "{body} EDITED". Fail if either value differs.', state.title, state.body),
       );
-      if (persisted === "inconclusive" || fresh === "inconclusive") return 2;
+      if (persisted === "inconclusive") return 2;
       if (persisted === "fail") return 1;
     }
     if ([fresh, returning].includes("inconclusive")) return 2;

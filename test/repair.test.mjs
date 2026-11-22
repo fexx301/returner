@@ -23,8 +23,11 @@ const kane = `#!/usr/bin/env node
 `;
 
 async function setup(agentScript) {
-  const root = await mkdtemp(join(tmpdir(), "returner-repair-"));
-  await mkdir(join(root, "old"));
+  // The project sits under a folder named node_modules, and the user's git signs commits with a failing signer:
+  // neither may break the candidate copy or its baseline commit.
+  const root = join(await mkdtemp(join(tmpdir(), "returner-repair-")), "node_modules", "app");
+  await mkdir(join(root, "old"), { recursive: true });
+  await writeFile(join(root, "gitconfig"), "[commit]\n  gpgsign = true\n[gpg]\n  program = false\n");
   await writeFile(join(root, "old", "index.html"), "old");
   await mkdir(join(root, "source", "site"), { recursive: true });
   await writeFile(join(root, "source", "site", "index.html"), "broken");
@@ -32,7 +35,7 @@ async function setup(agentScript) {
   await writeFile(join(root, "claude"), agentScript(root), { mode: 0o755 });
   const repair = fileURLToPath(new URL("../src/repair.mjs", import.meta.url));
   const r = spawnSync(process.execPath, [repair, "--old", "old", "--source", "source", "--serve", "site", "--promise", "draft survives", "--agent", "claude", "--attempts", "2"], {
-    cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH }, encoding: "utf8", timeout: 120000,
+    cwd: root, env: { ...process.env, PATH: root + ":" + process.env.PATH, GIT_CONFIG_GLOBAL: join(root, "gitconfig") }, encoding: "utf8", timeout: 120000,
   });
   const work = r.stdout.match(/^Repair workspace: (.+)$/m)[1];
   const runs = await readdir(join(work, ".returner"));
@@ -57,7 +60,9 @@ exit 0
   assert.ok(marker && !prompts.includes(marker), "the run's marker is redacted from every prompt");
   assert.match(prompts, /<saved title>/);
   assert.equal(await readFile(join(root, "source", "site", "index.html"), "utf8"), "broken", "the original source is untouched");
-  assert.match(await readFile(join(work, "repair.diff"), "utf8"), /new-helper\.js/, "files the agent creates are part of the patch");
+  const diff = await readFile(join(work, "repair.diff"), "utf8");
+  assert.match(diff, /new-helper\.js/, "files the agent creates are part of the patch");
+  assert.ok(!diff.includes("index.html\n+broken"), "the patch holds only the agent's changes, not the whole candidate");
   const saved = await readFile(join(work, "prompt-1.txt"), "utf8");
   assert.match(saved, /saved draft missing/, "each prompt is saved with the run");
   assert.ok(!saved.includes(marker));

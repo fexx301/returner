@@ -76,3 +76,17 @@ test("a replay uses the same origin and an untouched profile; partial runs are i
   });
   assert.equal(interrupted.status, 2, interrupted.stderr);
 });
+
+// A usage mistake must never read as the regression verdict (1), and must not spend Kane credits.
+test("bad flags and attempt counts exit 2 before any Kane run", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "returner-usage-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(join(root, "kane-cli"), `#!/bin/sh\ntouch "${root}/kane-ran"\nexit 1\n`, { mode: 0o755 });
+  const env = { ...process.env, PATH: root + ":" + process.env.PATH };
+  const node = (file, args) => spawnSync(process.execPath, [fileURLToPath(new URL(`../src/${file}`, import.meta.url)), ...args], { cwd: root, env, encoding: "utf8", timeout: 30000 });
+  assert.equal(node("returner.mjs", ["--unknown-flag"]).status, 2);
+  assert.equal(node("repair.mjs", ["--unknown-flag"]).status, 2);
+  for (const attempts of ["0", "-1", "abc"])
+    assert.equal(node("repair.mjs", ["--old", ".", "--source", ".", "--promise", "p", "--attempts", attempts]).status, 2, attempts);
+  await assert.rejects(readFile(join(root, "kane-ran")), "no Kane run was started");
+});

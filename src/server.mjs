@@ -13,6 +13,16 @@ const types = {
   ".webmanifest": "application/manifest+json",
   ".wasm": "application/wasm",
   ".woff2": "font/woff2",
+  ".woff": "font/woff",
+  ".ttf": "font/ttf",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".txt": "text/plain",
+  ".yaml": "text/yaml",
+  ".yml": "text/yaml",
 };
 
 export async function serve(port) {

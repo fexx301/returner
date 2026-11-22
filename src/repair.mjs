@@ -4,25 +4,30 @@
 import { parseArgs } from "node:util";
 import { spawn } from "node:child_process";
 import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const cli = fileURLToPath(new URL("./returner.mjs", import.meta.url));
-const { values: a } = parseArgs({
-  options: {
-    old: { type: "string" },
-    source: { type: "string" },
-    serve: { type: "string", default: "." },
-    build: { type: "string" },
-    promise: { type: "string" },
-    seed: { type: "string" },
-    check: { type: "string" },
-    agent: { type: "string", default: "codex" },
-    attempts: { type: "string", default: "3" },
-    note: { type: "string", default: "" },
-    reference: { type: "string", multiple: true, default: [] },
-  },
-});
+let a;
+try {
+  ({ values: a } = parseArgs({
+    options: {
+      old: { type: "string" },
+      source: { type: "string" },
+      serve: { type: "string", default: "." },
+      build: { type: "string" },
+      promise: { type: "string" },
+      seed: { type: "string" },
+      check: { type: "string" },
+      agent: { type: "string", default: "codex" },
+      attempts: { type: "string", default: "3" },
+      note: { type: "string", default: "" },
+      reference: { type: "string", multiple: true, default: [] },
+    },
+  }));
+} catch (error) {
+  a = { error: error.message }; // reported with the usage by main(), exit 2
+}
 // The agent may only read and edit the disposable candidate; Returner owns builds and verdicts.
 const AGENTS = {
   codex: ["codex", ["exec", "--sandbox", "workspace-write", "--ephemeral", "--skip-git-repo-check", "-"]],
@@ -60,22 +65,25 @@ const describe = (r) =>
    "Kane steps:", ...(r?.steps || []).filter((s) => s.status !== "running").map((s) => `- ${s.status}: ${s.remark}`)].join("\n");
 
 async function main() {
-  if (!a.old || !a.source || !a.promise || !AGENTS[a.agent]) {
-    console.error(usage);
+  // Checked before any Kane run, so a typo never spends the baseline's credits.
+  if (a.error || !a.old || !a.source || !a.promise || !AGENTS[a.agent] || !/^[1-9]\d*$/.test(a.attempts)) {
+    console.error([a.error, usage].filter(Boolean).join("\n"));
     return 2;
   }
   await mkdir(resolve(".returner"), { recursive: true, mode: 0o700 });
   const work = await mkdtemp(join(resolve(".returner"), "repair-"));
   const candidate = join(work, "candidate");
   const skip = new Set(["node_modules", ".git", ".returner"]);
-  await cp(resolve(a.source), candidate, { recursive: true, filter: (p) => !p.split("/").some((part) => skip.has(part)) });
+  const source = resolve(a.source);
+  await cp(source, candidate, { recursive: true, filter: (p) => !relative(source, p).split(sep).some((part) => skip.has(part)) });
   // Read-only material from the previous release (old code or data) that the agent may consult.
-  for (const file of a.reference) await cp(resolve(file), join(candidate, ".returner-reference", file.split("/").pop()));
+  for (const file of a.reference) await cp(resolve(file), join(candidate, ".returner-reference", basename(file)));
   // A throwaway git baseline gives an exact patch that respects the project's .gitignore.
-  const git = (...args) => execute("git", ["-c", "user.name=returner", "-c", "user.email=returner@localhost", ...args], candidate, { capture: true });
+  // Signing and global hooks are switched off: a failed baseline commit would turn repair.diff into the whole repository.
+  const git = (...args) => execute("git", ["-c", "user.name=returner", "-c", "user.email=returner@localhost", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null", ...args], candidate, { capture: true });
   await git("init", "-q");
   await git("add", "-A");
-  await git("commit", "-qm", "candidate before repair");
+  if ((await git("commit", "-qm", "candidate before repair", "--allow-empty")).code) return console.error("Could not record the candidate's git baseline."), 2;
   const site = join(candidate, a.serve);
   const build = () => (a.build ? execute(a.build, [], candidate, { capture: true, shell: true }) : { code: 0, out: "" });
   console.log("Repair workspace:", work);
@@ -85,8 +93,8 @@ async function main() {
   let last = await rehearse(["--old", resolve(a.old), "--new", site, "--promise", a.promise, ...options], work);
   const baseline = last.run;
   const verdict = (name) => last.results.find((r) => r.name === name)?.status;
-  if (last.code !== 1 || verdict("new user") !== "pass" || verdict("returning user") !== "fail") {
-    console.error("Repair needs a reproduced regression: new user pass, returning user fail.");
+  if (last.code !== 1 || verdict("new user") !== "pass" || ![verdict("returning user"), verdict("saved edit")].includes("fail")) {
+    console.error("Repair needs a reproduced regression: new user pass, returning user (or its saved edit) fail.");
     return last.code === 0 ? 0 : 2;
   }
 
@@ -107,7 +115,7 @@ async function main() {
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
       failing(last.results).map((r) => `Check "${r.name}":\n${describe(r)}`).join("\n\n"),
       a.note,
-      a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => f.split("/").pop()).join(", ")}. Read it; do not edit it.` : "",
+      a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => basename(f)).join(", ")}. Read it; do not edit it.` : "",
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
