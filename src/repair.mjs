@@ -3,9 +3,11 @@
 // agent, rebuild, and replay from the untouched baseline profile until Kane passes or attempts run out.
 import { parseArgs } from "node:util";
 import { spawn } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { closeSync, openSync } from "node:fs";
+import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isUrl } from "./server.mjs";
 
 const cli = fileURLToPath(new URL("./returner.mjs", import.meta.url));
 let a;
@@ -16,6 +18,7 @@ try {
       source: { type: "string" },
       serve: { type: "string", default: "." },
       build: { type: "string" },
+      start: { type: "string" },
       promise: { type: "string" },
       seed: { type: "string" },
       check: { type: "string" },
@@ -34,7 +37,8 @@ const AGENTS = {
   claude: ["claude", ["-p", "--permission-mode", "acceptEdits", "--allowedTools", "Read,Edit,Write,Glob,Grep,Bash(npm run build:*),Bash(npm test:*),Bash(npx jest:*),Bash(npx tsc:*)"]],
 };
 const usage =
-  'returner-repair --old ./v1-build --source ./v2-source [--build "npm run build"] [--serve dist] --promise "…" [--seed …] [--check …] [--agent codex|claude] [--attempts 3]';
+  'returner-repair --old ./v1-build --source ./v2-source [--build "npm run build"] [--serve dist] --promise "…" [--seed …] [--check …] [--agent codex|claude] [--attempts 3]\n' +
+  'Running apps: --old http://127.0.0.1:4001 --start "PORT=4002 node server.mjs" --serve http://127.0.0.1:4002 (the candidate is started for every check)';
 
 function execute(program, args, cwd, { prompt, capture, shell } = {}) {
   return new Promise((done, reject) => {
@@ -67,7 +71,7 @@ const describe = (r) =>
 
 async function main() {
   // Checked before any Kane run, so a typo never spends the baseline's credits.
-  if (a.error || !a.old || !a.source || !a.promise || !AGENTS[a.agent] || !/^[1-9]\d*$/.test(a.attempts)) {
+  if (a.error || !a.old || !a.source || !a.promise || !AGENTS[a.agent] || !/^[1-9]\d*$/.test(a.attempts) || Boolean(a.start) !== isUrl(a.serve)) {
     console.error([a.error, usage].filter(Boolean).join("\n"));
     return 2;
   }
@@ -85,13 +89,36 @@ async function main() {
   await git("init", "-q");
   await git("add", "-A");
   if ((await git("commit", "-qm", "candidate before repair", "--allow-empty")).code) return console.error("Could not record the candidate's git baseline."), 2;
-  const site = join(candidate, a.serve);
+  const site = a.start ? a.serve : join(candidate, a.serve);
+  const old = isUrl(a.old) ? a.old : resolve(a.old);
   const build = () => (a.build ? execute(a.build, [], candidate, { capture: true, shell: true }) : { code: 0, out: "" });
+  // Running apps: start the candidate for one rehearsal, keep its output for the agent, then stop it.
+  const log = join(work, "server.log");
+  const live = async (rehearsal) => {
+    if (!a.start) return rehearsal();
+    const from = (await stat(log).catch(() => ({ size: 0 }))).size;
+    const fd = openSync(log, "a");
+    const app = spawn(a.start, { cwd: candidate, shell: true, detached: true, stdio: ["ignore", fd, fd] });
+    closeSync(fd);
+    const exited = new Promise((done) => app.on("exit", done));
+    const tail = async () => (await readFile(log)).subarray(from).toString("utf8").slice(-3000);
+    try {
+      for (let t = 0; !(await fetch(a.serve, { redirect: "manual" }).then(() => true, () => false)); t++) {
+        if (t === 120 || app.exitCode !== null) return { startFailed: true, server: await tail(), results: [] };
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      return { ...(await rehearsal()), server: await tail() };
+    } finally {
+      try { process.kill(-app.pid); } catch {}
+      await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
+    }
+  };
   console.log("Repair workspace:", work);
   if ((await build()).code) return console.error("The candidate does not build before repair."), 2;
 
   const options = [...(a.seed ? ["--seed", a.seed] : []), ...(a.check ? ["--check", a.check] : [])];
-  let last = await rehearse(["--old", resolve(a.old), "--new", site, "--promise", a.promise, ...options], work);
+  let last = await live(() => rehearse(["--old", old, "--new", site, "--promise", a.promise, ...options], work));
+  if (last.startFailed) return console.error("The candidate app did not start:\n" + last.server), 2;
   const baseline = last.run;
   const verdict = (name) => last.results.find((r) => r.name === name)?.status;
   if (last.code !== 1 || verdict("new user") !== "pass" || ![verdict("returning user"), verdict("saved edit")].includes("fail")) {
@@ -107,7 +134,7 @@ async function main() {
   };
   const redact = (text) => secrets.reduce((t, [value, label]) => t.split(value).join(label), String(text));
   await learn(baseline);
-  const fullRehearsal = () => rehearse(["--old", resolve(a.old), "--new", site, "--promise", a.promise, ...options], work);
+  const fullRehearsal = () => live(() => rehearse(["--old", old, "--new", site, "--promise", a.promise, ...options], work));
   const attempts = [];
   const [program, args] = AGENTS[a.agent];
   for (let i = 1; i <= Number(a.attempts); i++) {
@@ -115,6 +142,7 @@ async function main() {
       "Repair the web application in the current directory.",
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
       failing(last.results).map((r) => `Check "${r.name}":\n${describe(r)}`).join("\n\n"),
+      last.server ? `The app server's output during that run (the end of it):\n${last.server}` : "",
       a.note,
       a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => basename(f)).join(", ")}. Read it; do not edit it.` : "",
       attempts.length ? "Your earlier attempts did not satisfy Kane:\n" + attempts.join("\n\n") : "",
@@ -130,7 +158,11 @@ async function main() {
       continue;
     }
     console.log("Replaying independently from the original baseline…");
-    last = await rehearse(["--replay", baseline, "--new", site], work);
+    last = await live(() => rehearse(["--replay", baseline, "--new", site], work));
+    if (last.startFailed) {
+      attempts.push(`Attempt ${i}: the app did not start:\n${last.server}`);
+      continue;
+    }
     const outcome = { attempt: i, code: last.code, evidence: last.run, results: last.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
