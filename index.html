@@ -78,7 +78,7 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <figure style="margin:0"><div class="frame"><div class="fbar"><i></i><i></i><i></i><span>examples/pkimm/run.sh codex · recorded</span></div><a href="https://youtu.be/iPpaQIgh1KI?t=173"><img src="docs/loop.gif" alt="A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes"></a></div>
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
-<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>4</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
+<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>5</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
 <nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
 <section class="loop" id="pkimm">
   <header class="lh"><div><p class="tag">Real regression · shipped in a release</p><h2>PKI Consortium self-assessment</h2>
@@ -150,7 +150,7 @@ Update the check to open the Racks view, wait for the rack list or canvas to loa
 <section class="loop" id="quillpad">
   <header class="lh"><div><p class="tag">Our fixture · server-rendered, proxied at one origin</p><h2>Quillpad: a running server app</h2>
   <p class="sub">v1 → v2, draft cookie format changed · repaired by Codex</p></div>
-  <p class="links"><a href="evidence/quillpad-server-v1-to-v2/before/report.html">Before report</a><a href="evidence/quillpad-server-v1-to-v2/after/report.html">After report</a><a href="https://github.com/fexx301/returner/blob/main/evidence/quillpad-server-v1-to-v2/repair.diff">Full patch</a></p></header>
+  <p class="links"><a href="evidence/quillpad-server-v1-to-v2/before/report.html">Before report</a><a href="evidence/quillpad-server-v1-to-v2/after/report.html">After report</a><a href="evidence/quillpad-server-v1-to-v2/fresh/report.html">Fresh rehearsal</a><a href="evidence/quillpad-server-v1-to-v2/repair-report.html">Repair report</a><a href="https://github.com/fexx301/returner/blob/main/evidence/quillpad-server-v1-to-v2/repair.diff">Full patch</a></p></header>
   <p class="note">Our own fixture, not an upstream bug: the first case where Returner proxies a running server instead of serving a static build. The agent also received the app server&#39;s stack trace. One uninterrupted run, and a fresh rehearsal with a new marker confirmed the patch.</p>
   <ol class="steps">
     <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3><a class="img" href="evidence/quillpad-server-v1-to-v2/before/shots/returning-user.jpg"><img src="evidence/quillpad-server-v1-to-v2/before/shots/returning-user.jpg" alt="Kane's final screenshot"><span class="chip">Kane's screenshot</span></a><p>Server: SyntaxError thrown in decode (server.mjs:8), answered as 500</p></li>

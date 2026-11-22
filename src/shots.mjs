@@ -11,18 +11,37 @@ import { writeReport } from "./report.mjs";
 const SESSIONS = join(homedir(), ".testmuai", "kaneai", "sessions");
 const slug = (name) => name.replace(/\s+/g, "-");
 
+function sessionRoot(session, sessionDir) {
+  if (sessionDir) {
+    const expanded = sessionDir.startsWith("~/") ? join(homedir(), sessionDir.slice(2)) : sessionDir;
+    if (existsSync(expanded)) return expanded;
+  }
+  return join(SESSIONS, session);
+}
+
+// Absolute path to a Kane session's sealed .evidence pack, or undefined if absent.
+export function packPath(session, sessionDir) {
+  try {
+    const evidence = join(sessionRoot(session, sessionDir), "evidence");
+    const name = readdirSync(evidence).find((f) => f.endsWith(".evidence"));
+    return name ? join(evidence, name) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 // A Kane session's sealed evidence pack (a zip) and the paths inside it.
-function pack(session) {
-  const evidence = join(SESSIONS, session, "evidence");
-  const file = join(evidence, readdirSync(evidence).find((f) => f.endsWith(".evidence")));
+function pack(session, sessionDir) {
+  const file = packPath(session, sessionDir);
+  if (!file) throw Error("no evidence pack");
   return { file, entries: spawnSync("unzip", ["-Z1", file], { encoding: "utf8" }).stdout.split("\n") };
 }
 
 // The browser console errors Kane recorded during a check: often the exact crash behind a failure,
 // even when Kane's prose summary guesses another cause. Unique, at most 5, each trimmed.
-export function consoleErrors(session) {
+export function consoleErrors(session, sessionDir) {
   try {
-    const { file, entries } = pack(session);
+    const { file, entries } = pack(session, sessionDir);
     const texts = entries.filter((p) => /logs\/\d+-console\.ndjson$/.test(p))
       .flatMap((p) => spawnSync("unzip", ["-p", file, p], { encoding: "utf8", maxBuffer: 64 << 20 }).stdout.split("\n"))
       .map((line) => { try { return JSON.parse(line); } catch {} })
@@ -34,9 +53,9 @@ export function consoleErrors(session) {
 }
 
 // Copies the last step screenshot of a Kane session into dir/shots; returns its relative path or undefined.
-export function attachShot(session, dir, name) {
+export function attachShot(session, dir, name, sessionDir) {
   try {
-    const { file, entries } = pack(session);
+    const { file, entries } = pack(session, sessionDir);
     const step = (p) => parseInt(p.match(/steps\/(\d+)/)?.[1] ?? "0", 10); // folders look like 9-0-5 or 4-0-e1169d09-1
     const shots = entries.filter((p) => /\/screenshot\.(jpg|jpeg|png)$/i.test(p))
       .sort((a, b) => step(a) - step(b) || a.localeCompare(b));

@@ -34,6 +34,9 @@ inputs:
   artifact-name:
     description: Name of the uploaded report artifact. Override in matrix jobs or when running Returner twice in one job.
     required: false
+  policy:
+    description: Optional Kane CLI evidence policy YAML path to judge the merged rehearsal pack against.
+    required: false
 outputs:
   verdict:
     description: pass, fail (regression for returning users) or inconclusive.
@@ -70,10 +73,12 @@ runs:
         PROMISE: ${{ inputs.promise }}
         SEED: ${{ inputs.seed }}
         CHECK: ${{ inputs.check }}
+        POLICY: ${{ inputs.policy }}
       run: |
         args=(--old "$OLD" --new "$NEW" --promise "$PROMISE")
         [ -n "$SEED" ] && args+=(--seed "$SEED")
         [ -n "$CHECK" ] && args+=(--check "$CHECK")
+        [ -n "$POLICY" ] && args+=(--policy "$POLICY")
         set +e
         node "$GITHUB_ACTION_PATH/src/returner.mjs" "${args[@]}" | tee returner.log
         code=${PIPESTATUS[0]}
@@ -81,6 +86,8 @@ runs:
         run=$(sed -n 's/^Evidence: //p' returner.log | head -1)
         rm -rf returner-report && mkdir -p returner-report
         [ -n "$run" ] && cp "$run"/report.html "$run"/report.json returner-report/ 2>/dev/null || true
+        [ -n "$run" ] && [ -f "$run/rehearsal.evidence" ] && cp "$run/rehearsal.evidence" returner-report/ || true
+        [ -n "$run" ] && [ -d "$run/rehearsal.evidence.verdicts" ] && cp -R "$run/rehearsal.evidence.verdicts" returner-report/ || true
         [ -n "$run" ] && [ -d "$run/shots" ] && cp -R "$run/shots" returner-report/ || true
         verdict=$([ "$code" = 0 ] && echo pass || ([ "$code" = 1 ] && echo fail || echo inconclusive))
         echo "verdict=$verdict" >> "$GITHUB_OUTPUT"

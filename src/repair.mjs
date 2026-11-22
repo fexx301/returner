@@ -8,6 +8,8 @@ import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises"
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isUrl } from "./server.mjs";
+import { describeStorage } from "./report.mjs";
+import { writeRepairReport } from "./repair-report.mjs";
 
 const cli = fileURLToPath(new URL("./returner.mjs", import.meta.url));
 let a;
@@ -69,7 +71,7 @@ async function rehearse(args, cwd) {
   const { code, out } = await execute(process.execPath, [cli, ...args], cwd, { capture: true });
   const run = out.match(/^Evidence: (.+)$/m)?.[1];
   const report = run ? JSON.parse(await readFile(join(run, "report.json"), "utf8").catch(() => "{}")) : {};
-  return { code, run, results: report.results || [] };
+  return { code, run, results: report.results || [], report };
 }
 
 // Every check that did not pass, so a failed control or read-only reopen reaches the agent too.
@@ -136,6 +138,8 @@ async function main() {
   let last = await live(() => rehearse(["--old", old, "--new", site, "--promise", a.promise, ...options], work));
   if (last.startFailed) return console.error("The candidate app did not start:\n" + last.server), 2;
   const baseline = last.run;
+  const beforeReport = last.report;
+  const beforeServer = last.server || "";
   const verdict = (name) => last.results.find((r) => r.name === name)?.status;
   if (last.code !== 1 || verdict("new user") !== "pass" || ![verdict("returning user"), verdict("saved edit")].includes("fail")) {
     console.error("Repair needs a reproduced regression: new user pass, returning user (or its saved edit) fail.");
@@ -152,12 +156,47 @@ async function main() {
   await learn(baseline);
   const fullRehearsal = () => live(() => rehearse(["--old", old, "--new", site, "--promise", a.promise, ...options], work));
   const attempts = [];
+  const attemptLog = [];
+  let lastPrompt = "";
+  let afterRun;
+  let afterReport;
+  let freshRun;
+  let freshReport;
+  const finish = async (code, diff = "") => {
+    const repairVerdict = code === 0 ? "pass" : code === 1 ? "fail" : "inconclusive";
+    await writeRepairReport(work, {
+      verdict: repairVerdict,
+      promise: a.promise,
+      agent: a.agent,
+      beforeDir: baseline,
+      beforeReport,
+      afterDir: afterRun,
+      afterReport,
+      freshDir: freshRun,
+      freshReport,
+      diff,
+      prompt: lastPrompt,
+      serverLog: beforeServer,
+      attempts: attemptLog,
+    });
+    console.log(`Repair report: ${join(work, "repair-report.html")}`);
+    return code;
+  };
   const [program, args] = AGENTS[a.agent];
   for (let i = 1; i <= Number(a.attempts); i++) {
+    const storage = describeStorage(last.results);
+    const storageSection = storage
+      ? [
+          "Browser state keys observed via Chrome DevTools (names only, no values):",
+          ...(storage.headline ? [storage.headline] : []),
+          ...storage.rows.map((r) => `- ${r.label}: ${r.items.length ? r.items.join(", ") : "(none)"}`),
+        ].join("\n")
+      : "";
     let prompt = [
       "Repair the web application in the current directory.",
       `Returner rehearsed this release with Kane CLI in real Chrome at one localhost origin. A new user (empty browser profile) passed. A returning user, whose browser profile was saved on the previous release, failed. Release promise: ${a.promise}`,
       failing(last.results).map((r) => `Check "${r.name}":\n${describe(r)}`).join("\n\n"),
+      storageSection,
       last.server ? `The app server's output during that run (the end of it):\n${last.server}` : "",
       a.note,
       a.reference.length ? `Reference material from the previous release is in .returner-reference/: ${a.reference.map((f) => basename(f)).join(", ")}. Read it; do not edit it.` : "",
@@ -165,48 +204,75 @@ async function main() {
       `Fix the application source so returning users keep their saved work and also get this release's behaviour. Edit source only; do not edit build output, data files or tests to fake a pass. After you exit, Returner ${a.build ? `rebuilds with \`${a.build}\` and ` : ""}replays the returning user from the untouched browser state with the same Kane objective.`,
     ].filter(Boolean).join("\n\n");
     prompt = redact(prompt); // covers Kane's findings, earlier attempts and build output alike
+    lastPrompt = prompt;
     await writeFile(join(work, `prompt-${i}.txt`), prompt); // exactly what the agent received, marker already redacted
     console.log(`Attempt ${i}/${a.attempts}: passing Kane's returning-user result to ${a.agent}…`);
-    if ((await execute(program, args, candidate, { prompt })).code) return console.error(`${a.agent} exited before finishing.`), 2;
+    if ((await execute(program, args, candidate, { prompt })).code) {
+      attemptLog.push({ attempt: i, status: "inconclusive", note: `${a.agent} exited before finishing.` });
+      console.error(`${a.agent} exited before finishing.`);
+      return finish(2);
+    }
     const built = await build();
     if (built.code) {
+      attemptLog.push({ attempt: i, status: "fail", note: "Build failed." });
       attempts.push(`Attempt ${i}: the build failed:\n${built.out.slice(-1500)}`);
       continue;
     }
     console.log("Replaying independently from the original baseline…");
     const replay = await live(() => rehearse(["--replay", baseline, "--new", site], work));
     if (replay.startFailed) {
+      attemptLog.push({ attempt: i, status: "fail", note: "Candidate app did not start." });
       attempts.push(`Attempt ${i}: the app did not start:\n${replay.server}`);
       continue;
     }
     last = replay;
+    afterRun = replay.run;
+    afterReport = replay.report;
     const outcome = { attempt: i, code: last.code, evidence: last.run, results: last.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
-    if (last.code === 2) return console.error("Replay was inconclusive; stopping without a verdict."), 2;
+    if (last.code === 2) {
+      attemptLog.push({ attempt: i, status: "inconclusive", note: "Replay was inconclusive." });
+      console.error("Replay was inconclusive; stopping without a verdict.");
+      return finish(2);
+    }
     if (last.code !== 0) {
+      attemptLog.push({ attempt: i, status: "fail", note: "Kane replay failed." });
       attempts.push(`Attempt ${i}: Kane still failed.\n${failing(last.results).map(describe).join("\n\n")}`);
       continue;
     }
     // A passing replay must also hold for saved work the agent has never seen: rehearse again with a new marker.
     console.log("Replay passed. Confirming with a fresh rehearsal and a new marker…");
     const fresh = await fullRehearsal();
-    if (fresh.startFailed) return console.error("The candidate app did not start for fresh confirmation:\n" + fresh.server), 2;
+    if (fresh.startFailed) {
+      attemptLog.push({ attempt: i, status: "inconclusive", note: "Candidate app did not start for fresh confirmation." });
+      console.error("The candidate app did not start for fresh confirmation:\n" + fresh.server);
+      return finish(2);
+    }
+    freshRun = fresh.run;
+    freshReport = fresh.report;
     outcome.fresh = { code: fresh.code, evidence: fresh.run, results: fresh.results.map(({ name, status, reason }) => ({ name, status, reason })) };
     await writeFile(join(work, `attempt-${i}.json`), JSON.stringify(outcome, null, 2));
     if (fresh.code === 0) {
       await git("add", "-A");
-      await writeFile(join(work, "repair.diff"), (await git("diff", "--cached")).out);
+      const diff = (await git("diff", "--cached")).out;
+      await writeFile(join(work, "repair.diff"), diff);
+      attemptLog.push({ attempt: i, status: "pass", note: "Untouched replay passed and fresh rehearsal with a new marker confirmed it." });
       console.log(`Kane passed the returning user after attempt ${i}, and a fresh rehearsal with a new marker confirmed it. Patch: ${join(work, "repair.diff")}`);
-      return 0;
+      return finish(0, diff);
     }
-    if (fresh.code === 2) return console.error("The fresh confirmation was inconclusive; stopping without a verdict."), 2;
+    if (fresh.code === 2) {
+      attemptLog.push({ attempt: i, status: "inconclusive", note: "Fresh rehearsal was inconclusive." });
+      console.error("The fresh confirmation was inconclusive; stopping without a verdict.");
+      return finish(2);
+    }
     if (fresh.run) await learn(fresh.run);
     last = fresh;
+    attemptLog.push({ attempt: i, status: "fail", note: "Passed replay, rejected by fresh rehearsal with a new marker." });
     console.log(`Attempt ${i} passed the replay but failed the fresh rehearsal; rejecting it.`);
     attempts.push(`Attempt ${i}: the replay passed, but a fresh rehearsal with new saved work failed, so the fix does not hold for other users' data.\n${failing(fresh.results).map(describe).join("\n\n")}`);
   }
   console.error("Kane did not pass the returning user within the attempt limit.");
-  return 1;
+  return finish(1);
 }
 
 main().then((code) => (process.exitCode = code)).catch((e) => {

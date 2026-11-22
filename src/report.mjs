@@ -29,10 +29,44 @@ const meta = (r) => {
   return parts.length ? `<p class="meta">${parts.join(" · ")}</p>` : "";
 };
 
+// Structural browser-state inventory (names only, never values) across checks.
+const formatBuckets = (s) => {
+  if (!s) return [];
+  const out = [];
+  for (const [label, key] of [["localStorage", "localStorage"], ["cookies", "cookies"], ["IndexedDB", "indexedDB"], ["sessionStorage", "sessionStorage"]])
+    for (const name of s[key] || []) out.push(`${label}: ${name}`);
+  return out;
+};
+
+export function describeStorage(results) {
+  const rows = (results || [])
+    .filter((r) => r?.storage)
+    .map((r) => ({ name: r.name, label: LABELS[r.name] || r.name, items: formatBuckets(r.storage) }));
+  if (!rows.length) return null;
+  const oldItems = new Set(formatBuckets(results.find((r) => r.name === "old baseline")?.storage));
+  const newItems = new Set(formatBuckets(results.find((r) => r.name === "new user")?.storage));
+  const onlyOld = [...oldItems].filter((x) => !newItems.has(x));
+  const onlyNew = [...newItems].filter((x) => !oldItems.has(x));
+  const shared = [...oldItems].filter((x) => newItems.has(x));
+  let headline = "";
+  if (onlyOld.length || onlyNew.length) {
+    const parts = [];
+    if (onlyOld.length) parts.push(`v1 saved ${onlyOld.join(", ")}`);
+    if (onlyNew.length) parts.push(`v2 new user wrote ${onlyNew.join(", ")}`);
+    headline = `Storage keys diverged: ${parts.join(" · ")}`;
+  } else if (shared.length) {
+    headline = `Both releases use ${shared.join(", ")}`;
+  }
+  return { rows, onlyOld, onlyNew, shared, headline };
+}
+
 export async function writeReport(directory, report) {
   await writeFile(join(directory, "report.json"), JSON.stringify(report, null, 2));
-  const results = ORDER.map((name) => report.results.find((r) => r.name === name)).filter(Boolean);
+  const known = ORDER.map((name) => report.results.find((r) => r.name === name)).filter(Boolean);
+  const extra = report.results.filter((r) => !ORDER.includes(r.name));
+  const results = [...known, ...extra];
   const returning = report.results.find((r) => r.name === "returning user");
+  const storage = describeStorage(report.results);
   // Live runs pass the CLI's final verdict. Older reports without one are judged only when the returning user ran.
   const failed = report.results.filter((r) => r.status === "fail");
   const overall = report.verdict
@@ -101,6 +135,11 @@ h2{font-size:20px;margin:0;letter-spacing:-.01em}
 .shot.none{display:grid;place-items:center;color:var(--muted);font-size:14px}
 .console{margin:0 0 14px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--fail) 35%,var(--line));background:color-mix(in srgb,var(--fail) 7%,transparent)}
 .console ul{margin:6px 0 0;padding-left:18px}.console code{font-size:13px;overflow-wrap:anywhere}
+.xray{margin-top:24px;background:#17181b;color:#e9e6df;border-radius:14px;padding:16px 20px;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.xray .who{color:#a9a69e}.xray .hl{color:#ffd180;margin:4px 0 10px;font-weight:600}.xray .row{display:flex;gap:12px;flex-wrap:wrap;padding:3px 0;border-top:1px solid rgba(255,255,255,.08)}
+.xray .row b{min-width:160px;color:#9fd5b0}.xray .none{color:#8a8780}
+.policy{margin-top:20px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pass);border-radius:12px;padding:14px 18px;font-size:14px}
+.policy.fail{border-left-color:var(--fail)}.policy.errored{border-left-color:var(--warn)}
 .summary{margin:0;white-space:pre-line;overflow-wrap:anywhere}
 details{border-top:1px solid var(--line);padding-top:10px}
 summary{cursor:pointer;color:var(--muted);font-size:14px}
@@ -117,9 +156,12 @@ footer{margin-top:36px;color:var(--muted);font-size:13px}
 <div class="verdict ${overall}"><span class="dot" aria-hidden="true"></span><h1>${escape(headline)}</h1></div>
 <p class="promise">Promise: “${escape(report.promise)}”</p>
 ${report.url ? `<p class="meta">Both builds served at ${escape(report.url)}</p>` : ""}
+${report.policyVerdict ? `<section class="policy ${escape(report.policyVerdict.result)}"><span class="who">Kane CLI evidence policy</span><strong>${escape(report.policyVerdict.result.toUpperCase())}</strong>${(report.policyVerdict.policies || []).map((p) => ` · ${escape(p.id)}: ${escape(p.result)}${p.failedGates?.length ? ` (${p.failedGates.map(escape).join(", ")})` : ""}`).join("")}</section>` : ""}
+${storage ? `<section class="xray" aria-label="Browser state keys observed via Chrome DevTools"><span class="who">Browser state X-ray · key names only (via Chrome DevTools)</span>${storage.headline ? `<div class="hl">${escape(storage.headline)}</div>` : ""}${storage.rows.map((r) => `<div class="row"><b>${escape(r.label)}</b><span>${r.items.length ? escape(r.items.join(" · ")) : '<span class="none">(no storage keys or cookies)</span>'}</span></div>`).join("")}</section>` : ""}
 <div class="grid">
 ${cards}
 </div>
+${report.evidencePack ? `<section class="replay"><strong>Sealed Kane CLI evidence pack</strong><code>kane-cli evidence serve '${escape(report.evidencePack)}'</code></section>` : ""}
 ${report.replay ? `<section class="replay"><strong>Replay after repair</strong><code>${escape(report.replay)}</code></section>` : ""}
 <footer>Every screenshot and verdict comes from Kane CLI's own run evidence. Screenshots show Kane's final step for each check.</footer>
 </main></body></html>`;

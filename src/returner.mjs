@@ -1,26 +1,31 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { existsSync } from "node:fs";
 import { mkdtemp, mkdir, cp, readFile, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
 import { isUrl, serve } from "./server.mjs";
 import { openChrome } from "./chrome.mjs";
 import { writeReport } from "./report.mjs";
-import { attachShot, consoleErrors } from "./shots.mjs";
+import { attachShot, consoleErrors, packPath } from "./shots.mjs";
 
 const usage =
-  'returner --old ./v1 --new ./v2 --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
+  'returner --old ./v1 --new ./v2 --promise "my draft survives" [--policy policies/release-gate.yaml]\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
 let args;
 try {
   ({ values: args } = parseArgs({
-    options: Object.fromEntries(
-      ["old", "new", "promise", "seed", "check", "replay", "help"].map((key) => [
-        key,
-        { type: key === "help" ? "boolean" : "string" },
-      ]),
-    ),
+    options: {
+      old: { type: "string" },
+      new: { type: "string" },
+      promise: { type: "string" },
+      seed: { type: "string" },
+      check: { type: "string" },
+      replay: { type: "string" },
+      policy: { type: "string", multiple: true, default: [] },
+      help: { type: "boolean" },
+    },
   }));
 } catch (error) {
   // A usage mistake is never a regression verdict: exit 2, not 1.
@@ -34,6 +39,18 @@ if (args.help) {
 if (!args.new || (!args.replay && (!args.old || !args.promise))) {
   console.error(usage);
   process.exit(2);
+}
+const policyFiles = (args.policy || []).map((p) => resolve(p));
+if (policyFiles.length) {
+  // Lint Kane CLI policy YAML up front so a bad gate never spends rehearsal credits.
+  const lint = spawnSync("kane-cli", ["evidence", "lint-policy", ...policyFiles, "--json"], {
+    encoding: "utf8",
+    env: { KANE_CLI_USER_AGENT: "returner", ...process.env },
+  });
+  if (lint.error || lint.status !== 0) {
+    console.error("Invalid Kane CLI policy:\n" + (lint.stderr || lint.stdout || lint.error?.message || "lint failed"));
+    process.exit(2);
+  }
 }
 
 async function main() {
@@ -58,6 +75,7 @@ async function main() {
   const server = await serve(state.port || 0);
   const url = "http://127.0.0.1:" + server.port;
   const results = [];
+  const sessionPacks = [];
   let activeChild;
   let activeChrome;
   const stop = (signal) => {
@@ -122,8 +140,15 @@ async function main() {
       if (e.remark && e.status)
         steps.push({ step: e.step, status: e.status, remark: e.remark });
     });
-    const code = await completion.finally(() => chrome.close());
-    activeChrome = null;
+    let code;
+    let storage;
+    try {
+      code = await completion;
+      storage = await chrome.inspect(url);
+    } finally {
+      await chrome.close();
+      activeChrome = null;
+    }
     const loaded = server.documents() > before;
     let status = "inconclusive";
     if (loaded && code === 0 && end?.status === "passed") status = "pass";
@@ -150,9 +175,12 @@ async function main() {
       objective: task,
       steps,
     };
+    if (storage) result.storage = storage;
     if (result.session) {
-      result.shot = attachShot(result.session, run, name);
-      result.consoleErrors = consoleErrors(result.session);
+      result.shot = attachShot(result.session, run, name, end?.session_dir);
+      result.consoleErrors = consoleErrors(result.session, end?.session_dir);
+      const pack = packPath(result.session, end?.session_dir);
+      if (pack) sessionPacks.push(pack);
     }
     results.push(result);
     await writeReport(run, { promise: state.promise, url, results });
@@ -222,6 +250,61 @@ async function main() {
   }
   try {
     process.exitCode = await rehearse();
+    let evidencePack;
+    let policyVerdict;
+    // Merge the checks' sealed Kane CLI .evidence packs into one bundle (and judge --policy gates when requested).
+    if (sessionPacks.length) {
+      const mergedOut = join(run, "rehearsal.evidence");
+      const mergeArgs = [
+        "evidence",
+        "merge",
+        ...sessionPacks,
+        "--run-id",
+        basename(run),
+        "-o",
+        mergedOut,
+        "--title",
+        `Returner: ${state.promise}`,
+        "--json",
+        ...policyFiles.flatMap((p) => ["--policy", p]),
+      ];
+      const merged = spawnSync("kane-cli", mergeArgs, {
+        encoding: "utf8",
+        env: { KANE_CLI_USER_AGENT: "returner", ...process.env },
+      });
+      if (existsSync(mergedOut)) {
+        evidencePack = "rehearsal.evidence";
+        console.log("Sealed Kane CLI evidence pack: " + mergedOut);
+      }
+      if (policyFiles.length) {
+        let parsed;
+        try { parsed = JSON.parse(merged.stdout || "{}"); } catch {}
+        const v = parsed?.verdict;
+        if (v?.result) {
+          policyVerdict = {
+            result: v.result,
+            exitCode: v.exit_code,
+            policies: (v.policies || []).map((p) => ({
+              id: p.id,
+              result: p.result,
+              failedGates: p.failed_gate_ids || [],
+              erroredGates: p.errored_gate_ids || [],
+            })),
+          };
+          console.log("Kane CLI policy verdict: " + v.result);
+          if (process.exitCode === 0) {
+            if (v.result === "fail") process.exitCode = 1;
+            else if (v.result !== "pass") process.exitCode = 2;
+          }
+        } else {
+          console.error("Kane CLI policy could not be evaluated against the merged evidence pack.");
+          if (process.exitCode === 0) process.exitCode = 2;
+        }
+      }
+    } else if (policyFiles.length) {
+      console.error("No sealed Kane CLI evidence packs were produced to judge against --policy.");
+      if (process.exitCode === 0) process.exitCode = 2;
+    }
     // The report's verdict is the CLI's verdict; reports written mid-run are marked in progress.
     const verdict = { 0: "pass", 1: "fail", 2: "inconclusive" }[process.exitCode] ?? "inconclusive";
     let replay;
@@ -233,7 +316,7 @@ async function main() {
       const rel = (p) => relative(process.cwd(), p) || ".";
       replay = ["node", rel(resolve(process.argv[1])), "--replay", rel(baseline), "--new", isUrl(args.new) ? args.new : rel(resolve(args.new))].map(quote).join(" ");
     }
-    await writeReport(run, { promise: state.promise, url, results, verdict, replay });
+    await writeReport(run, { promise: state.promise, url, results, verdict, replay, evidencePack, policyVerdict });
   } catch (error) {
     console.error(error.message);
     process.exitCode = 2;

@@ -1,0 +1,20 @@
+policy: returner-release-gate
+requires:
+  catalog: kane-cli
+  version: ">=1"
+gates:
+  - id: no-failed-checks
+    metric: totals.failed
+    equals: 0
+    severity: blocking
+    message: Every release check (baseline, new user, returning user) must pass.
+  - id: no-broken-checks
+    metric: totals.broken
+    equals: 0
+    severity: blocking
+    message: No release check may end in a broken or inconclusive state.
+  - id: every-check-asserts
+    metric: metrics.tests_without_checks
+    equals: 0
+    severity: blocking
+    message: Every rehearsal check must verify an observable outcome.

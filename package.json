@@ -9,6 +9,7 @@
   },
   "files": [
     "src/",
+    "policies/",
     "README.md",
     "LICENSE"
   ],

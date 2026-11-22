@@ -36,6 +36,8 @@ const loops = [
   { id: "quillpad", title: "Quillpad: a running server app", tag: "Our fixture · server-rendered, proxied at one origin", change: "v1 → v2, draft cookie format changed", agent: "Codex",
     note: "Our own fixture, not an upstream bug: the first case where Returner proxies a running server instead of serving a static build. The agent also received the app server's stack trace. One uninterrupted run, and a fresh rehearsal with a new marker confirmed the patch.",
     server: "evidence/quillpad-server-v1-to-v2/server.log",
+    fresh: "evidence/quillpad-server-v1-to-v2/fresh",
+    repairReport: "evidence/quillpad-server-v1-to-v2/repair-report.html",
     before: "evidence/quillpad-server-v1-to-v2/before", after: "evidence/quillpad-server-v1-to-v2/after", diff: "evidence/quillpad-server-v1-to-v2/repair.diff" },
   { id: "fieldnotes", title: "Fieldnotes", tag: "Our fixture · storage key deliberately renamed", change: "v1 → v2", agent: "Codex", before: "evidence/fieldnotes-before", after: "evidence/fieldnotes-after",
     fixture: ["examples/draft/v2-broken/draft.js", "examples/draft/v2/draft.js"] },
@@ -62,7 +64,7 @@ function strip(l) {
   return `<section class="loop" id="${l.id}">
   <header class="lh"><div><p class="tag">${esc(l.tag)}</p><h2>${esc(l.title)}</h2>
   <p class="sub">${esc(l.change)}${l.issue ? ` · <a href="${l.issue[1]}">${esc(l.issue[0])}</a>` : ""} · repaired by ${esc(l.agent)}</p></div>
-  <p class="links"><a href="${l.before}/report.html">Before report</a><a href="${l.after}/report.html">After report</a>${l.diff ? `<a href="https://github.com/fexx301/returner/blob/main/${l.diff}">Full patch</a>` : `<a href="https://github.com/fexx301/returner/tree/main/examples/draft">Fixture source</a>`}</p></header>
+  <p class="links"><a href="${l.before}/report.html">Before report</a><a href="${l.after}/report.html">After report</a>${l.fresh ? `<a href="${l.fresh}/report.html">Fresh rehearsal</a>` : ""}${l.repairReport ? `<a href="${l.repairReport}">Repair report</a>` : ""}${l.diff ? `<a href="https://github.com/fexx301/returner/blob/main/${l.diff}">Full patch</a>` : `<a href="https://github.com/fexx301/returner/tree/main/examples/draft">Fixture source</a>`}</p></header>
   ${l.note ? `<p class="note">${esc(l.note)}</p>` : ""}
   <ol class="steps">
     <li class="step fail"><span class="n">1</span><h3>Returning user fails</h3>${shot(l.before, fail)}<p>${esc(clip(serverLine ? `Server: ${serverLine}` : consoleLine ? `Console: ${consoleLine}` : failLine(fail), 150))}</p></li>
@@ -154,7 +156,7 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 <figure style="margin:0"><div class="frame"><div class="fbar"><i></i><i></i><i></i><span>examples/pkimm/run.sh codex · recorded</span></div><a href="https://youtu.be/iPpaQIgh1KI?t=173"><img src="docs/loop.gif" alt="A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes"></a></div>
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
-<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>4</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
+<div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>${loops.length}</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
 <nav class="jump" aria-label="Jump to a loop" id="loops"><a href="#pkimm">PKI Consortium #148</a><a href="#recorded-run">Recorded Codex run</a><a href="#rackula">Rackula #935</a><a href="#quillpad">Quillpad server app</a><a href="#fieldnotes">Fieldnotes fixture</a><a href="#deckmark">DeckMark clean upgrade</a></nav>
 ${loops.map(strip).join("\n")}
 <section class="loop" id="deckmark"><header class="lh"><div><p class="tag">Clean upgrade · unmodified upstream builds</p><h2>DeckMark v2.5.3 → v2.5.4</h2><p class="sub">An open-source Markdown editor: the returning user's note survives</p></div><p class="links"><a href="evidence/deckmark-2.5.3-to-2.5.4/report.html">Report</a></p></header>

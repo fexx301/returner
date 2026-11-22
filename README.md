@@ -50,7 +50,7 @@ Then open a real regression, [PKI Consortium #148: before](https://fexx301.githu
 | **Clean upgrade:** DeckMark v2.5.3 → v2.5.4, unmodified upstream builds | Pass | Pass: original note opened, edited and reloaded | [report](https://fexx301.github.io/returner/evidence/deckmark-2.5.3-to-2.5.4/report.html) |
 | **Fixture:** Fieldnotes, storage key deliberately renamed in v2 | Pass | Fail → **Pass** after Codex repair | [before](https://fexx301.github.io/returner/evidence/fieldnotes-before/report.html) · [after](https://fexx301.github.io/returner/evidence/fieldnotes-after/report.html) · [one command](evidence/one-command-repair.json) |
 
-Every browser observation comes from Kane. Report links open the rendered `report.html` (objectives, verdicts and Kane's step logs); the JSON sits next to each one. Method and disclosures: [PKIMM](evidence/pkimm-1.0.0-to-1.1.0/README.md), [Rackula](evidence/rackula-0.6.16-to-0.7.0-dev/README.md).
+Every browser observation comes from Kane. Report links open the rendered `report.html` (objectives, verdicts and Kane's step logs); the JSON sits next to each one. Method and disclosures: [PKIMM](evidence/pkimm-1.0.0-to-1.1.0/README.md), [Rackula](evidence/rackula-0.6.16-to-0.7.0-dev/README.md), [Quillpad](evidence/quillpad-server-v1-to-v2/README.md).
 
 ## How it works
 
@@ -126,8 +126,9 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 | `2` | Not enough evidence: a failed baseline, an interrupted runner, an occupied replay port or a missing document request |
 
 - `returner.mjs --replay <run-dir> --new <build>`: reruns the new-user and returning-user checks from a saved baseline, with the same port, marker, objective and untouched v1 profile. A failed rehearsal prints the exact replay command.
-- `repair.mjs` writes `attempt-N.json` per attempt and `repair.diff` on success. `--reference <file>` gives the agent read-only material from the previous release, and `--note` adds context.
-- Reports go to `report.json` and `report.html` in each run directory. Keep run directories local, because they hold browser profiles, and share only the reports.
+- `returner.mjs --policy policies/release-gate.yaml`: lints the Kane CLI policy up front, merges the rehearsal's sealed `.evidence` packs into `rehearsal.evidence` (viewable with `kane-cli evidence serve`), and judges the merged pack against the policy gates.
+- `repair.mjs` writes `attempt-N.json`, `prompt-N.txt` (marker redacted), `repair.diff` on success, and a self-contained `repair-report.html` showing the full 4-step closed loop. `--reference <file>` gives the agent read-only material from the previous release, and `--note` adds context.
+- Reports go to `report.json` and `report.html` in each run directory, including a CDP browser-state X-ray of observed `localStorage`, cookie and `IndexedDB` key names (names only, never values). Keep run directories local, because they hold browser profiles, and share only the reports.
 
 ## Limitations
 
