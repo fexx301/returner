@@ -11,15 +11,17 @@ import { fileURLToPath } from "node:url";
 import { isUrl } from "./server.mjs";
 import { describeStorage } from "./report.mjs";
 import { writeRepairReport } from "./repair-report.mjs";
+import { loadConfig, mergeOptions } from "./config.mjs";
 
 const cli = fileURLToPath(new URL("./returner.mjs", import.meta.url));
 let a;
 try {
-  ({ values: a } = parseArgs({
+  const parsed = parseArgs({
     options: {
+      config: { type: "string" },
       old: { type: "string" },
       source: { type: "string" },
-      serve: { type: "string", default: "." },
+      serve: { type: "string" },
       build: { type: "string" },
       start: { type: "string" },
       promise: { type: "string" },
@@ -27,14 +29,20 @@ try {
       check: { type: "string" },
       "holdout-seed": { type: "string" },
       "holdout-check": { type: "string" },
-      "holdout-secret": { type: "string", multiple: true, default: [] },
-      "holdout-field": { type: "string", multiple: true, default: [] },
-      agent: { type: "string", default: "codex" },
-      attempts: { type: "string", default: "3" },
-      note: { type: "string", default: "" },
-      reference: { type: "string", multiple: true, default: [] },
+      "holdout-secret": { type: "string", multiple: true },
+      "holdout-field": { type: "string", multiple: true },
+      agent: { type: "string" },
+      attempts: { type: "string" },
+      note: { type: "string" },
+      reference: { type: "string", multiple: true },
     },
-  }));
+  }).values;
+  const cfg = parsed.config ? loadConfig(parsed.config) : {};
+  a = mergeOptions(
+    { serve: ".", agent: "codex", attempts: "3", note: "", reference: [], "holdout-secret": [], "holdout-field": [] },
+    cfg,
+    parsed,
+  );
 } catch (error) {
   a = { error: error.message }; // reported with the usage by main(), exit 2
 }
@@ -45,6 +53,7 @@ const AGENTS = {
 };
 const usage =
   'returner-repair --old ./v1-build --source ./v2-source [--build "npm run build"] [--serve dist] --promise "…" [--seed …] [--check …] [--agent codex|claude] [--attempts 3]\n' +
+  'Or via config file: returner-repair --config returner.json [--agent codex|claude] [--attempts 3]\n' +
   'Running apps: --old http://127.0.0.1:4001 --start "PORT=4002 node server.mjs" --serve http://127.0.0.1:4002 (the candidate is started for every check)';
 
 const cleanups = new Set();

@@ -10,13 +10,15 @@ import { isUrl, serve } from "./server.mjs";
 import { openChrome } from "./chrome.mjs";
 import { writeReport } from "./report.mjs";
 import { attachShot, consoleErrors, packPath } from "./shots.mjs";
+import { loadConfig, mergeOptions } from "./config.mjs";
 
 const usage =
-  'returner --old ./v1 --new ./v2 --promise "my draft survives" [--policy policies/release-gate.yaml]\nreturner --old ./v1 --seed-only --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
+  'returner --old ./v1 --new ./v2 --promise "my draft survives" [--policy policies/release-gate.yaml]\nreturner --config returner.json [--new ./v2]\nreturner --old ./v1 --seed-only --promise "my draft survives"\nreturner --replay <run-directory> --new ./fixed-v2\n--old and --new take a static build folder or the URL of a running app (http://127.0.0.1:4001).';
 let args;
 try {
-  ({ values: args } = parseArgs({
+  const parsed = parseArgs({
     options: {
+      config: { type: "string" },
       old: { type: "string" },
       new: { type: "string" },
       promise: { type: "string" },
@@ -24,10 +26,12 @@ try {
       check: { type: "string" },
       replay: { type: "string" },
       "seed-only": { type: "boolean" },
-      policy: { type: "string", multiple: true, default: [] },
+      policy: { type: "string", multiple: true },
       help: { type: "boolean" },
     },
-  }));
+  }).values;
+  const cfg = parsed.config ? loadConfig(parsed.config) : {};
+  args = mergeOptions({ policy: [] }, cfg, parsed);
 } catch (error) {
   // A usage mistake is never a regression verdict: exit 2, not 1.
   console.error(error.message + "\n" + usage);
@@ -280,7 +284,11 @@ async function main() {
       }
       if (policyFiles.length) {
         let parsed;
-        try { parsed = JSON.parse(merged.stdout || "{}"); } catch {}
+        const rawOut = (merged.stdout || "").trim();
+        try { parsed = JSON.parse(rawOut); } catch {
+          const line = rawOut.split("\n").reverse().find((l) => l.trim().startsWith("{"));
+          if (line) try { parsed = JSON.parse(line); } catch {}
+        }
         const v = parsed?.verdict;
         if (v?.result) {
           policyVerdict = {

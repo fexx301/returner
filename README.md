@@ -85,6 +85,8 @@ npm install -g @testmuai/kane-cli && kane-cli login
 
 ```sh
 node src/returner.mjs --old ./v1 --new ./v2 --promise "My draft survives the release"
+# Or from a returner.json config file (see examples/draft/returner.json and examples/pkimm/returner.json):
+node src/returner.mjs --config examples/draft/returner.json
 # Or two running servers, proxied through Returner's one localhost origin:
 node src/returner.mjs --old http://127.0.0.1:4001 --new http://127.0.0.1:4002 --promise "My draft survives the release"
 ```
@@ -92,7 +94,7 @@ node src/returner.mjs --old http://127.0.0.1:4001 --new http://127.0.0.1:4002 --
 Or skip the clone and run it straight from GitHub:
 
 ```sh
-npx github:fexx301/returner --old ./v1 --new ./v2 --promise "My draft survives the release"
+npx github:fexx301/returner --config returner.json
 ```
 
 The default task creates and reopens a draft with a title and body. For other apps, describe the task with `--seed` (create the saved work) and `--check` (what a returning user must still find). Returner fills in a fresh `{title}` and `{body}` marker on every run.
@@ -120,9 +122,7 @@ node src/repair.mjs --old ./v1-build --source ./v2-source --build "npm run build
 ```yaml
 - uses: fexx301/returner@main
   with:
-    old: previous-build   # build the previous release here in an earlier step
-    new: dist
-    promise: My draft survives the release
+    config: returner.json   # or pass old / new / promise / policy directly
     testmu-username: ${{ secrets.LT_USERNAME }}
     testmu-access-key: ${{ secrets.LT_ACCESS_KEY }}
 ```
@@ -137,6 +137,7 @@ The action installs a pinned kane-cli and runs headless Chrome. It posts the ver
 | `1` | A release check failed its assertion (the returning-user regression) |
 | `2` | Not enough evidence: a failed baseline, an interrupted runner, an occupied replay port or a missing document request |
 
+- `returner.mjs --config returner.json` / `repair.mjs --config returner.json`: loads shared paths, objectives, `holdout` profile settings, and `--policy` gates from JSON (relative paths resolve from the config file; explicit CLI flags override it). See [examples/draft/returner.json](examples/draft/returner.json) and [examples/pkimm/returner.json](examples/pkimm/returner.json).
 - `returner.mjs --replay <run-dir> --new <build>`: reruns the new-user and returning-user checks from a saved baseline, with the same port, marker, objective and untouched v1 profile. A failed rehearsal prints the exact replay command.
 - `returner.mjs --policy policies/release-gate.yaml`: lints the Kane CLI policy up front, merges the rehearsal's sealed `.evidence` packs into `rehearsal.evidence` (viewable with `kane-cli evidence serve`), and judges the merged pack against the policy gates.
 - `repair.mjs` writes `attempt-N.json`, `prompt-N.txt` (marker redacted), `repair.diff` on success, and a self-contained `repair-report.html` showing the full 4-step closed loop. `--reference <file>` gives the agent read-only material from the previous release, `--note` adds context, and optional `--holdout-seed` / `--holdout-check` (with `--holdout-secret` and `--holdout-field`) replays a second isolated returning-user profile whose expected values stay outside the agent's workspace and prompt.

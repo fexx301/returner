@@ -4,15 +4,18 @@ branding:
   icon: rotate-ccw
   color: green
 inputs:
+  config:
+    description: Optional JSON config file (returner.json). Explicit action inputs override config values.
+    required: false
   old:
-    description: Directory with the previous release's static build.
-    required: true
+    description: Directory with the previous release's static build, or URL of a running app (required unless set in config).
+    required: false
   new:
-    description: Directory with the candidate release's static build.
-    required: true
+    description: Directory with the candidate release's static build, or URL of a running app (required unless set in config).
+    required: false
   promise:
-    description: What a returning user depends on, in plain English.
-    required: true
+    description: What a returning user depends on, in plain English (required unless set in config).
+    required: false
   seed:
     description: Kane objective that creates saved work on the old build. {title} and {body} are replaced with a random marker. Defaults to Returner's draft objective.
     required: false
@@ -68,6 +71,7 @@ runs:
       id: rehearse
       shell: bash
       env:
+        CONFIG: ${{ inputs.config }}
         OLD: ${{ inputs.old }}
         NEW: ${{ inputs.new }}
         PROMISE: ${{ inputs.promise }}
@@ -75,7 +79,11 @@ runs:
         CHECK: ${{ inputs.check }}
         POLICY: ${{ inputs.policy }}
       run: |
-        args=(--old "$OLD" --new "$NEW" --promise "$PROMISE")
+        args=()
+        [ -n "$CONFIG" ] && args+=(--config "$CONFIG")
+        [ -n "$OLD" ] && args+=(--old "$OLD")
+        [ -n "$NEW" ] && args+=(--new "$NEW")
+        [ -n "$PROMISE" ] && args+=(--promise "$PROMISE")
         [ -n "$SEED" ] && args+=(--seed "$SEED")
         [ -n "$CHECK" ] && args+=(--check "$CHECK")
         [ -n "$POLICY" ] && args+=(--policy "$POLICY")

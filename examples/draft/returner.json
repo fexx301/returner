@@ -1,0 +1,8 @@
+{
+  "old": "./v1",
+  "new": "./v2",
+  "promise": "My draft survives the release",
+  "policy": [
+    "../../policies/release-gate.yaml"
+  ]
+}
