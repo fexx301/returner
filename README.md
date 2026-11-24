@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/fexx301/returner/actions/workflows/test.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/test.yml) [![Returner demo](https://github.com/fexx301/returner/actions/workflows/returner.yml/badge.svg)](https://github.com/fexx301/returner/actions/workflows/returner.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**Release checks for the people who come back.** · **[Try it live in your browser →](https://fexx301.github.io/returner/try/)** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
+**Release checks for the people who come back.** · **[Try it live in your browser →](https://fexx301.github.io/returner/try/)** · **[All 6 closed loops →](https://fexx301.github.io/returner/)** · **[For judges](#for-judges)**
 
 [![A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/i8QzMHhWfew?t=107)
 
@@ -16,6 +16,18 @@ Returner rehearses a release as both users. It uses real Chrome, driven by [Kane
 - **A side-by-side verdict.** On the new build at the same address, a new user and the returning user run the same task.
 - **A closed repair loop.** Kane's failure goes to Codex or Claude Code. The agent patches a disposable copy, Returner rebuilds it, and Kane replays the returning user from the same snapshot until it passes or the attempts run out. The agent never grades its own fix.
 - **Runs locally or in CI.** It's one Node CLI with zero package dependencies, and it also ships as a GitHub Action.
+
+## For judges
+
+| Rubric | One-click proof |
+| --- | --- |
+| **Bar 1: works end to end** | [4-min video](https://youtu.be/i8QzMHhWfew) · [Interactive `/try/` demo](https://fexx301.github.io/returner/try/) (30 s, no account) · [Live `ubuntu-latest` CI run](https://github.com/fexx301/returner/actions/runs/45484890341) |
+| **Bar 2: Kane caught or proved something** | Two real OSS regressions ([PKIMM #148](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/before/report.html), [Rackula #935](https://fexx301.github.io/returner/evidence/rackula-0.6.16-to-0.7.0-dev/before/report.html)), one clean OSS upgrade ([DeckMark](https://fexx301.github.io/returner/evidence/deckmark-2.5.3-to-2.5.4/report.html)), one proxied SSR cookie `500` ([Quillpad](https://fexx301.github.io/returner/evidence/quillpad-server-v1-to-v2/before/report.html)) |
+| **Bar 3: agent ↔ Kane talked** | [PKIMM two-profile Codex loop](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/two-profile/codex-repair/repair-report.html) (attempt 1 rejected → redacted `prompt-2.txt` → attempt 2 passed) · [Quillpad server stack-trace fix](https://fexx301.github.io/returner/evidence/quillpad-server-v1-to-v2/repair-report.html) |
+| **Ships** | Zero-dep Node 22 CLI (`npx github:fexx301/returner --config returner.json`), [GitHub Action](action.yml), static builds & proxied running apps (`--start`), 18/18 green CI tests |
+| **Verified** *(tie-breaker 1)* | [Rejected deliberate `3/4/2` negative control](https://fexx301.github.io/returner/evidence/pkimm-1.0.0-to-1.1.0/two-profile/negative-control/repair-report.html) (`exit 1` on holdout Profile B) · strict `exit 2` inconclusive handling · `kane-cli evidence merge` + `--policy` live in CI ([run 45484890341](https://github.com/fexx301/returner/actions/runs/45484890341)) |
+| **Closed loop** *(tie-breaker 2)* | Zero agent self-grading · marker redaction · isolated holdout profile (field-name-only failure feedback) · `.evidence` console extraction · CDP storage-key X-ray · Returner-owned Chrome (`--cdp-endpoint` + `Browser.close` cookie fix) |
+| **Craft** | Zero npm dependencies · shared `--config returner.json` ([draft](examples/draft/returner.json), [pkimm](examples/pkimm/returner.json)) · self-contained HTML reports · `npm test` (18 contract tests, 0 credits) · honest [Limitations](#limitations) |
 
 ## Try it
 
