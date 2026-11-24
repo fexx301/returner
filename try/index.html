@@ -99,14 +99,14 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
 </head>
 <body>
 <header class="site"><div class="siteinner"><a class="logo" href="../"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a>
-<nav class="sitenav" aria-label="Site"><a href="../" class="keep">Results</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a><a href="https://github.com/fexx301/returner">GitHub</a><span class="here" aria-current="page">Live demo</span></nav></div></header>
+<nav class="sitenav" aria-label="Site"><a href="../" class="keep">Results</a><a href="https://youtu.be/i8QzMHhWfew">Video</a><a href="https://github.com/fexx301/returner">GitHub</a><span class="here" aria-current="page">Live demo</span></nav></div></header>
 <main class="wrap">
   <p class="brand">Live demo · real builds · your browser</p>
 
   <h1>Be yesterday's user.</h1>
   <p class="lede">Below are the <b>real builds</b> of a small draft editor: version 1, a broken version 2 and a repaired version 2. They run at the same address, so they share <b>your browser's storage</b>, just like an app you upgrade in place. Save a draft, ship the upgrade and see what a returning user sees. This is the check Returner automates with Kane CLI in real Chrome.</p>
 
-  <div id="warn" class="warn" role="alert"><strong>Your browser is blocking storage for this page</strong> (for example a private window or strict tracking protection). The demo app saves drafts in localStorage, so it can't remember anything here. Try a normal window, or watch the <a href="https://youtu.be/iPpaQIgh1KI?t=28">recorded walkthrough</a>.</div>
+  <div id="warn" class="warn" role="alert"><strong>Your browser is blocking storage for this page</strong> (for example a private window or strict tracking protection). The demo app saves drafts in localStorage, so it can't remember anything here. Try a normal window, or watch the <a href="https://youtu.be/i8QzMHhWfew?t=25">4-minute walkthrough</a>.</div>
 
   <ol class="rail" aria-label="Demo steps">
     <li id="r1" class="now"><span class="dot">1</span>Yesterday: save a draft on v1</li>
@@ -160,7 +160,7 @@ footer{margin-top:34px;color:var(--muted);font-size:13px;max-width:80ch}
 
   <section class="after" aria-label="Go further">
     <a href="../"><b>Two real regressions →</b><span>PKI Consortium and Rackula, each with Kane's screenshots, the agent's patch and the passing replay.</span></a>
-    <a href="https://youtu.be/iPpaQIgh1KI?t=173"><b>A 20-minute repair, recorded →</b><span>Kane finds the bug, Codex patches it, Kane replays the saved profile, sped up 50×.</span></a>
+    <a href="https://youtu.be/i8QzMHhWfew?t=107"><b>PKI Consortium #148: two-profile repair →</b><span>Fake 3/4/2 patch rejected on holdout Profile B; genuine Codex fix passes both.</span></a>
     <div class="runit"><b>Run it on your builds</b><code id="npx">npx github:fexx301/returner --old ./v1 --new ./v2 --promise "my work survives"</code><div class="actions" style="margin-top:10px"><button type="button" id="copy">Copy command</button><a href="https://github.com/fexx301/returner#try-it" style="font-size:14px;align-self:center">How it works →</a></div><span class="sr" id="copied" aria-live="polite"></span></div>
   </section>
 

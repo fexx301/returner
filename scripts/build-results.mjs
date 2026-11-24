@@ -151,15 +151,15 @@ pre{margin:0;background:var(--code);color:var(--codeink);border-radius:8px;paddi
 @media (max-width:620px){.stats{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cta a{flex:1 1 auto;text-align:center}.sitenav a:not(.go):not(.keep){display:none}.siteinner{padding:10px 16px}.steps{grid-template-columns:1fr;gap:22px}.step:not(:last-child)::after{content:"↓";display:block;right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%);padding:0 6px}.clean{grid-template-columns:1fr}.wrap{padding:32px 16px 56px}}
 </style></head><body>
 <header class="site"><div class="siteinner"><a class="logo" href="./"><span class="mk"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 17l6 6 12-15" stroke="#3fbf75" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Returner</a>
-<nav class="sitenav" aria-label="Site"><a href="#loops" class="keep">Results</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a><a href="https://github.com/fexx301/returner">GitHub</a><a class="go" href="try/">Try it live</a></nav></div></header>
+<nav class="sitenav" aria-label="Site"><a href="#loops" class="keep">Results</a><a href="https://youtu.be/i8QzMHhWfew">Video</a><a href="https://github.com/fexx301/returner">GitHub</a><a class="go" href="try/">Try it live</a></nav></div></header>
 <main class="wrap">
 <div class="hero"><div>
 <p class="kicker">Built with Kane CLI · Kane CLI Online Hackathon</p>
 <h1>Release checks for the people who come back.</h1>
 <p class="lede">Browser tests start with an empty profile, so they only meet new users. Returner rehearses each release as a new user and as a returning user with yesterday's saved work, in real Chrome via Kane CLI. When the returning user breaks, a coding agent repairs it, and Kane replays the exact same saved profile to decide.</p>
-<p class="cta"><a class="primary" href="try/">Try it live in your browser →</a><a href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/iPpaQIgh1KI">Watch the video (4 min)</a></p>
+<p class="cta"><a class="primary" href="try/">Try it live in your browser →</a><a href="https://github.com/fexx301/returner">Repository</a><a href="https://youtu.be/i8QzMHhWfew">Watch the video (4 min)</a></p>
 </div>
-<figure style="margin:0"><div class="frame"><div class="fbar"><i></i><i></i><i></i><span>examples/pkimm/run.sh codex · recorded</span></div><a href="https://youtu.be/iPpaQIgh1KI?t=173"><img src="docs/loop.gif" alt="A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes"></a></div>
+<figure style="margin:0"><div class="frame"><div class="fbar"><i></i><i></i><i></i><span>examples/pkimm/run.sh codex · recorded</span></div><a href="https://youtu.be/i8QzMHhWfew?t=107"><img src="docs/loop.gif" alt="A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes"></a></div>
 <figcaption class="figcap">One real, uninterrupted 20-minute repair, condensed to 15 seconds. Kane fails the returning user, Codex patches, Kane's replay passes.</figcaption></figure>
 </div>
 <div class="stats"><div><b>2</b><span>real regressions reproduced</span></div><div><b>${loops.length}</b><span>closed loops: fail → patch → pass</span></div><div><b>1</b><span>clean real upgrade confirmed</span></div><div><b>0</b><span>agent self-grading: Kane's replay decides</span></div></div>
@@ -173,7 +173,7 @@ ${loops.map(strip).join("\n")}
 <li>Repairs map these specific data changes; upstream projects later shipped general migrations. Method and disclosures are in each evidence folder.</li>
 </ul>
 </main>
-<footer class="sitefoot"><div class="footinner"><span>Returner · built for the Kane CLI Online Hackathon by TestMu AI · MIT licensed</span><nav aria-label="Footer"><a href="try/">Try it live</a><a href="https://youtu.be/iPpaQIgh1KI">Video</a><a href="https://github.com/fexx301/returner">GitHub</a></nav></div></footer>
+<footer class="sitefoot"><div class="footinner"><span>Returner · built for the Kane CLI Online Hackathon by TestMu AI · MIT licensed</span><nav aria-label="Footer"><a href="try/">Try it live</a><a href="https://youtu.be/i8QzMHhWfew">Video</a><a href="https://github.com/fexx301/returner">GitHub</a></nav></div></footer>
 </body></html>`;
 writeFileSync(join(root, "index.html"), page);
 console.log("wrote index.html");

@@ -4,9 +4,9 @@
 
 **Release checks for the people who come back.** · **[Try it live in your browser →](https://fexx301.github.io/returner/try/)** · **[See every closed loop on one page →](https://fexx301.github.io/returner/)**
 
-[![A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/iPpaQIgh1KI?t=173)
+[![A recorded 20-minute run, condensed: the returning user fails on a blank page, Codex patches it, and Kane's replay from the same saved profile passes](docs/loop.gif)](https://youtu.be/i8QzMHhWfew?t=107)
 
-<sub>One real, uninterrupted 20-minute run (PKI Consortium #148), condensed to 15 seconds (about 81×) from its timestamped terminal output. Click for the narrated walkthrough, which shows it at 50×.</sub>
+<sub>One real, uninterrupted 20-minute run (PKI Consortium #148), condensed to 15 seconds (about 81×) from its timestamped terminal output. Click to watch the 4-minute walkthrough.</sub>
 
 Browser tests usually start with an empty profile, so they only ever meet new users. The bugs that hurt returning users never show up there. A renamed storage key, a changed data model or a migration that forgets old saves can each lose or break the work people already have.
 
@@ -35,7 +35,7 @@ Then open a real regression, [PKI Consortium #148: before](https://fexx301.githu
 
 ## Watch the walkthrough
 
-**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/iPpaQIgh1KI)**. It covers the planted bug, two real regressions (PKI Consortium and Rackula), an uninterrupted Codex run at 50× and the GitHub Action on a real runner. Jump straight to the closed loop: [Kane's finding → Codex → replay (1:22)](https://youtu.be/iPpaQIgh1KI?t=82) · [an uninterrupted recorded run at 50× (2:53)](https://youtu.be/iPpaQIgh1KI?t=173).
+**[▶ Watch the 4-minute walkthrough on YouTube](https://youtu.be/i8QzMHhWfew)**. It covers the Fieldnotes loop, the PKI Consortium #148 two-profile holdout check (deliberate `3/4/2` negative control rejected + genuine Codex repair), Quillpad's proxied server app and Chrome `Browser.close` cookie fix, `--config` + `--policy` on GitHub Actions, and Rackula #935. Jump straight to: [two-profile holdout & negative control (1:47)](https://youtu.be/i8QzMHhWfew?t=107) · [running server app & cookie fix (3:10)](https://youtu.be/i8QzMHhWfew?t=190) · [policy gates & GitHub Actions (3:34)](https://youtu.be/i8QzMHhWfew?t=214).
 
 ## Proof
 
